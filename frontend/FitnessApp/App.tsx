@@ -1,11 +1,15 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ThemeProvider, Button, Input, Text } from "react-native-elements";
+import useSWR from "swr";
 
 export default function App() {
-  const [message, setMessage] = useState("");
+  const [userInput, setUserInput] = useState("");
+
+  const { message, isLoading } = useHelloWorld();
+  const [isVisibleHelloWorld, setIsVisibleHelloWorld] = useState(true);
 
   return (
     <SafeAreaProvider>
@@ -15,17 +19,32 @@ export default function App() {
           <LineBreak />
           <StatusBar style="auto" />
           <Input
-            placeholder="Your Message Here"
-            value={message}
-            onChangeText={setMessage}
+            placeholder="Your Input Here"
+            value={userInput}
+            onChangeText={setUserInput}
           />
           <Button
             raised
-            onPress={() => console.log("hi")}
+            onPress={() => setIsVisibleHelloWorld(!isVisibleHelloWorld)}
             title="Press Me"
             buttonStyle={styles.testButton}
             titleStyle={styles.title}
           />
+          {isVisibleHelloWorld && (
+            <View
+              style={{
+                borderWidth: 1,
+                margin: "5%",
+                padding: "5%",
+                width: "80%",
+                alignItems: "center",
+              }}
+            >
+              <Text h1 style={{ color: "red" }}>
+                {isLoading ? "Loading..." : message}
+              </Text>
+            </View>
+          )}
         </View>
       </ThemeProvider>
     </SafeAreaProvider>
@@ -51,3 +70,23 @@ const styles = StyleSheet.create({
 const LineBreak = () => {
   return <Text>{"\n"}</Text>;
 };
+
+const useHelloWorld = () => {
+  const { data, error, isValidating, mutate } = useSWR<HelloWorldType, string>(
+    "https://jsonplaceholder.typicode.com/users/1",
+    fetcher
+  );
+
+  return {
+    message: data ? data.address.city : null,
+    isLoading: !data && !error,
+    isError: error,
+  };
+};
+
+type HelloWorldType = {
+  address: { city: string };
+};
+
+const fetcher = (...args: Parameters<typeof fetch>) =>
+  fetch(...args).then((res) => res.json());
