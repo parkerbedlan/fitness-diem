@@ -1,20 +1,34 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
-import { StyleSheet, Text, View, TextInput } from "react-native";
+import { StyleSheet, View } from "react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { ThemeProvider, Button, Input, Text } from "react-native-elements";
 
 export default function App() {
-  const [message, setMessage] = useState("Your Message Here");
+  const [message, setMessage] = useState("");
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome to Fitness Dium!</Text>
-      <StatusBar style="auto" />
-      <TextInput
-        style={styles.input}
-        value={message}
-        onChangeText={setMessage}
-      />
-    </View>
+    <SafeAreaProvider>
+      <ThemeProvider>
+        <View style={styles.container}>
+          <Text style={styles.title}>Welcome to Fitness Dium!</Text>
+          <LineBreak />
+          <StatusBar style="auto" />
+          <Input
+            placeholder="Your Message Here"
+            value={message}
+            onChangeText={setMessage}
+          />
+          <Button
+            raised
+            onPress={() => console.log("hi")}
+            title="Press Me"
+            buttonStyle={styles.testButton}
+            titleStyle={styles.title}
+          />
+        </View>
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 }
 
@@ -25,13 +39,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  input: {
-    height: 40,
-    margin: 12,
-    borderWidth: 1,
-    padding: 10,
-  },
   title: {
     fontSize: 30,
   },
+  testButton: {
+    width: 200,
+    height: 100,
+  },
 });
+
+const LineBreak = () => {
+  return <Text>{"\n"}</Text>;
+};
