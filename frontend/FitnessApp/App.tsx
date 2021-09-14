@@ -16,18 +16,15 @@ export default function App() {
     <SafeAreaProvider>
       <ThemeProvider>
         <View
-          style={tw`bg-purple-50 h-full w-full flex justify-center items-center`}
+          style={tw`bg-gray-50 h-full w-full flex justify-center items-center`}
         >
-          <Text style={tw`text-3xl text-purple-800`}>
-            Welcome to Fitness Dium!
-          </Text>
+          <Text style={tw`text-3xl`}>Welcome to Fitness Dium!</Text>
           <LineBreak />
           <StatusBar style="auto" />
           <Input
             placeholder="Your Input Here"
             value={userInput}
             onChangeText={setUserInput}
-            style={tw`text-purple-800`}
           />
           <Button
             raised
@@ -46,7 +43,7 @@ export default function App() {
                 alignItems: "center",
               }}
             >
-              <Text h1 style={tw`text-purple-800`}>
+              <Text h1 style={tw`text-red-500`}>
                 {isLoading ? "Loading..." : message}
               </Text>
             </View>
@@ -83,7 +80,7 @@ const fetcher = (...args: Parameters<typeof fetch>) =>
 
 // unnecessary, just used as an example of a StyleSheet equivalent using tailwind if we end up wanting to go this route
 const twStyles = {
-  container: tw`bg-purple-50 h-full w-full flex justify-center items-center`,
+  container: tw`bg-gray-50 h-full w-full flex justify-center items-center`,
   title: tw`text-3xl`,
   testButton: tw`w-48 h-24 bg-purple-500`,
 };
