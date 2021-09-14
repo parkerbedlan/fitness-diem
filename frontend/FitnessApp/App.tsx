@@ -1,9 +1,10 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ThemeProvider, Button, Input, Text } from "react-native-elements";
 import useSWR from "swr";
+import tw from "tailwind-react-native-classnames";
 
 export default function App() {
   const [userInput, setUserInput] = useState("");
@@ -14,21 +15,26 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <ThemeProvider>
-        <View style={styles.container}>
-          <Text style={styles.title}>Welcome to Fitness Dium!</Text>
+        <View
+          style={tw`bg-purple-50 h-full w-full flex justify-center items-center`}
+        >
+          <Text style={tw`text-3xl text-purple-800`}>
+            Welcome to Fitness Dium!
+          </Text>
           <LineBreak />
           <StatusBar style="auto" />
           <Input
             placeholder="Your Input Here"
             value={userInput}
             onChangeText={setUserInput}
+            style={tw`text-purple-800`}
           />
           <Button
             raised
             onPress={() => setIsVisibleHelloWorld(!isVisibleHelloWorld)}
             title="Press Me"
-            buttonStyle={styles.testButton}
-            titleStyle={styles.title}
+            buttonStyle={tw`w-48 h-24 bg-purple-500`}
+            titleStyle={tw`text-3xl`}
           />
           {isVisibleHelloWorld && (
             <View
@@ -40,7 +46,7 @@ export default function App() {
                 alignItems: "center",
               }}
             >
-              <Text h1 style={{ color: "red" }}>
+              <Text h1 style={tw`text-purple-800`}>
                 {isLoading ? "Loading..." : message}
               </Text>
             </View>
@@ -50,22 +56,6 @@ export default function App() {
     </SafeAreaProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  title: {
-    fontSize: 30,
-  },
-  testButton: {
-    width: 200,
-    height: 100,
-  },
-});
 
 const LineBreak = () => {
   return <Text>{"\n"}</Text>;
@@ -90,3 +80,27 @@ type HelloWorldType = {
 
 const fetcher = (...args: Parameters<typeof fetch>) =>
   fetch(...args).then((res) => res.json());
+
+// unnecessary, just used as an example of a StyleSheet equivalent using tailwind if we end up wanting to go this route
+const twStyles = {
+  container: tw`bg-purple-50 h-full w-full flex justify-center items-center`,
+  title: tw`text-3xl`,
+  testButton: tw`w-48 h-24 bg-purple-500`,
+};
+
+// use inline tailwind instead https://tailwindcss.com/docs
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  title: {
+    fontSize: 30,
+  },
+  testButton: {
+    width: 200,
+    height: 100,
+  },
+});
