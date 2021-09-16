@@ -8,6 +8,8 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@react-navigation/native": "^6.0.2",
+    "@react-navigation/native-stack": "^6.1.0",
     "expo": "~42.0.1",
     "expo-status-bar": "~1.0.4",
     "formik": "^2.2.9",
@@ -17,7 +19,9 @@
     "react-native-elements": "^3.4.2",
     "react-native-web": "~0.13.12",
     "swr": "^1.0.0",
-    "tailwind-react-native-classnames": "^1.4.3"
+    "tailwind-react-native-classnames": "^1.4.3",
+    "react-native-screens": "~3.4.0",
+    "react-native-safe-area-context": "3.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",
