@@ -1,18 +1,11 @@
 import React from "react";
-import { View } from "react-native";
 import { Button, Text } from "react-native-elements";
 import CenteredContainer from "../components/CenteredContainer";
+import { useRootScreen } from "./RootScreensManager";
 
-type SignupScreenProps = {
-  navigation: any;
-  route: {
-    params: {
-      email: string;
-    };
-  };
-};
+export default function SignupScreen() {
+  const { navigation } = useRootScreen("Sign Up");
 
-export default function SignupScreen({ navigation, route }: SignupScreenProps) {
   return (
     <CenteredContainer>
       <Text h1>This is the Signup Screen.</Text>

@@ -1,4 +1,4 @@
-import { FastField, Formik } from "formik";
+import { Formik } from "formik";
 import React from "react";
 import { View } from "react-native";
 import { Input, Icon, Text, Button } from "react-native-elements";
@@ -6,15 +6,14 @@ import tw from "tailwind-react-native-classnames";
 import CenteredContainer from "../components/CenteredContainer";
 import LineBreak from "../components/LineBreak";
 import * as yup from "yup";
+import { useRootScreen } from "./RootScreensManager";
 
-type LoginScreenProps = {
-  navigation: any;
-};
+export default function LoginScreen() {
+  const { navigation } = useRootScreen("Log in");
 
-export default function LoginScreen({ navigation }: LoginScreenProps) {
-  const handleSignup = () => {
+  const handleSignup = (email?: string) => {
     console.log("signing up");
-    navigation.navigate("Sign Up");
+    navigation.navigate("Sign Up", { email });
   };
 
   return (
