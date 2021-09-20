@@ -7,12 +7,13 @@ import CenteredContainer from "../components/CenteredContainer";
 import LineBreak from "../components/LineBreak";
 import * as yup from "yup";
 import { useRootScreen } from "./RootScreensManager";
+import FormikInput from "../components/FormikInput";
+import BigButton from "../components/BigButton";
 
 export default function LoginScreen() {
   const { navigation } = useRootScreen("Log in");
 
   const handleSignup = (email?: string) => {
-    console.log("signing up");
     navigation.navigate("Sign Up", { email });
   };
 
@@ -29,43 +30,26 @@ export default function LoginScreen() {
             setSubmitting(false);
           }, 1000);
         }}
-        validationSchema={yup.object({
-          email: yup
-            .string()
-            .required("Please enter your email.")
-            .email("Invalid email"),
-          password: yup.string().required("Please enter your password."),
-        })}
+        validationSchema={yup.object(yupSchemaEmailAndPassword)}
       >
-        {({
-          values,
-          handleChange,
-          handleSubmit,
-          isSubmitting,
-          errors,
-          touched,
-        }) => (
+        {({ values, handleSubmit, isSubmitting }) => (
           <>
-            <Input
-              placeholder="john@example.com"
-              value={values.email}
-              onChangeText={handleChange("email")}
+            <FormikInput
+              name="email"
               label="Email"
+              placeholder="john@example.com"
               leftIcon={<Icon name="email" />}
-              errorMessage={touched.email ? errors.email : ""}
             />
-            <Input
-              placeholder="password123"
-              value={values.password}
-              onChangeText={handleChange("password")}
+            <FormikInput
+              name="password"
               label="Password"
-              secureTextEntry={true}
+              placeholder="password123"
               leftIcon={<Icon name="lock" />}
-              errorMessage={touched.password ? errors.password : ""}
+              secureTextEntry={true}
             />
             <LoginSignupButtonGroup
               onSubmit={handleSubmit}
-              onSignup={handleSignup}
+              onSignup={() => handleSignup(values.email)}
               version={2}
               isLoading={isSubmitting}
             />
@@ -89,14 +73,10 @@ const LoginSignupButtonGroup = ({
 }) => {
   return (
     <View style={tw`flex justify-center items-center`}>
-      <Button
-        raised
+      <BigButton
         title="Log in"
-        buttonStyle={tw`bg-purple-500 w-44 h-20`}
-        titleStyle={tw`text-3xl p-3`}
         onPress={(e) => onSubmit()}
         loading={isLoading}
-        loadingProps={{ size: "large" }}
       />
       <View style={tw`mt-1`}>
         <Button
@@ -109,4 +89,12 @@ const LoginSignupButtonGroup = ({
       </View>
     </View>
   );
+};
+
+export const yupSchemaEmailAndPassword = {
+  email: yup
+    .string()
+    .required("Please enter your email.")
+    .email("Invalid email"),
+  password: yup.string().required("Please enter your password."),
 };
