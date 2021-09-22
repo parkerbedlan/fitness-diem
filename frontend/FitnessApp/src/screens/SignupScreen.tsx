@@ -43,7 +43,7 @@ export default function SignupScreen() {
               "Your username can contain letters and numbers only."
             ),
           password: yupSchemaEmailAndPassword.password
-            // .min(8, "Password must contain at least 8 characters.")
+            .min(8, "Password must contain at least 8 characters.")
             .matches(/.*\d.*/, "Password must contain at least one number")
             .matches(
               /.*[A-Z].*/,
