@@ -9,9 +9,13 @@ import * as yup from "yup";
 import { useRootScreen } from "./RootScreensManager";
 import FormikInput from "../components/FormikInput";
 import BigButton from "../components/BigButton";
+import { useHelloQuery } from "../generated/graphql";
+import { createUrqlClient } from "../utils/createUrqlClient";
+import { withUrqlClient } from "next-urql";
 
-export default function LoginScreen() {
+const LoginScreen = () => {
   const { navigation } = useRootScreen("Log in");
+  const [{ data, fetching }] = useHelloQuery();
 
   const handleSignup = (email?: string) => {
     navigation.navigate("Sign Up", { email });
@@ -20,6 +24,13 @@ export default function LoginScreen() {
   return (
     <CenteredContainer>
       <Text style={tw`text-3xl`}>Welcome to Fitness Dium!</Text>
+      <Text style={tw`text-3xl text-red-500`}>
+        {fetching
+          ? "Loading..."
+          : data
+          ? data.hello
+          : "couldn't connect to server"}
+      </Text>
       <LineBreak />
       <Formik
         initialValues={{ email: "", password: "" }}
@@ -58,7 +69,7 @@ export default function LoginScreen() {
       </Formik>
     </CenteredContainer>
   );
-}
+};
 
 const LoginSignupButtonGroup = ({
   onSubmit,
@@ -98,3 +109,5 @@ export const yupSchemaEmailAndPassword = {
     .email("Invalid email"),
   password: yup.string().required("Please enter your password."),
 };
+
+export default withUrqlClient(createUrqlClient)(LoginScreen);
