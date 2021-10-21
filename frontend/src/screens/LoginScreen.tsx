@@ -9,7 +9,11 @@ import BigButton from "../components/BigButton";
 import CenteredContainer from "../components/CenteredContainer";
 import FormikInput from "../components/FormikInput";
 import LineBreak from "../components/LineBreak";
-import { useHelloQuery, useLoginMutation } from "../generated/graphql";
+import {
+  useHelloQuery,
+  useLoginMutation,
+  useMeQuery,
+} from "../generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
 import { HomeScreenName } from "./HomeScreen";
 import { useRootScreen } from "./RootScreensManager";
@@ -23,6 +27,7 @@ const LoginScreen = () => {
   const { navigation } = useRootScreen(LoginScreenName);
   const [{ data, fetching }] = useHelloQuery();
   const [, login] = useLoginMutation();
+  const [{ data: meData }] = useMeQuery();
 
   const handleSignup = (email?: string) => {
     navigation.navigate(SignupScreenName, { usernameOrEmail: email });
@@ -38,6 +43,7 @@ const LoginScreen = () => {
           ? data.hello
           : "couldn't connect to server"}
       </Text>
+      <Text>{meData?.me?.username}</Text>
       <LineBreak />
       <Formik
         initialValues={{ usernameOrEmail: "", password: "" }}

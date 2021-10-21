@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Button, Text } from "react-native-elements";
-import { useMeQuery } from "../generated/graphql";
+import { useLogoutMutation, useMeQuery } from "../generated/graphql";
 import CenteredContainer from "../components/CenteredContainer";
 import { LoginScreenName } from "./LoginScreen";
 import { useRootScreen } from "./RootScreensManager";
@@ -14,18 +14,29 @@ export type HomeScreenParams = undefined;
 
 function HomeScreen() {
   const { navigation } = useRootScreen(HomeScreenName);
-  const [{ data, fetching }] = useMeQuery();
+  const [{ data: meData, fetching: meFetching }, getMe] = useMeQuery();
+  const [, logout] = useLogoutMutation();
 
   return (
     <CenteredContainer>
+      <Button
+        title="me refresh"
+        onPress={() => {
+          getMe();
+        }}
+      />
       <Text h1>This is the Home Screen.</Text>
-      {fetching ? (
+      {meFetching ? (
         <ActivityIndicator size="large" />
       ) : (
-        <Text h2>Greetings, {data?.me?.username}</Text>
+        <Text h2>Greetings, {meData?.me?.username}</Text>
       )}
       <Button
-        onPress={() => navigation.navigate(LoginScreenName)}
+        onPress={async () => {
+          await logout();
+          // TODO: useIsAuth, so manual navigation to login screen is no longer necessary
+          navigation.navigate(LoginScreenName);
+        }}
         title="Log out"
       />
     </CenteredContainer>
