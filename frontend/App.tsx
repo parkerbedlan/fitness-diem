@@ -1,11 +1,11 @@
 import React from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ThemeProvider } from "react-native-elements";
-import LoginScreen from "./src/screens/LoginScreen";
+import LoginScreen, { LoginScreenName } from "./src/screens/LoginScreen";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import HomeScreen from "./src/screens/HomeScreen";
-import SignupScreen from "./src/screens/SignupScreen";
+import HomeScreen, { HomeScreenName } from "./src/screens/HomeScreen";
+import SignupScreen, { SignupScreenName } from "./src/screens/SignupScreen";
 import { RootScreenList } from "./src/screens/RootScreensManager";
 
 const Stack = createNativeStackNavigator<RootScreenList>();
@@ -28,14 +28,14 @@ const Navigator = () => {
           headerShown: false,
         }}
       >
-        <Stack.Screen name="Log in" component={LoginScreen} />
+        <Stack.Screen name={LoginScreenName} component={LoginScreen} />
         <Stack.Screen
-          name="Home"
+          name={HomeScreenName}
           component={HomeScreen}
           options={{ title: "Welcome" }}
         />
         <Stack.Screen
-          name="Sign Up"
+          name={SignupScreenName}
           component={SignupScreen}
           options={{
             headerShown: true,

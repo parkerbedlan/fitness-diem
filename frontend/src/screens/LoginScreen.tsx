@@ -1,24 +1,30 @@
 import { Formik } from "formik";
+import { withUrqlClient } from "next-urql";
 import React from "react";
 import { View } from "react-native";
-import { Input, Icon, Text, Button } from "react-native-elements";
+import { Button, Icon, Text } from "react-native-elements";
 import tw from "tailwind-react-native-classnames";
-import CenteredContainer from "../components/CenteredContainer";
-import LineBreak from "../components/LineBreak";
 import * as yup from "yup";
-import { useRootScreen } from "./RootScreensManager";
-import FormikInput from "../components/FormikInput";
 import BigButton from "../components/BigButton";
+import CenteredContainer from "../components/CenteredContainer";
+import FormikInput from "../components/FormikInput";
+import LineBreak from "../components/LineBreak";
 import { useHelloQuery } from "../generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
-import { withUrqlClient } from "next-urql";
+import { HomeScreenName } from "./HomeScreen";
+import { useRootScreen } from "./RootScreensManager";
+import { SignupScreenName } from "./SignupScreen";
+
+export const LoginScreenName = "Log in";
+
+export type LoginScreenParams = undefined;
 
 const LoginScreen = () => {
-  const { navigation } = useRootScreen("Log in");
+  const { navigation } = useRootScreen(LoginScreenName);
   const [{ data, fetching }] = useHelloQuery();
 
   const handleSignup = (email?: string) => {
-    navigation.navigate("Sign Up", { email });
+    navigation.navigate(SignupScreenName, { email });
   };
 
   return (
@@ -37,7 +43,7 @@ const LoginScreen = () => {
         onSubmit={(values, { setSubmitting }) => {
           setTimeout(() => {
             console.log("logging in with", values);
-            navigation.navigate("Home", { email: values.email });
+            navigation.navigate(HomeScreenName, { email: values.email });
             setSubmitting(false);
           }, 1000);
         }}
