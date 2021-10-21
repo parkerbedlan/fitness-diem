@@ -1,7 +1,6 @@
-import { withUrqlClient } from "next-urql";
 import React from "react";
-import { Button, Text } from "react-native-elements";
-import { createUrqlClient } from "src/utils/createUrqlClient";
+import { Text } from "react-native-elements";
+import BigButton from "../components/BigButton";
 import CenteredContainer from "../components/CenteredContainer";
 import { useRootScreen } from "./RootScreensManager";
 
@@ -9,13 +8,17 @@ export const MyRoutinesScreenName = "MyRoutines";
 
 export type MyRoutinesScreenParams = undefined;
 
-function MyRoutinesScreen() {
-  const {} = useRootScreen(MyRoutinesScreenName);
+export default function MyRoutinesScreen() {
+  const { navigation } = useRootScreen(MyRoutinesScreenName);
   return (
     <CenteredContainer>
-      <Text h1>This are My Routines</Text>
+      <Text h1>These are My Routines</Text>
+      <BigButton
+        title="Go Back"
+        onPress={() => {
+          navigation.goBack();
+        }}
+      />
     </CenteredContainer>
   );
 }
-
-export default withUrqlClient(createUrqlClient)(MyRoutinesScreen);

@@ -3,7 +3,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import {
   FitnessDiumRoutinesScreenName,
   FitnessDiumRoutinesScreenParams,
-} from "./FitnessDiumRoutines";
+} from "./FitnessDiumRoutinesScreen";
 import { HomeScreenParams, HomeScreenName } from "./HomeScreen";
 import { LoginScreenName, LoginScreenParams } from "./LoginScreen";
 import {

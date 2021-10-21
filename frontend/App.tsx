@@ -10,6 +10,12 @@ import { RootScreenList } from "./src/screens/RootScreensManager";
 import RoutineLibraryScreen, {
   RoutineLibraryScreenName,
 } from "./src/screens/RoutineLibraryScreen";
+import MyRoutinesScreen, {
+  MyRoutinesScreenName,
+} from "./src/screens/MyRoutinesScreen";
+import FitnessDiumRoutinesScreen, {
+  FitnessDiumRoutinesScreenName,
+} from "./src/screens/FitnessDiumRoutinesScreen";
 
 const Stack = createNativeStackNavigator<RootScreenList>();
 
@@ -48,6 +54,14 @@ const Navigator = () => {
           options={{
             headerShown: true,
           }}
+        />
+        <Stack.Screen
+          name={MyRoutinesScreenName}
+          component={MyRoutinesScreen}
+        />
+        <Stack.Screen
+          name={FitnessDiumRoutinesScreenName}
+          component={FitnessDiumRoutinesScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>

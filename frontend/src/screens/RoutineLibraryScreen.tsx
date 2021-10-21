@@ -1,16 +1,13 @@
 import React from "react";
-import { Button, Text } from "react-native-elements";
-import CenteredContainer from "../components/CenteredContainer";
-import { useRootScreen } from "./RootScreensManager";
+import { View } from "react-native";
+import { Text } from "react-native-elements";
+import tw from "tailwind-react-native-classnames";
 import BigButton from "../components/BigButton";
-import MyRoutinesScreen, { MyRoutinesScreenName } from "./MyRoutinesScreen";
-import {
-  NavigationContext,
-  NavigationHelpersContext,
-} from "@react-navigation/core";
-import { FitnessDiumRoutinesScreenName } from "./FitnessDiumRoutines";
-import { HomeScreenName } from "./HomeScreen";
-import LoginScreen, { LoginScreenName } from "./LoginScreen";
+import CenteredContainer from "../components/CenteredContainer";
+import { FitnessDiumRoutinesScreenName } from "./FitnessDiumRoutinesScreen";
+import { LoginScreenName } from "./LoginScreen";
+import { MyRoutinesScreenName } from "./MyRoutinesScreen";
+import { useRootScreen } from "./RootScreensManager";
 
 export const RoutineLibraryScreenName = "RoutineLibrary";
 
@@ -21,25 +18,35 @@ export default function RoutineLibraryScreen() {
   return (
     <CenteredContainer>
       <Text h1>Routine Library</Text>
-      <BigButton
-        title="My Routines"
-        onPress={() => {
-          console.log("going to my routines");
-          navigation.navigate(MyRoutinesScreenName);
-        }}
-      />
-      <BigButton
-        title="Fitness Dium Routines"
-        onPress={() => {
-          navigation.navigate(FitnessDiumRoutinesScreenName);
-        }}
-      />
-      <BigButton
-        title="Login"
-        onPress={() => {
-          navigation.navigate(LoginScreenName);
-        }}
-      />
+      <View style={tw`flex-col justify-center`}>
+        <RoutineLibButton
+          title="My Routines"
+          onPress={() => {
+            console.log("going to my routines");
+            navigation.navigate(MyRoutinesScreenName);
+          }}
+        />
+        <RoutineLibButton
+          title="FitnessDium Routines"
+          onPress={() => {
+            navigation.navigate(FitnessDiumRoutinesScreenName);
+          }}
+        />
+      </View>
     </CenteredContainer>
   );
 }
+
+const RoutineLibButton = ({
+  title,
+  onPress,
+}: {
+  title: string;
+  onPress: () => void;
+}) => {
+  return (
+    <View style={tw`m-5`}>
+      <BigButton title={title} onPress={onPress} />
+    </View>
+  );
+};
