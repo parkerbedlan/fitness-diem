@@ -11,6 +11,7 @@ import { useRootScreen } from "./RootScreensManager";
 import { createUrqlClient } from "../utils/createUrqlClient";
 import { withUrqlClient } from "next-urql";
 import { useRegisterMutation } from "../generated/graphql";
+import { useAuthSkip } from "../utils/hooks/useAuthSkip";
 
 export const SignupScreenName = "Sign Up";
 
@@ -18,6 +19,7 @@ export type SignupScreenParams = { usernameOrEmail: string | undefined };
 
 function SignupScreen() {
   const { navigation, route } = useRootScreen(SignupScreenName);
+  useAuthSkip(navigation);
   const [, register] = useRegisterMutation();
 
   return (

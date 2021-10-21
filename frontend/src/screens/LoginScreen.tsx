@@ -1,6 +1,6 @@
 import { Formik } from "formik";
 import { withUrqlClient } from "next-urql";
-import React from "react";
+import React, { useEffect } from "react";
 import { View } from "react-native";
 import { Button, Icon, Text } from "react-native-elements";
 import { toErrorMap } from "../utils/toErrorMap";
@@ -18,6 +18,7 @@ import { createUrqlClient } from "../utils/createUrqlClient";
 import { HomeScreenName } from "./HomeScreen";
 import { useRootScreen } from "./RootScreensManager";
 import { SignupScreenName } from "./SignupScreen";
+import { useAuthSkip } from "../utils/hooks/useAuthSkip";
 
 export const LoginScreenName = "Log in";
 
@@ -25,6 +26,7 @@ export type LoginScreenParams = undefined;
 
 const LoginScreen = () => {
   const { navigation } = useRootScreen(LoginScreenName);
+  useAuthSkip(navigation);
   const [{ data, fetching }] = useHelloQuery();
   const [, login] = useLoginMutation();
   const [{ data: meData }] = useMeQuery();
