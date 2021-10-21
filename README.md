@@ -1,4 +1,4 @@
-# Fitness Dium: Seize your day.
+# Fitness Dium: Seize your fitness.
 
 ## Overview
 
