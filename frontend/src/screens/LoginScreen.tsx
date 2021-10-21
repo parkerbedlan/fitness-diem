@@ -25,7 +25,7 @@ const LoginScreen = () => {
   const [, login] = useLoginMutation();
 
   const handleSignup = (email?: string) => {
-    navigation.navigate(SignupScreenName, { email });
+    navigation.navigate(SignupScreenName, { usernameOrEmail: email });
   };
 
   return (
@@ -47,9 +47,7 @@ const LoginScreen = () => {
           if (response.data?.login.errors) {
             setErrors(toErrorMap(response.data.login.errors));
           } else if (response.data?.login.user) {
-            navigation.navigate(HomeScreenName, {
-              email: response.data.login.user.username,
-            });
+            navigation.navigate(HomeScreenName);
           }
         }}
       >

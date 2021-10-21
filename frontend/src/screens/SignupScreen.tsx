@@ -1,19 +1,24 @@
 import { Formik } from "formik";
 import React from "react";
 import { Icon, Text } from "react-native-elements";
+import { toErrorMap } from "../utils/toErrorMap";
 import BigButton from "../components/BigButton";
 import CenteredContainer from "../components/CenteredContainer";
 import FormikInput from "../components/FormikInput";
 import LineBreak from "../components/LineBreak";
 import { HomeScreenName } from "./HomeScreen";
 import { useRootScreen } from "./RootScreensManager";
+import { createUrqlClient } from "../utils/createUrqlClient";
+import { withUrqlClient } from "next-urql";
+import { useRegisterMutation } from "../generated/graphql";
 
 export const SignupScreenName = "Sign Up";
 
-export type SignupScreenParams = { email: string | undefined };
+export type SignupScreenParams = { usernameOrEmail: string | undefined };
 
-export default function SignupScreen() {
+function SignupScreen() {
   const { navigation, route } = useRootScreen(SignupScreenName);
+  const [, register] = useRegisterMutation();
 
   return (
     <CenteredContainer>
@@ -21,17 +26,25 @@ export default function SignupScreen() {
       <LineBreak />
       <Formik
         initialValues={{
-          email: route.params?.email || "",
-          username: "",
+          email: route.params?.usernameOrEmail?.includes("@")
+            ? route.params.usernameOrEmail
+            : "",
+          username:
+            route.params?.usernameOrEmail &&
+            !route.params.usernameOrEmail.includes("@")
+              ? route.params?.usernameOrEmail
+              : "",
           password: "",
           confirmPassword: "",
         }}
-        onSubmit={(values, { setSubmitting }) => {
-          setTimeout(() => {
-            console.log("signing up with", values);
-            navigation.navigate(HomeScreenName, { email: values.email });
-            setSubmitting(false);
-          }, 1000);
+        onSubmit={async (values, { setErrors }) => {
+          const response = await register({ options: values });
+          console.log(response);
+          if (response.data?.register.errors) {
+            setErrors(toErrorMap(response.data.register.errors));
+          } else if (response.data?.register.user) {
+            navigation.navigate(HomeScreenName);
+          }
         }}
       >
         {({ isSubmitting, handleSubmit }) => (
@@ -39,7 +52,7 @@ export default function SignupScreen() {
             <FormikInput
               name="email"
               label="Email"
-              placeholder="john@example.com"
+              placeholder="joe@mama.edu"
               leftIcon={<Icon name="email" />}
             />
             <FormikInput
@@ -73,3 +86,5 @@ export default function SignupScreen() {
     </CenteredContainer>
   );
 }
+
+export default withUrqlClient(createUrqlClient)(SignupScreen);
