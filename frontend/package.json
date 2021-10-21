@@ -26,8 +26,7 @@
     "react-native-web": "~0.13.12",
     "swr": "^1.0.0",
     "tailwind-react-native-classnames": "^1.4.3",
-    "urql": "^2.0.5",
-    "yup": "^0.32.9"
+    "urql": "^2.0.5"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",
