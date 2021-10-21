@@ -20,7 +20,7 @@ import { v4 as uuid } from "uuid";
 import { UsernamePasswordInput } from "./UsernamePasswordInput";
 
 @ObjectType()
-class FieldError {
+export class FieldError {
   @Field()
   field: string;
 
@@ -130,7 +130,7 @@ export class UserResolver {
     @Arg("options") options: UsernamePasswordInput,
     @Ctx() { req }: MyContext
   ): Promise<UserResponse> {
-    const validationErrors = validateRegister(options);
+    const validationErrors = await validateRegister(options);
     if (validationErrors) return { errors: validationErrors };
 
     const hashedPassword = await argon2.hash(options.password);
