@@ -1,21 +1,17 @@
-import { Formik } from "formik";
+import { ErrorMessage, Formik } from "formik";
 import React from "react";
-import { Icon, Text } from "react-native-elements";
-import * as yup from "yup";
-import BigButton from "../components/BigButton";
+import { Button, Icon, Input, Text } from "react-native-elements";
 import CenteredContainer from "../components/CenteredContainer";
-import FormikInput from "../components/FormikInput";
-import LineBreak from "../components/LineBreak";
-import { HomeScreenName } from "./HomeScreen";
-import { yupSchemaEmailAndPassword } from "./LoginScreen";
 import { useRootScreen } from "./RootScreensManager";
-
-export const SignupScreenName = "Sign Up";
-
-export type SignupScreenParams = { email: string | undefined };
+import * as yup from "yup";
+import { yupSchemaEmailAndPassword } from "./LoginScreen";
+import LineBreak from "../components/LineBreak";
+import FormikInput from "../components/FormikInput";
+import tw from "tailwind-react-native-classnames";
+import BigButton from "../components/BigButton";
 
 export default function SignupScreen() {
-  const { navigation, route } = useRootScreen(SignupScreenName);
+  const { navigation, route } = useRootScreen("Sign Up");
 
   return (
     <CenteredContainer>
@@ -31,7 +27,7 @@ export default function SignupScreen() {
         onSubmit={(values, { setSubmitting }) => {
           setTimeout(() => {
             console.log("signing up with", values);
-            navigation.navigate(HomeScreenName, { email: values.email });
+            navigation.navigate("Home", { email: values.email });
             setSubmitting(false);
           }, 1000);
         }}
