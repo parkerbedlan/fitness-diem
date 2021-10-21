@@ -10,10 +10,14 @@ export type RootScreenList = {
   [LoginScreenName]: LoginScreenParams;
 };
 
+export type RootNavigation = NativeStackNavigationProp<
+  RootScreenList,
+  keyof RootScreenList
+>;
+
+export type RootRoute = RouteProp<RootScreenList, keyof RootScreenList>;
+
 export const useRootScreen = (routeName: keyof RootScreenList) => ({
-  navigation:
-    useNavigation<
-      NativeStackNavigationProp<RootScreenList, typeof routeName>
-    >(),
-  route: useRoute<RouteProp<RootScreenList, typeof routeName>>(),
+  navigation: useNavigation<RootNavigation>(),
+  route: useRoute<RootRoute>(),
 });
