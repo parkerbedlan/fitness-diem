@@ -24,6 +24,7 @@ export const validateRegister = async (
       .string()
       .required("Please enter your password")
       .min(8, "Password must contain at least 8 characters")
+      .max(64, "Password cannot be longer than 64 characters")
       .matches(/.*\d.*/, "Password must contain at least one number")
       .matches(
         /.*[A-Z].*/,
