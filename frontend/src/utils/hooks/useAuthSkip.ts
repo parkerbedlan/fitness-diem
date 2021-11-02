@@ -4,10 +4,10 @@ import { HomeScreenName } from "../../screens/HomeScreen";
 import { RootNavigation } from "../../screens/RootScreensManager";
 
 export const useAuthSkip = (navigation: RootNavigation) => {
-  const [{ data, fetching }] = useMeQuery();
+  const { data, loading } = useMeQuery();
   useEffect(() => {
-    if (!fetching && data?.me) {
+    if (!loading && data?.me) {
       navigation.navigate(HomeScreenName);
     }
-  }, [data, fetching, navigation]);
+  }, [data, loading, navigation]);
 };

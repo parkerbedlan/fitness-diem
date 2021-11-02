@@ -7,16 +7,28 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen, { HomeScreenName } from "./src/screens/HomeScreen";
 import SignupScreen, { SignupScreenName } from "./src/screens/SignupScreen";
 import { RootScreenList } from "./src/screens/RootScreensManager";
+import UploadTestScreen, {
+  UploadTestName,
+} from "./src/screens/UploadTestScreen";
+import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 
 const Stack = createNativeStackNavigator<RootScreenList>();
 
+const client = new ApolloClient({
+  uri: "http://localhost:4000/graphql",
+  credentials: "include",
+  cache: new InMemoryCache(),
+});
+
 export default function App() {
   return (
-    <SafeAreaProvider>
-      <ThemeProvider>
-        <Navigator />
-      </ThemeProvider>
-    </SafeAreaProvider>
+    <ApolloProvider client={client}>
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <Navigator />
+        </ThemeProvider>
+      </SafeAreaProvider>
+    </ApolloProvider>
   );
 }
 
@@ -41,6 +53,7 @@ const Navigator = () => {
             headerShown: true,
           }}
         />
+        <Stack.Screen name={UploadTestName} component={UploadTestScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
