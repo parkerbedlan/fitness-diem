@@ -1,17 +1,26 @@
-import { ErrorMessage, Formik } from "formik";
+import { Formik } from "formik";
 import React from "react";
-import { Button, Icon, Input, Text } from "react-native-elements";
-import CenteredContainer from "../components/CenteredContainer";
-import { useRootScreen } from "./RootScreensManager";
-import * as yup from "yup";
-import { yupSchemaEmailAndPassword } from "./LoginScreen";
-import LineBreak from "../components/LineBreak";
-import FormikInput from "../components/FormikInput";
-import tw from "tailwind-react-native-classnames";
+import { Icon, Text } from "react-native-elements";
+import { toErrorMap } from "../utils/toErrorMap";
 import BigButton from "../components/BigButton";
+import CenteredContainer from "../components/CenteredContainer";
+import FormikInput from "../components/FormikInput";
+import LineBreak from "../components/LineBreak";
+import { HomeScreenName } from "./HomeScreen";
+import { useRootScreen } from "./RootScreensManager";
+import { createUrqlClient } from "../utils/createUrqlClient";
+import { withUrqlClient } from "next-urql";
+import { useRegisterMutation } from "../generated/graphql";
+import { useAuthSkip } from "../utils/hooks/useAuthSkip";
 
-export default function SignupScreen() {
-  const { navigation, route } = useRootScreen("Sign Up");
+export const SignupScreenName = "Sign Up";
+
+export type SignupScreenParams = { usernameOrEmail: string | undefined };
+
+function SignupScreen() {
+  const { navigation, route } = useRootScreen(SignupScreenName);
+  useAuthSkip(navigation);
+  const [, register] = useRegisterMutation();
 
   return (
     <CenteredContainer>
@@ -19,52 +28,33 @@ export default function SignupScreen() {
       <LineBreak />
       <Formik
         initialValues={{
-          email: route.params?.email || "",
-          username: "",
+          email: route.params?.usernameOrEmail?.includes("@")
+            ? route.params.usernameOrEmail
+            : "",
+          username:
+            route.params?.usernameOrEmail &&
+            !route.params.usernameOrEmail.includes("@")
+              ? route.params?.usernameOrEmail
+              : "",
           password: "",
           confirmPassword: "",
         }}
-        onSubmit={(values, { setSubmitting }) => {
-          setTimeout(() => {
-            console.log("signing up with", values);
-            navigation.navigate("Home", { email: values.email });
-            setSubmitting(false);
-          }, 1000);
+        onSubmit={async (values, { setErrors }) => {
+          const response = await register({ options: values });
+          console.log(response);
+          if (response.data?.register.errors) {
+            setErrors(toErrorMap(response.data.register.errors));
+          } else if (response.data?.register.user) {
+            navigation.navigate(HomeScreenName);
+          }
         }}
-        validationSchema={yup.object({
-          email: yupSchemaEmailAndPassword.email,
-          username: yup
-            .string()
-            .required("You must select a username.")
-            .min(4, "Your username must contain at least 4 characters.")
-            .max(15, "Your username cannot be more than 15 characters.")
-            .matches(
-              /^[A-Za-z0-9]+$/,
-              "Your username can contain letters and numbers only."
-            ),
-          password: yupSchemaEmailAndPassword.password
-            .min(8, "Password must contain at least 8 characters.")
-            .matches(/.*\d.*/, "Password must contain at least one number")
-            .matches(
-              /.*[A-Z].*/,
-              "Password must contain at least one uppercase letter."
-            )
-            .matches(
-              /.*[a-z].*/,
-              "Password must contain at least one lowercase letter."
-            ),
-          confirmPassword: yup
-            .string()
-            .required("Please re-enter your selected password.")
-            .equals([yup.ref("password")], "Passwords must match."),
-        })}
       >
         {({ isSubmitting, handleSubmit }) => (
           <>
             <FormikInput
               name="email"
               label="Email"
-              placeholder="john@example.com"
+              placeholder="joe@mama.edu"
               leftIcon={<Icon name="email" />}
             />
             <FormikInput
@@ -98,3 +88,5 @@ export default function SignupScreen() {
     </CenteredContainer>
   );
 }
+
+export default withUrqlClient(createUrqlClient)(SignupScreen);

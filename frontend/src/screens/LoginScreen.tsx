@@ -1,24 +1,38 @@
 import { Formik } from "formik";
-import React from "react";
-import { View } from "react-native";
-import { Input, Icon, Text, Button } from "react-native-elements";
-import tw from "tailwind-react-native-classnames";
-import CenteredContainer from "../components/CenteredContainer";
-import LineBreak from "../components/LineBreak";
-import * as yup from "yup";
-import { useRootScreen } from "./RootScreensManager";
-import FormikInput from "../components/FormikInput";
-import BigButton from "../components/BigButton";
-import { useHelloQuery } from "../generated/graphql";
-import { createUrqlClient } from "../utils/createUrqlClient";
 import { withUrqlClient } from "next-urql";
+import React, { useEffect } from "react";
+import { View } from "react-native";
+import { Button, Icon, Text } from "react-native-elements";
+import { toErrorMap } from "../utils/toErrorMap";
+import tw from "tailwind-react-native-classnames";
+import BigButton from "../components/BigButton";
+import CenteredContainer from "../components/CenteredContainer";
+import FormikInput from "../components/FormikInput";
+import LineBreak from "../components/LineBreak";
+import {
+  useHelloQuery,
+  useLoginMutation,
+  useMeQuery,
+} from "../generated/graphql";
+import { createUrqlClient } from "../utils/createUrqlClient";
+import { HomeScreenName } from "./HomeScreen";
+import { useRootScreen } from "./RootScreensManager";
+import { SignupScreenName } from "./SignupScreen";
+import { useAuthSkip } from "../utils/hooks/useAuthSkip";
+
+export const LoginScreenName = "Log in";
+
+export type LoginScreenParams = undefined;
 
 const LoginScreen = () => {
-  const { navigation } = useRootScreen("Log in");
+  const { navigation } = useRootScreen(LoginScreenName);
+  useAuthSkip(navigation);
   const [{ data, fetching }] = useHelloQuery();
+  const [, login] = useLoginMutation();
+  const [{ data: meData }] = useMeQuery();
 
   const handleSignup = (email?: string) => {
-    navigation.navigate("Sign Up", { email });
+    navigation.navigate(SignupScreenName, { usernameOrEmail: email });
   };
 
   return (
@@ -31,24 +45,26 @@ const LoginScreen = () => {
           ? data.hello
           : "couldn't connect to server"}
       </Text>
+      <Text>{meData?.me?.username}</Text>
       <LineBreak />
       <Formik
-        initialValues={{ email: "", password: "" }}
-        onSubmit={(values, { setSubmitting }) => {
-          setTimeout(() => {
-            console.log("logging in with", values);
-            navigation.navigate("Home", { email: values.email });
-            setSubmitting(false);
-          }, 1000);
+        initialValues={{ usernameOrEmail: "", password: "" }}
+        onSubmit={async (values, { setErrors }) => {
+          const response = await login(values);
+          console.log(response);
+          if (response.data?.login.errors) {
+            setErrors(toErrorMap(response.data.login.errors));
+          } else if (response.data?.login.user) {
+            navigation.navigate(HomeScreenName);
+          }
         }}
-        validationSchema={yup.object(yupSchemaEmailAndPassword)}
       >
         {({ values, handleSubmit, isSubmitting }) => (
           <>
             <FormikInput
-              name="email"
-              label="Email"
-              placeholder="john@example.com"
+              name="usernameOrEmail"
+              label="Username or Email"
+              placeholder="joe@mama.edu"
               leftIcon={<Icon name="email" />}
             />
             <FormikInput
@@ -60,8 +76,7 @@ const LoginScreen = () => {
             />
             <LoginSignupButtonGroup
               onSubmit={handleSubmit}
-              onSignup={() => handleSignup(values.email)}
-              version={2}
+              onSignup={() => handleSignup(values.usernameOrEmail)}
               isLoading={isSubmitting}
             />
           </>
@@ -74,12 +89,10 @@ const LoginScreen = () => {
 const LoginSignupButtonGroup = ({
   onSubmit,
   onSignup,
-  version,
   isLoading,
 }: {
   onSubmit: any;
   onSignup: any;
-  version: 1 | 2;
   isLoading: boolean;
 }) => {
   return (
@@ -100,14 +113,6 @@ const LoginSignupButtonGroup = ({
       </View>
     </View>
   );
-};
-
-export const yupSchemaEmailAndPassword = {
-  email: yup
-    .string()
-    .required("Please enter your email.")
-    .email("Invalid email"),
-  password: yup.string().required("Please enter your password."),
 };
 
 export default withUrqlClient(createUrqlClient)(LoginScreen);

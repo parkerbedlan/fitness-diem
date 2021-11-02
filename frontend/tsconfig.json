@@ -8,7 +8,6 @@
     "lib": ["es6", "esnext.asynciterable", "es2017"],
     "strict": true,
     "esModuleInterop": true,
-    "rootDir": "src",
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
@@ -17,8 +16,9 @@
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true,
     "skipLibCheck": true,
-    "baseUrl": ".",
     "allowSyntheticDefaultImports": true,
     "removeComments": true
-  }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
 }
