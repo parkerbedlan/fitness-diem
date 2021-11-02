@@ -7,6 +7,9 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen, { HomeScreenName } from "./src/screens/HomeScreen";
 import SignupScreen, { SignupScreenName } from "./src/screens/SignupScreen";
 import { RootScreenList } from "./src/screens/RootScreensManager";
+import UploadTestScreen, {
+  UploadTestName,
+} from "./src/screens/UploadTestScreen";
 
 const Stack = createNativeStackNavigator<RootScreenList>();
 
@@ -28,6 +31,7 @@ const Navigator = () => {
           headerShown: false,
         }}
       >
+        {/* <Stack.Screen name={UploadTestName} component={UploadTestScreen} /> */}
         <Stack.Screen name={LoginScreenName} component={LoginScreen} />
         <Stack.Screen
           name={HomeScreenName}

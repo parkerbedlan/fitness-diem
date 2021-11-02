@@ -3,11 +3,13 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { HomeScreenParams, HomeScreenName } from "./HomeScreen";
 import { LoginScreenName, LoginScreenParams } from "./LoginScreen";
 import { SignupScreenName, SignupScreenParams } from "./SignupScreen";
+import { UploadTestName, UploadTestParams } from "./UploadTestScreen";
 
 export type RootScreenList = {
   [HomeScreenName]: HomeScreenParams;
   [SignupScreenName]: SignupScreenParams;
   [LoginScreenName]: LoginScreenParams;
+  [UploadTestName]: UploadTestParams;
 };
 
 export type RootNavigation = NativeStackNavigationProp<
