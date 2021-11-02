@@ -6,7 +6,7 @@ import BigButton from "../components/BigButton";
 import CenteredContainer from "../components/CenteredContainer";
 import { FitnessDiumRoutinesScreenName } from "./FitnessDiumRoutinesScreen";
 import { LoginScreenName } from "./LoginScreen";
-import { MyRoutinesScreenName } from "./MyRoutinesScreen";
+import { MyRegimenScreenName } from "./MyRegimensScreen";
 import { useRootScreen } from "./RootScreensManager";
 
 export const RoutineLibraryScreenName = "RoutineLibrary";
@@ -23,7 +23,7 @@ export default function RoutineLibraryScreen() {
           title="My Routines"
           onPress={() => {
             console.log("going to my routines");
-            navigation.navigate(MyRoutinesScreenName);
+            navigation.navigate(MyRegimenScreenName);
           }}
         />
         <RoutineLibButton

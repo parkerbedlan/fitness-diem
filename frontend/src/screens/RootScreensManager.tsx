@@ -6,14 +6,11 @@ import {
 } from "./FitnessDiumRoutinesScreen";
 import { HomeScreenParams, HomeScreenName } from "./HomeScreen";
 import { LoginScreenName, LoginScreenParams } from "./LoginScreen";
-import {
-  MyRoutinesScreenName,
-  MyRoutinesScreenParams,
-} from "./MyRoutinesScreen";
+import { MyRegimenScreenName, MyRegimenScreenParams } from "./MyRegimensScreen";
 import {
   RoutineLibraryScreenName,
   RoutineLibraryScreenParams,
-} from "./RoutineLibraryScreen";
+} from "./RegimenLibraryScreen";
 import { SignupScreenName, SignupScreenParams } from "./SignupScreen";
 
 export type RootScreenList = {
@@ -21,7 +18,7 @@ export type RootScreenList = {
   [SignupScreenName]: SignupScreenParams;
   [LoginScreenName]: LoginScreenParams;
   [RoutineLibraryScreenName]: RoutineLibraryScreenParams;
-  [MyRoutinesScreenName]: MyRoutinesScreenParams;
+  [MyRegimenScreenName]: MyRegimenScreenParams;
   [FitnessDiumRoutinesScreenName]: FitnessDiumRoutinesScreenParams;
 };
 

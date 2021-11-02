@@ -9,10 +9,10 @@ import SignupScreen, { SignupScreenName } from "./src/screens/SignupScreen";
 import { RootScreenList } from "./src/screens/RootScreensManager";
 import RoutineLibraryScreen, {
   RoutineLibraryScreenName,
-} from "./src/screens/RoutineLibraryScreen";
+} from "./src/screens/RegimenLibraryScreen";
 import MyRoutinesScreen, {
-  MyRoutinesScreenName,
-} from "./src/screens/MyRoutinesScreen";
+  MyRegimenScreenName,
+} from "./src/screens/MyRegimensScreen";
 import FitnessDiumRoutinesScreen, {
   FitnessDiumRoutinesScreenName,
 } from "./src/screens/FitnessDiumRoutinesScreen";
@@ -55,10 +55,7 @@ const Navigator = () => {
             headerShown: true,
           }}
         />
-        <Stack.Screen
-          name={MyRoutinesScreenName}
-          component={MyRoutinesScreen}
-        />
+        <Stack.Screen name={MyRegimenScreenName} component={MyRoutinesScreen} />
         <Stack.Screen
           name={FitnessDiumRoutinesScreenName}
           component={FitnessDiumRoutinesScreen}

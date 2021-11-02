@@ -4,15 +4,15 @@ import BigButton from "../components/BigButton";
 import CenteredContainer from "../components/CenteredContainer";
 import { useRootScreen } from "./RootScreensManager";
 
-export const MyRoutinesScreenName = "MyRoutines";
+export const MyRegimenScreenName = "MyRegimen";
 
-export type MyRoutinesScreenParams = undefined;
+export type MyRegimenScreenParams = undefined;
 
-export default function MyRoutinesScreen() {
-  const { navigation } = useRootScreen(MyRoutinesScreenName);
+export default function MyRegimenScreen() {
+  const { navigation } = useRootScreen(MyRegimenScreenName);
   return (
     <CenteredContainer>
-      <Text h1>These are My Routines</Text>
+      <Text h1>These are My Regimens</Text>
       <BigButton
         title="Go Back"
         onPress={() => {
