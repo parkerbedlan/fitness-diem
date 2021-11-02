@@ -1,6 +1,5 @@
 import { Formik } from "formik";
-import { withUrqlClient } from "next-urql";
-import React, { useEffect } from "react";
+import React from "react";
 import { View } from "react-native";
 import { Button, Icon, Text } from "react-native-elements";
 import { toErrorMap } from "../utils/toErrorMap";
@@ -10,11 +9,12 @@ import CenteredContainer from "../components/CenteredContainer";
 import FormikInput from "../components/FormikInput";
 import LineBreak from "../components/LineBreak";
 import {
+  MeDocument,
+  MeQuery,
   useHelloQuery,
   useLoginMutation,
   useMeQuery,
 } from "../generated/graphql";
-import { createUrqlClient } from "../utils/createUrqlClient";
 import { HomeScreenName } from "./HomeScreen";
 import { useRootScreen } from "./RootScreensManager";
 import { SignupScreenName } from "./SignupScreen";
@@ -27,9 +27,9 @@ export type LoginScreenParams = undefined;
 const LoginScreen = () => {
   const { navigation } = useRootScreen(LoginScreenName);
   useAuthSkip(navigation);
-  const [{ data, fetching }] = useHelloQuery();
-  const [, login] = useLoginMutation();
-  const [{ data: meData }] = useMeQuery();
+  const { data, loading } = useHelloQuery();
+  const [login] = useLoginMutation();
+  const { data: meData } = useMeQuery();
 
   const handleSignup = (email?: string) => {
     navigation.navigate(SignupScreenName, { usernameOrEmail: email });
@@ -39,7 +39,7 @@ const LoginScreen = () => {
     <CenteredContainer>
       <Text style={tw`text-3xl`}>Welcome to Fitness Dium!</Text>
       <Text style={tw`text-3xl text-red-500`}>
-        {fetching
+        {loading
           ? "Loading..."
           : data
           ? data.hello
@@ -50,7 +50,19 @@ const LoginScreen = () => {
       <Formik
         initialValues={{ usernameOrEmail: "", password: "" }}
         onSubmit={async (values, { setErrors }) => {
-          const response = await login(values);
+          const response = await login({
+            variables: values,
+            update: (cache, { data }) => {
+              cache.writeQuery<MeQuery>({
+                query: MeDocument,
+                data: {
+                  __typename: "Query",
+                  me: data?.login.user,
+                },
+              });
+              cache.evict({ fieldName: "posts" });
+            },
+          });
           console.log(response);
           if (response.data?.login.errors) {
             setErrors(toErrorMap(response.data.login.errors));
@@ -115,4 +127,4 @@ const LoginSignupButtonGroup = ({
   );
 };
 
-export default withUrqlClient(createUrqlClient)(LoginScreen);
+export default LoginScreen;

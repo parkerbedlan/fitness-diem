@@ -8,9 +8,7 @@ import FormikInput from "../components/FormikInput";
 import LineBreak from "../components/LineBreak";
 import { HomeScreenName } from "./HomeScreen";
 import { useRootScreen } from "./RootScreensManager";
-import { createUrqlClient } from "../utils/createUrqlClient";
-import { withUrqlClient } from "next-urql";
-import { useRegisterMutation } from "../generated/graphql";
+import { MeDocument, MeQuery, useRegisterMutation } from "../generated/graphql";
 import { useAuthSkip } from "../utils/hooks/useAuthSkip";
 
 export const SignupScreenName = "Sign Up";
@@ -20,7 +18,7 @@ export type SignupScreenParams = { usernameOrEmail: string | undefined };
 function SignupScreen() {
   const { navigation, route } = useRootScreen(SignupScreenName);
   useAuthSkip(navigation);
-  const [, register] = useRegisterMutation();
+  const [register] = useRegisterMutation();
 
   return (
     <CenteredContainer>
@@ -40,7 +38,18 @@ function SignupScreen() {
           confirmPassword: "",
         }}
         onSubmit={async (values, { setErrors }) => {
-          const response = await register({ options: values });
+          const response = await register({
+            variables: { options: values },
+            update: (cache, { data }) => {
+              cache.writeQuery<MeQuery>({
+                query: MeDocument,
+                data: {
+                  __typename: "Query",
+                  me: data?.register.user,
+                },
+              });
+            },
+          });
           console.log(response);
           if (response.data?.register.errors) {
             setErrors(toErrorMap(response.data.register.errors));
@@ -89,4 +98,4 @@ function SignupScreen() {
   );
 }
 
-export default withUrqlClient(createUrqlClient)(SignupScreen);
+export default SignupScreen;

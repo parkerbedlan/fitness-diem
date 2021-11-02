@@ -1,8 +1,6 @@
 import React from "react";
-import { withUrqlClient } from "next-urql";
 import { Text } from "react-native-elements";
 import CenteredContainer from "../components/CenteredContainer";
-import { createUrqlClient } from "../utils/createUrqlClient";
 
 export const UploadTestName = "UploadTest";
 
@@ -16,4 +14,4 @@ function UploadTestScreen() {
   );
 }
 
-export default withUrqlClient(createUrqlClient)(UploadTestScreen);
+export default UploadTestScreen;

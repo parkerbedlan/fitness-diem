@@ -1,10 +1,13 @@
-import { withUrqlClient } from "next-urql";
 import React from "react";
 import { ActivityIndicator } from "react-native";
 import { Button, Text } from "react-native-elements";
 import CenteredContainer from "../components/CenteredContainer";
-import { useLogoutMutation, useMeQuery } from "../generated/graphql";
-import { createUrqlClient } from "../utils/createUrqlClient";
+import {
+  MeDocument,
+  MeQuery,
+  useLogoutMutation,
+  useMeQuery,
+} from "../generated/graphql";
 import { useIsAuth } from "../utils/hooks/useIsAuth";
 import { useRootScreen } from "./RootScreensManager";
 
@@ -15,8 +18,8 @@ export type HomeScreenParams = undefined;
 function HomeScreen() {
   const { navigation } = useRootScreen(HomeScreenName);
   useIsAuth(navigation);
-  const [{ data: meData, fetching: meFetching }] = useMeQuery();
-  const [, logout] = useLogoutMutation();
+  const { data: meData, loading: meFetching } = useMeQuery();
+  const [logout] = useLogoutMutation();
 
   return (
     <CenteredContainer>
@@ -28,7 +31,17 @@ function HomeScreen() {
       )}
       <Button
         onPress={() => {
-          logout();
+          logout({
+            update: (cache, { data }) => {
+              cache.writeQuery<MeQuery>({
+                query: MeDocument,
+                data: {
+                  __typename: "Query",
+                  me: null,
+                },
+              });
+            },
+          });
         }}
         title="Log out"
       />
@@ -36,4 +49,4 @@ function HomeScreen() {
   );
 }
 
-export default withUrqlClient(createUrqlClient)(HomeScreen);
+export default HomeScreen;
