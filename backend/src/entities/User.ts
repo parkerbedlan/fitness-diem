@@ -1,9 +1,11 @@
+import { userInfo } from "os";
 import { Field, ObjectType } from "type-graphql";
 import {
   BaseEntity,
   Column,
   CreateDateColumn,
   Entity,
+  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -38,4 +40,10 @@ export class User extends BaseEntity {
   @Field(() => String)
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @ManyToMany(() => User, (user) => user.followed)
+  follower!: number;
+
+  @ManyToMany(() => User, (user) => user.follower)
+  followed!: number;
 }
