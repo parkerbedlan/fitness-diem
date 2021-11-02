@@ -8,8 +8,8 @@ import { HomeScreenParams, HomeScreenName } from "./HomeScreen";
 import { LoginScreenName, LoginScreenParams } from "./LoginScreen";
 import { MyRegimenScreenName, MyRegimenScreenParams } from "./MyRegimensScreen";
 import {
-  RoutineLibraryScreenName,
-  RoutineLibraryScreenParams,
+  RegimenLibraryScreenName,
+  RegimenLibraryScreenParams,
 } from "./RegimenLibraryScreen";
 import { SignupScreenName, SignupScreenParams } from "./SignupScreen";
 
@@ -17,7 +17,7 @@ export type RootScreenList = {
   [HomeScreenName]: HomeScreenParams;
   [SignupScreenName]: SignupScreenParams;
   [LoginScreenName]: LoginScreenParams;
-  [RoutineLibraryScreenName]: RoutineLibraryScreenParams;
+  [RegimenLibraryScreenName]: RegimenLibraryScreenParams;
   [MyRegimenScreenName]: MyRegimenScreenParams;
   [FitnessDiumRoutinesScreenName]: FitnessDiumRoutinesScreenParams;
 };

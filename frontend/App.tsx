@@ -7,8 +7,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen, { HomeScreenName } from "./src/screens/HomeScreen";
 import SignupScreen, { SignupScreenName } from "./src/screens/SignupScreen";
 import { RootScreenList } from "./src/screens/RootScreensManager";
-import RoutineLibraryScreen, {
-  RoutineLibraryScreenName,
+import RegimenLibraryScreen, {
+  RegimenLibraryScreenName,
 } from "./src/screens/RegimenLibraryScreen";
 import MyRoutinesScreen, {
   MyRegimenScreenName,
@@ -38,8 +38,8 @@ const Navigator = () => {
         }}
       >
         <Stack.Screen
-          name={RoutineLibraryScreenName}
-          component={RoutineLibraryScreen}
+          name={RegimenLibraryScreenName}
+          component={RegimenLibraryScreen}
           options={{ headerShown: true, title: "Routine Library" }}
         />
         <Stack.Screen name={LoginScreenName} component={LoginScreen} />

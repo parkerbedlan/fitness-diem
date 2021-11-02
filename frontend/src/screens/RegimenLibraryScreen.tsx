@@ -9,24 +9,24 @@ import { LoginScreenName } from "./LoginScreen";
 import { MyRegimenScreenName } from "./MyRegimensScreen";
 import { useRootScreen } from "./RootScreensManager";
 
-export const RoutineLibraryScreenName = "RoutineLibrary";
+export const RegimenLibraryScreenName = "RegimenLibrary";
 
-export type RoutineLibraryScreenParams = undefined;
+export type RegimenLibraryScreenParams = undefined;
 
-export default function RoutineLibraryScreen() {
-  const { navigation } = useRootScreen(RoutineLibraryScreenName);
+export default function RegimenLibraryScreen() {
+  const { navigation } = useRootScreen(RegimenLibraryScreenName);
   return (
     <CenteredContainer>
       <Text h1>Routine Library</Text>
       <View style={tw`flex-col justify-center`}>
-        <RoutineLibButton
+        <RegimenLibButton
           title="My Routines"
           onPress={() => {
             console.log("going to my routines");
             navigation.navigate(MyRegimenScreenName);
           }}
         />
-        <RoutineLibButton
+        <RegimenLibButton
           title="FitnessDium Routines"
           onPress={() => {
             navigation.navigate(FitnessDiumRoutinesScreenName);
@@ -37,7 +37,7 @@ export default function RoutineLibraryScreen() {
   );
 }
 
-const RoutineLibButton = ({
+const RegimenLibButton = ({
   title,
   onPress,
 }: {
