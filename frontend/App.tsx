@@ -40,6 +40,7 @@ const Navigator = () => {
           headerShown: false,
         }}
       >
+        <Stack.Screen name={UploadTestName} component={UploadTestScreen} />
         <Stack.Screen name={LoginScreenName} component={LoginScreen} />
         <Stack.Screen
           name={HomeScreenName}
