@@ -54,7 +54,6 @@ const Navigator = () => {
             headerShown: true,
           }}
         />
-        <Stack.Screen name={UploadTestName} component={UploadTestScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
