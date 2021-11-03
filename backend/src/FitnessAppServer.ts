@@ -62,9 +62,9 @@ export class FitnessAppServer {
       logging: true,
       migrations: [path.join(__dirname, "./migrations/*")],
       entities: this.entities,
-      synchronize: true, // only use in dev??
+      synchronize: !__prod__,
     });
-    await this.ormConnection.runMigrations();
+    if (__prod__) await this.ormConnection.runMigrations();
     // await Post.delete({});
   }
 

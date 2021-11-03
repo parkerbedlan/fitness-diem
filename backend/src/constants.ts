@@ -6,16 +6,17 @@ export const COOKIE_NAME = "qid";
 export const FORGOT_PASSWORD_PREFIX = "forgot-password:";
 
 export const corsOptions: CorsOptions = {
-  origin: (origin, callback) => {
-    if (!__prod__ || (origin && originWhitelist.includes(origin)))
-      callback(null, true);
-    else {
-      callback(new Error("Origin not allowed by CORS"));
-    }
+  origin: (_origin, callback) => {
+    // if (!__prod__ || (origin && originWhitelist.includes(origin)))
+    //   callback(null, true);
+    // else {
+    //   callback(new Error("Origin not allowed by CORS"));
+    // }
+    callback(null, true);
   },
   credentials: true,
 };
-const originWhitelist = [
-  !__prod__ ? "https://studio.apollographql.com" : process.env.CORS_ORIGIN,
-  process.env.CORS_ORIGIN,
-];
+// const originWhitelist = [
+//   !__prod__ ? "https://studio.apollographql.com" : process.env.CORS_ORIGIN,
+//   process.env.CORS_ORIGIN,
+// ];
