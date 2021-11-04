@@ -12,6 +12,8 @@ import Redis from "ioredis";
 import { corsOptions } from "./constants";
 import { Connection, createConnection, EntitySchema } from "typeorm";
 import path from "path";
+import { graphqlUploadExpress } from "graphql-upload";
+import os from "os";
 
 type Resolvers = NonEmptyArray<Function> | NonEmptyArray<string>;
 type Entities = (Function | string | EntitySchema<any>)[];
@@ -45,8 +47,15 @@ export class FitnessAppServer {
   }
 
   public start() {
-    this.app.listen(parseInt(process.env.PORT!), () => {
-      console.log(`server started on localhost:${parseInt(process.env.PORT!)}`);
+    const ipAddress = __prod__
+      ? "localhost"
+      : os.networkInterfaces()["Wi-Fi"]?.find((ip) => ip.family === "IPv4")!
+          .address;
+
+    this.app.listen(parseInt(process.env.PORT!), ipAddress as string, () => {
+      console.log(
+        `server started on ${ipAddress}:${parseInt(process.env.PORT!)}`
+      );
     });
   }
 
@@ -112,6 +121,7 @@ export class FitnessAppServer {
     });
 
     await this.apolloServer.start();
+    this.app.use(graphqlUploadExpress());
     this.apolloServer.applyMiddleware({
       app: this.app,
       cors: false,

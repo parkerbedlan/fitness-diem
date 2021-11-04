@@ -3,18 +3,11 @@ import React, { useState } from "react";
 import { Button, Image, Text } from "react-native-elements";
 import tw from "tailwind-react-native-classnames";
 import CenteredContainer from "../components/CenteredContainer";
-import { ReactNativeFile } from "apollo-upload-client";
 import * as mime from "react-native-mime-types";
-
-function generateRNFile(uri: string, name: string) {
-  return uri
-    ? new ReactNativeFile({
-        uri,
-        type: mime.lookup(uri) || "image",
-        name,
-      })
-    : null;
-}
+import { useUploadTestImageMutation } from "../generated/graphql";
+import { Platform } from "react-native";
+import { urltoFile } from "../utils/urlToFile";
+import { generateRNFile } from "../utils/generateRNFile";
 
 export const UploadTestName = "UploadTest";
 
@@ -22,6 +15,7 @@ export type UploadTestParams = undefined;
 
 function UploadTestScreen() {
   const [image, setImage] = useState<string | null>(null);
+  const [uploadTestImage] = useUploadTestImageMutation();
 
   const pickImage = async (location: "camera" | "library") => {
     let picker: typeof ImagePicker.launchCameraAsync;
@@ -45,8 +39,21 @@ function UploadTestScreen() {
 
     if (!result.cancelled) {
       setImage(result.uri);
-      const file = generateRNFile(result.uri, `picture-${Date.now()}`);
-      console.log(file);
+      console.log("react native file:");
+      if (Platform.OS === "web") {
+        const file = await urltoFile(
+          result.uri,
+          "testfile.png",
+          mime.lookup(result.uri) || "image"
+        );
+        console.log("file", file);
+        uploadTestImage({ variables: { fileUpload: file } });
+      } else {
+        // const file = generateRNFile(result.uri, `picture-${Date.now()}`);
+        const file = generateRNFile(result.uri, "testfile.png");
+        console.log(file);
+        uploadTestImage({ variables: { fileUpload: file } });
+      }
     }
   };
 

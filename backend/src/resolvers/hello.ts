@@ -1,5 +1,7 @@
 import { Arg, Mutation, Query, Resolver } from "type-graphql";
-import { Upload, FileUpload } from "graphql-upload";
+import { FileUpload, GraphQLUpload } from "graphql-upload";
+import { createWriteStream } from "fs";
+import path from "path";
 
 @Resolver()
 export class HelloResolver {
@@ -8,10 +10,22 @@ export class HelloResolver {
     return "hello world";
   }
 
-  // @Mutation()
-  // async uploadTestImage(
-  //   @Arg('fileUpload') fileUpload: Upload
-  // ) {
-  //   const file = fileUpload.resolve()
-  // }
+  @Mutation(() => Boolean)
+  async uploadTestImage(
+    @Arg("fileUpload", () => GraphQLUpload)
+    { createReadStream, filename }: FileUpload
+  ) {
+    console.log("uploading file...");
+    try {
+      await new Promise((res) =>
+        createReadStream()
+          .pipe(createWriteStream(path.join(__dirname, "../images", filename)))
+          .on("close", res)
+      );
+      console.log("file successfully uploaded");
+    } catch (error) {
+      console.error(error);
+    }
+    return true;
+  }
 }
