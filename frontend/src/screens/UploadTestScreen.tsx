@@ -74,7 +74,11 @@ function UploadTestScreen() {
         onPress={() => pickImage("library")}
         buttonStyle={tw`m-4`}
       />
-      <CachelessImage uri={image} style={{ width: 200, height: 200 }} />
+      <CachelessImage
+        uri={image}
+        style={{ width: 200, height: 200 }}
+        cacheless={image.startsWith("http")}
+      />
       <Button
         title="Refresh"
         onPress={() => {
