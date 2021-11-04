@@ -15,14 +15,12 @@ export class HelloResolver {
     @Arg("fileUpload", () => GraphQLUpload)
     { createReadStream, filename }: FileUpload
   ) {
-    console.log("uploading file...");
     try {
       await new Promise((res) =>
         createReadStream()
           .pipe(createWriteStream(path.join(__dirname, "../images", filename)))
           .on("close", res)
       );
-      console.log("file successfully uploaded");
     } catch (error) {
       console.error(error);
     }

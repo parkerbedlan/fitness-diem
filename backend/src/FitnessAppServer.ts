@@ -13,12 +13,14 @@ import { corsOptions } from "./constants";
 import { Connection, createConnection, EntitySchema } from "typeorm";
 import path from "path";
 import { graphqlUploadExpress } from "graphql-upload";
-import os from "os";
+import { getLANipAddress } from "./utils/getLANipAddress";
 
+type HostingMode = "localhost" | "LAN";
 type Resolvers = NonEmptyArray<Function> | NonEmptyArray<string>;
 type Entities = (Function | string | EntitySchema<any>)[];
 
 export class FitnessAppServer {
+  hostingMode: HostingMode;
   corsOptions: CorsOptions;
   app: Express;
   ormConnection: Connection;
@@ -30,10 +32,12 @@ export class FitnessAppServer {
   entities?: Entities;
 
   constructor(
+    hostingMode: HostingMode,
     corsOptions: CorsOptions,
     resolvers: Resolvers,
     entities?: Entities
   ) {
+    this.hostingMode = hostingMode;
     this.corsOptions = corsOptions;
     this.resolvers = resolvers;
     this.entities = entities;
@@ -47,10 +51,8 @@ export class FitnessAppServer {
   }
 
   public start() {
-    const ipAddress = __prod__
-      ? "localhost"
-      : os.networkInterfaces()["Wi-Fi"]?.find((ip) => ip.family === "IPv4")!
-          .address;
+    const ipAddress =
+      this.hostingMode === "localhost" ? "localhost" : getLANipAddress();
 
     this.app.listen(parseInt(process.env.PORT!), ipAddress as string, () => {
       console.log(
