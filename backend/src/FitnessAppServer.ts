@@ -14,6 +14,7 @@ import { Connection, createConnection, EntitySchema } from "typeorm";
 import path from "path";
 import { graphqlUploadExpress } from "graphql-upload";
 import { getLANipAddress } from "./utils/getLANipAddress";
+import fs from "fs";
 
 type HostingMode = "localhost" | "LAN";
 type Resolvers = NonEmptyArray<Function> | NonEmptyArray<string>;
@@ -48,6 +49,11 @@ export class FitnessAppServer {
     await this.configureOrm();
     this.configureSessionCookies();
     await this.configureApolloServer();
+
+    this.app.get("/testimage.png", (_req, res) => {
+      res.send(fs.readFileSync(path.join(__dirname, "images/testfile.png")));
+    });
+    // this.app.use("/images", express.static(path.join(__dirname, "../images")));
   }
 
   public start() {

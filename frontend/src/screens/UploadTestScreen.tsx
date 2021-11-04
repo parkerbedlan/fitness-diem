@@ -1,21 +1,26 @@
 import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
-import { Button, Image, Text } from "react-native-elements";
-import tw from "tailwind-react-native-classnames";
-import CenteredContainer from "../components/CenteredContainer";
-import * as mime from "react-native-mime-types";
-import { useUploadTestImageMutation } from "../generated/graphql";
 import { Platform } from "react-native";
-import { urltoFile } from "../utils/urlToFile";
+import { Button, Text } from "react-native-elements";
+import * as mime from "react-native-mime-types";
+import tw from "tailwind-react-native-classnames";
+import { CachelessImage } from "../components/CachelessImage";
+import CenteredContainer from "../components/CenteredContainer";
+import { useUploadTestImageMutation } from "../generated/graphql";
 import { generateRNFile } from "../utils/generateRNFile";
+import { useForceRerender } from "../utils/hooks/useForceRerender";
+import { urltoFile } from "../utils/urlToFile";
 
 export const UploadTestName = "UploadTest";
 
 export type UploadTestParams = undefined;
 
 function UploadTestScreen() {
-  const [image, setImage] = useState<string | null>(null);
+  const initialImage = "http://172.16.182.31:4000/testimage.png";
+  const [image, setImage] = useState<string>(initialImage);
   const [uploadTestImage] = useUploadTestImageMutation();
+
+  const forceRerender = useForceRerender();
 
   const pickImage = async (location: "camera" | "library") => {
     let picker: typeof ImagePicker.launchCameraAsync;
@@ -39,7 +44,6 @@ function UploadTestScreen() {
 
     if (!result.cancelled) {
       setImage(result.uri);
-      console.log("react native file:");
       if (Platform.OS === "web") {
         const file = await urltoFile(
           result.uri,
@@ -51,7 +55,7 @@ function UploadTestScreen() {
       } else {
         // const file = generateRNFile(result.uri, `picture-${Date.now()}`);
         const file = generateRNFile(result.uri, "testfile.png");
-        console.log(file);
+        console.log("file", file);
         uploadTestImage({ variables: { fileUpload: file } });
       }
     }
@@ -70,9 +74,15 @@ function UploadTestScreen() {
         onPress={() => pickImage("library")}
         buttonStyle={tw`m-4`}
       />
-      {image && (
-        <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />
-      )}
+      <CachelessImage uri={image} style={{ width: 200, height: 200 }} />
+      <Button
+        title="Refresh"
+        onPress={() => {
+          setImage(initialImage);
+          forceRerender();
+        }}
+        buttonStyle={tw`m-4`}
+      />
     </CenteredContainer>
   );
 }

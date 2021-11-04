@@ -1,7 +1,7 @@
-import { Arg, Mutation, Query, Resolver } from "type-graphql";
-import { FileUpload, GraphQLUpload } from "graphql-upload";
 import { createWriteStream } from "fs";
+import { FileUpload, GraphQLUpload } from "graphql-upload";
 import path from "path";
+import { Arg, Mutation, Query, Resolver } from "type-graphql";
 
 @Resolver()
 export class HelloResolver {
