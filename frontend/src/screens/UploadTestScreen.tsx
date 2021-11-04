@@ -3,6 +3,18 @@ import React, { useState } from "react";
 import { Button, Image, Text } from "react-native-elements";
 import tw from "tailwind-react-native-classnames";
 import CenteredContainer from "../components/CenteredContainer";
+import { ReactNativeFile } from "apollo-upload-client";
+import * as mime from "react-native-mime-types";
+
+function generateRNFile(uri: string, name: string) {
+  return uri
+    ? new ReactNativeFile({
+        uri,
+        type: mime.lookup(uri) || "image",
+        name,
+      })
+    : null;
+}
 
 export const UploadTestName = "UploadTest";
 
@@ -12,16 +24,15 @@ function UploadTestScreen() {
   const [image, setImage] = useState<string | null>(null);
 
   const pickImage = async (location: "camera" | "library") => {
+    let picker: typeof ImagePicker.launchCameraAsync;
+
     if (location === "camera") {
       await ImagePicker.requestCameraPermissionsAsync();
+      picker = ImagePicker.launchCameraAsync;
     } else {
       await ImagePicker.requestMediaLibraryPermissionsAsync();
+      picker = ImagePicker.launchImageLibraryAsync;
     }
-
-    const picker =
-      location === "camera"
-        ? ImagePicker.launchCameraAsync
-        : ImagePicker.launchImageLibraryAsync;
 
     let result = await picker({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -34,6 +45,8 @@ function UploadTestScreen() {
 
     if (!result.cancelled) {
       setImage(result.uri);
+      const file = generateRNFile(result.uri, `picture-${Date.now()}`);
+      console.log(file);
     }
   };
 

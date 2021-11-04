@@ -16,6 +16,7 @@ const Stack = createNativeStackNavigator<RootScreenList>();
 
 const client = new ApolloClient({
   uri: "http://localhost:4000/graphql",
+  // uri: "https://fitness-api.sloper.us/graphql",
   credentials: "include",
   cache: new InMemoryCache(),
 });
@@ -40,6 +41,7 @@ const Navigator = () => {
           headerShown: false,
         }}
       >
+        <Stack.Screen name={UploadTestName} component={UploadTestScreen} />
         <Stack.Screen name={LoginScreenName} component={LoginScreen} />
         <Stack.Screen
           name={HomeScreenName}
@@ -53,7 +55,6 @@ const Navigator = () => {
             headerShown: true,
           }}
         />
-        <Stack.Screen name={UploadTestName} component={UploadTestScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
