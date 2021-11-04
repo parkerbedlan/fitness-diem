@@ -12,11 +12,15 @@ import Redis from "ioredis";
 import { corsOptions } from "./constants";
 import { Connection, createConnection, EntitySchema } from "typeorm";
 import path from "path";
+import { graphqlUploadExpress } from "graphql-upload";
+import { getLANipAddress } from "./utils/getLANipAddress";
 
+type HostingMode = "localhost" | "LAN";
 type Resolvers = NonEmptyArray<Function> | NonEmptyArray<string>;
 type Entities = (Function | string | EntitySchema<any>)[];
 
 export class FitnessAppServer {
+  hostingMode: HostingMode;
   corsOptions: CorsOptions;
   app: Express;
   ormConnection: Connection;
@@ -28,10 +32,12 @@ export class FitnessAppServer {
   entities?: Entities;
 
   constructor(
+    hostingMode: HostingMode,
     corsOptions: CorsOptions,
     resolvers: Resolvers,
     entities?: Entities
   ) {
+    this.hostingMode = hostingMode;
     this.corsOptions = corsOptions;
     this.resolvers = resolvers;
     this.entities = entities;
@@ -45,8 +51,13 @@ export class FitnessAppServer {
   }
 
   public start() {
-    this.app.listen(parseInt(process.env.PORT!), () => {
-      console.log(`server started on localhost:${parseInt(process.env.PORT!)}`);
+    const ipAddress =
+      this.hostingMode === "localhost" ? "localhost" : getLANipAddress();
+
+    this.app.listen(parseInt(process.env.PORT!), ipAddress as string, () => {
+      console.log(
+        `server started on ${ipAddress}:${parseInt(process.env.PORT!)}`
+      );
     });
   }
 
@@ -62,9 +73,9 @@ export class FitnessAppServer {
       logging: true,
       migrations: [path.join(__dirname, "./migrations/*")],
       entities: this.entities,
-      synchronize: true, // only use in dev??
+      synchronize: !__prod__,
     });
-    await this.ormConnection.runMigrations();
+    if (__prod__) await this.ormConnection.runMigrations();
     // await Post.delete({});
   }
 
@@ -112,6 +123,7 @@ export class FitnessAppServer {
     });
 
     await this.apolloServer.start();
+    this.app.use(graphqlUploadExpress());
     this.apolloServer.applyMiddleware({
       app: this.app,
       cors: false,

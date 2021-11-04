@@ -11,13 +11,23 @@ import UploadTestScreen, {
   UploadTestName,
 } from "./src/screens/UploadTestScreen";
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
+import { createUploadLink } from "apollo-upload-client";
+import Constants from "expo-constants";
+
+const { manifest } = Constants;
+const ipAddress = manifest?.debuggerHost?.split(":")[0];
+const uri = `http://${ipAddress}:4000/graphql`;
+// const uri = "https://fitness-api.sloper.us/graphql";
 
 const Stack = createNativeStackNavigator<RootScreenList>();
 
+const link = createUploadLink({ uri });
+
 const client = new ApolloClient({
-  uri: "http://localhost:4000/graphql",
+  uri,
   credentials: "include",
   cache: new InMemoryCache(),
+  link,
 });
 
 export default function App() {
@@ -40,7 +50,6 @@ const Navigator = () => {
           headerShown: false,
         }}
       >
-        <Stack.Screen name={UploadTestName} component={UploadTestScreen} />
         <Stack.Screen name={LoginScreenName} component={LoginScreen} />
         <Stack.Screen
           name={HomeScreenName}
