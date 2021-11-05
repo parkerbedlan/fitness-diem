@@ -7,6 +7,7 @@ import tw from "tailwind-react-native-classnames";
 import { CachelessImage } from "../components/CachelessImage";
 import CenteredContainer from "../components/CenteredContainer";
 import { useUploadTestImageMutation } from "../generated/graphql";
+import { serverBaseUrl } from "../utils/constants";
 import { generateRNFile } from "../utils/generateRNFile";
 import { useForceRerender } from "../utils/hooks/useForceRerender";
 import { urltoFile } from "../utils/urlToFile";
@@ -16,7 +17,7 @@ export const UploadTestName = "UploadTest";
 export type UploadTestParams = undefined;
 
 function UploadTestScreen() {
-  const initialImage = "http://172.16.182.31:4000/testimage.png";
+  const initialImage = `${serverBaseUrl}/testimage.png`;
   const [image, setImage] = useState<string>(initialImage);
   const [uploadTestImage] = useUploadTestImageMutation();
 
