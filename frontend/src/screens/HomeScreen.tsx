@@ -1,13 +1,9 @@
+import { useIsFocused } from "@react-navigation/core";
 import React from "react";
 import { ActivityIndicator } from "react-native";
 import { Button, Text } from "react-native-elements";
 import CenteredContainer from "../components/CenteredContainer";
-import {
-  MeDocument,
-  MeQuery,
-  useLogoutMutation,
-  useMeQuery,
-} from "../generated/graphql";
+import { useLogoutMutation, useMeQuery } from "../generated/graphql";
 import { updateLogout } from "../utils/GraphQLUtils";
 import { useIsAuth } from "../utils/hooks/useIsAuth";
 import { useRootScreen } from "./RootScreensManager";
@@ -18,7 +14,7 @@ export type HomeScreenParams = undefined;
 
 function HomeScreen() {
   const { navigation } = useRootScreen(HomeScreenName);
-  useIsAuth(navigation);
+  useIsAuth(navigation, useIsFocused());
   const { data: meData, loading: meFetching } = useMeQuery();
   const [logout] = useLogoutMutation();
 

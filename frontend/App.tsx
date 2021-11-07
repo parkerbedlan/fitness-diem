@@ -51,7 +51,14 @@ const Navigator = () => {
     <NavigationContainer>
       <Drawer.Navigator
         initialRouteName={LoginScreenName}
-        drawerContent={(props) => <RootDrawerContent {...props} />}
+        backBehavior="history"
+        drawerContent={(props) => (
+          <RootDrawerContent
+            {...props}
+            drawerOmissions={[LoginScreenName, SignupScreenName]}
+            defaultIcon={nameToNavIcon("chevron-right")}
+          />
+        )}
         screenOptions={{
           headerStyle: tw`bg-purple-500`,
           headerTitleStyle: tw`text-white`,
@@ -59,9 +66,34 @@ const Navigator = () => {
         }}
       >
         <Drawer.Screen
+          name={HomeScreenName}
+          component={HomeScreen}
+          options={{
+            title: "Welcome",
+            drawerIcon: nameToNavIcon("home"),
+          }}
+        />
+        <Drawer.Screen
+          name={ProfileScreenName}
+          component={ProfileScreen}
+          options={{
+            drawerIcon: nameToNavIcon("account-circle"),
+          }}
+        />
+        <Drawer.Screen
+          name={UploadTestName}
+          component={UploadTestScreen}
+          options={{
+            drawerIcon: nameToNavIcon("file-upload"),
+          }}
+        />
+        {/* IMPORTANT NOTE: always keep the drawer omissions last in the drawer order!*/}
+        <Drawer.Screen
           name={LoginScreenName}
           component={LoginScreen}
-          options={{ headerShown: false }}
+          options={{
+            headerShown: false,
+          }}
         />
         <Drawer.Screen
           name={SignupScreenName}
@@ -84,28 +116,6 @@ const Navigator = () => {
                 />
               );
             },
-          }}
-        />
-        <Drawer.Screen
-          name={HomeScreenName}
-          component={HomeScreen}
-          options={{
-            title: "Welcome",
-            drawerIcon: nameToNavIcon("home"),
-          }}
-        />
-        <Drawer.Screen
-          name={ProfileScreenName}
-          component={ProfileScreen}
-          options={{
-            drawerIcon: nameToNavIcon("account-circle"),
-          }}
-        />
-        <Drawer.Screen
-          name={UploadTestName}
-          component={UploadTestScreen}
-          options={{
-            drawerIcon: nameToNavIcon("file-upload"),
           }}
         />
       </Drawer.Navigator>
