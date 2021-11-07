@@ -1,13 +1,6 @@
 import React from "react";
 import { Icon } from "react-native-elements/dist/icons/Icon";
-
-export type NavIcon =
-  | ((props: {
-      focused: boolean;
-      size: number;
-      color: string;
-    }) => React.ReactNode)
-  | undefined;
+import { NavIcon } from "./types/navigationTypes";
 
 export const nameToNavIcon = (iconName: string) => {
   const iconFunction: NavIcon = ({ color, size }) => (

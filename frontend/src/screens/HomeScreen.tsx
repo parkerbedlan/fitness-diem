@@ -6,14 +6,14 @@ import CenteredContainer from "../components/CenteredContainer";
 import { useLogoutMutation, useMeQuery } from "../generated/graphql";
 import { updateLogout } from "../utils/GraphQLUtils";
 import { useIsAuth } from "../utils/hooks/useIsAuth";
-import { useRootScreen } from "./RootScreensManager";
+import { useRootScreen } from "../utils/hooks/useRootScreen";
 
 export const HomeScreenName = "Home";
 
 export type HomeScreenParams = undefined;
 
 function HomeScreen() {
-  const { navigation } = useRootScreen(HomeScreenName);
+  const { navigation } = useRootScreen();
   useIsAuth(navigation, useIsFocused());
   const { data: meData, loading: meFetching } = useMeQuery();
   const [logout] = useLogoutMutation();

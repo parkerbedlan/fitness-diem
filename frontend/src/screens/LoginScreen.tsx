@@ -16,17 +16,17 @@ import {
   useMeQuery,
 } from "../generated/graphql";
 import { HomeScreenName } from "./HomeScreen";
-import { useRootScreen } from "./RootScreensManager";
 import { SignupScreenName } from "./SignupScreen";
 import { useAuthSkip } from "../utils/hooks/useAuthSkip";
 import { useIsFocused } from "@react-navigation/core";
+import { useRootScreen } from "../utils/hooks/useRootScreen";
 
 export const LoginScreenName = "Log in";
 
 export type LoginScreenParams = undefined;
 
 const LoginScreen = () => {
-  const { navigation } = useRootScreen(LoginScreenName);
+  const { navigation } = useRootScreen();
   useAuthSkip(navigation, useIsFocused());
   const { data, loading } = useHelloQuery();
   const [login] = useLoginMutation();

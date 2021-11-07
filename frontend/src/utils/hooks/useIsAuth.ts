@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useMeQuery } from "../../generated/graphql";
 import { LoginScreenName } from "../../screens/LoginScreen";
-import { RootNavigation } from "../../screens/RootScreensManager";
+import { RootNavigation } from "../types/navigationTypes";
 
 export const useIsAuth = (navigation: RootNavigation, isFocused: boolean) => {
   const { data, loading } = useMeQuery();
