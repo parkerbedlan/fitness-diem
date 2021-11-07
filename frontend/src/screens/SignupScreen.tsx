@@ -7,17 +7,18 @@ import CenteredContainer from "../components/CenteredContainer";
 import FormikInput from "../components/FormikInput";
 import LineBreak from "../components/LineBreak";
 import { HomeScreenName } from "./HomeScreen";
-import { useRootScreen } from "./RootScreensManager";
 import { MeDocument, MeQuery, useRegisterMutation } from "../generated/graphql";
 import { useAuthSkip } from "../utils/hooks/useAuthSkip";
+import { useIsFocused } from "@react-navigation/core";
+import { useRootScreen } from "../utils/hooks/useRootScreen";
 
 export const SignupScreenName = "Sign Up";
 
 export type SignupScreenParams = { usernameOrEmail: string | undefined };
 
 function SignupScreen() {
-  const { navigation, route } = useRootScreen(SignupScreenName);
-  useAuthSkip(navigation);
+  const { navigation, route } = useRootScreen();
+  useAuthSkip(navigation, useIsFocused());
   const [register] = useRegisterMutation();
 
   return (
@@ -50,7 +51,6 @@ function SignupScreen() {
               });
             },
           });
-          console.log(response);
           if (response.data?.register.errors) {
             setErrors(toErrorMap(response.data.register.errors));
           } else if (response.data?.register.user) {

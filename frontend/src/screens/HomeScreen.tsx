@@ -1,23 +1,20 @@
+import { useIsFocused } from "@react-navigation/core";
 import React from "react";
 import { ActivityIndicator } from "react-native";
 import { Button, Text } from "react-native-elements";
 import CenteredContainer from "../components/CenteredContainer";
-import {
-  MeDocument,
-  MeQuery,
-  useLogoutMutation,
-  useMeQuery,
-} from "../generated/graphql";
+import { useLogoutMutation, useMeQuery } from "../generated/graphql";
+import { updateLogout } from "../utils/GraphQLUtils";
 import { useIsAuth } from "../utils/hooks/useIsAuth";
-import { useRootScreen } from "./RootScreensManager";
+import { useRootScreen } from "../utils/hooks/useRootScreen";
 
 export const HomeScreenName = "Home";
 
 export type HomeScreenParams = undefined;
 
 function HomeScreen() {
-  const { navigation } = useRootScreen(HomeScreenName);
-  useIsAuth(navigation);
+  const { navigation } = useRootScreen();
+  useIsAuth(navigation, useIsFocused());
   const { data: meData, loading: meFetching } = useMeQuery();
   const [logout] = useLogoutMutation();
 
@@ -32,15 +29,7 @@ function HomeScreen() {
       <Button
         onPress={() => {
           logout({
-            update: (cache, { data }) => {
-              cache.writeQuery<MeQuery>({
-                query: MeDocument,
-                data: {
-                  __typename: "Query",
-                  me: null,
-                },
-              });
-            },
+            update: updateLogout,
           });
         }}
         title="Log out"

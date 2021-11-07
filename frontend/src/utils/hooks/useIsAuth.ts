@@ -1,13 +1,13 @@
 import { useEffect } from "react";
 import { useMeQuery } from "../../generated/graphql";
 import { LoginScreenName } from "../../screens/LoginScreen";
-import { RootNavigation } from "../../screens/RootScreensManager";
+import { RootNavigation } from "../types/navigationTypes";
 
-export const useIsAuth = (navigation: RootNavigation) => {
+export const useIsAuth = (navigation: RootNavigation, isFocused: boolean) => {
   const { data, loading } = useMeQuery();
   useEffect(() => {
-    if (!loading && !data?.me) {
+    if (isFocused && !loading && !data?.me) {
       navigation.navigate(LoginScreenName);
     }
-  }, [data, loading, navigation]);
+  }, [data, loading, navigation, isFocused]);
 };

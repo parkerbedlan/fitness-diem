@@ -16,17 +16,18 @@ import {
   useMeQuery,
 } from "../generated/graphql";
 import { HomeScreenName } from "./HomeScreen";
-import { useRootScreen } from "./RootScreensManager";
 import { SignupScreenName } from "./SignupScreen";
 import { useAuthSkip } from "../utils/hooks/useAuthSkip";
+import { useIsFocused } from "@react-navigation/core";
+import { useRootScreen } from "../utils/hooks/useRootScreen";
 
 export const LoginScreenName = "Log in";
 
 export type LoginScreenParams = undefined;
 
 const LoginScreen = () => {
-  const { navigation } = useRootScreen(LoginScreenName);
-  useAuthSkip(navigation);
+  const { navigation } = useRootScreen();
+  useAuthSkip(navigation, useIsFocused());
   const { data, loading } = useHelloQuery();
   const [login] = useLoginMutation();
   const { data: meData } = useMeQuery();
@@ -63,7 +64,6 @@ const LoginScreen = () => {
               cache.evict({ fieldName: "posts" });
             },
           });
-          console.log(response);
           if (response.data?.login.errors) {
             setErrors(toErrorMap(response.data.login.errors));
           } else if (response.data?.login.user) {
