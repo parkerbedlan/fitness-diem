@@ -81,7 +81,6 @@ export const RootNavigator: React.FC<RootNavigatorProps> = ({ Drawer }) => {
           name={SignupScreenName}
           component={SignupScreen}
           options={{
-            headerShown: true,
             header: ({ navigation }) => {
               return (
                 <Header

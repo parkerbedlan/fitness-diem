@@ -1,11 +1,15 @@
+import { useNavigation } from "@react-navigation/core";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React, { useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 import { Button, Icon, Text } from "react-native-elements";
 import tw from "tailwind-react-native-classnames";
 import { CachelessImage } from "../components/CachelessImage";
+import CenteredContainer from "../components/CenteredContainer";
 import { LineRule } from "../components/LineRule";
 import { ModalTapOutsideToClose } from "../components/ModalTapOutsideToClose";
 import { useMeQuery } from "../generated/graphql";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 type ProfileHeaderInfo = {
   username: string;
@@ -31,6 +35,30 @@ const fakeResult = {
   },
 };
 
+type ProfileStackScreenList = {
+  ViewProfile: undefined;
+  EditProfile: undefined;
+};
+
+const ProfileStack = createNativeStackNavigator<ProfileStackScreenList>();
+
+const useProfileStackNavigation = () =>
+  useNavigation<
+    NativeStackNavigationProp<
+      ProfileStackScreenList,
+      keyof ProfileStackScreenList
+    >
+  >();
+
+const ProfileNavigator = () => {
+  return (
+    <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
+      <ProfileStack.Screen name={"ViewProfile"} component={ProfileScreen} />
+      <ProfileStack.Screen name={"EditProfile"} component={EditProfileScreen} />
+    </ProfileStack.Navigator>
+  );
+};
+
 export const ProfileScreenName = "Profile";
 
 export type ProfileScreenParams = undefined;
@@ -39,6 +67,7 @@ function ProfileScreen() {
   const { data: meData } = useMeQuery();
   const { data: profileData } = fakeResult;
   const { profile } = profileData;
+
   return (
     <>
       <ProfileHeader
@@ -57,6 +86,7 @@ const ProfileHeader = ({
   profile: ProfileHeaderInfo;
   editable: boolean;
 }) => {
+  const { navigate } = useProfileStackNavigation();
   const [isModalVisible, setIsModalVisible] = useState(false);
   return (
     <>
@@ -84,7 +114,7 @@ const ProfileHeader = ({
                   icon={<Icon name="edit" color="white" />}
                   title="Edit profile"
                   buttonStyle={tw`bg-purple-600`}
-                  onPress={() => console.log("time to edit!")}
+                  onPress={() => navigate("EditProfile")}
                 />
               </View>
             )}
@@ -196,4 +226,19 @@ const ProfilePosts = () => {
   );
 };
 
-export default ProfileScreen;
+const EditProfileScreen = () => {
+  const { navigate } = useProfileStackNavigation();
+  return (
+    <CenteredContainer>
+      <Text h1>edit profile screen</Text>
+      <Button
+        icon={<Icon name="check" color="white" />}
+        title="accept changes"
+        buttonStyle={tw`bg-green-600`}
+        onPress={() => navigate("ViewProfile")}
+      />
+    </CenteredContainer>
+  );
+};
+
+export default ProfileNavigator;
