@@ -1,21 +1,27 @@
-import { useNavigation } from "@react-navigation/core";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { useIsFocused, useNavigation } from "@react-navigation/core";
+import {
+  createNativeStackNavigator,
+  NativeStackNavigationProp,
+} from "@react-navigation/native-stack";
+import { Formik } from "formik";
 import React, { useState } from "react";
-import { TouchableOpacity, View } from "react-native";
+import { ScrollView, TouchableOpacity, View } from "react-native";
 import { Button, Icon, Text } from "react-native-elements";
 import tw from "tailwind-react-native-classnames";
 import { CachelessImage } from "../components/CachelessImage";
-import CenteredContainer from "../components/CenteredContainer";
+import FormikInput from "../components/FormikInput";
 import { LineRule } from "../components/LineRule";
 import { ModalTapOutsideToClose } from "../components/ModalTapOutsideToClose";
 import { useMeQuery } from "../generated/graphql";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { getProfilePicUri } from "../utils/getProfilePicUri";
+import { useIsAuth } from "../utils/hooks/useIsAuth";
+import { useRootScreen } from "../utils/hooks/useRootScreen";
 
 type ProfileHeaderInfo = {
   username: string;
   displayName: string;
+  email: string;
   bio: string;
-  profilePic: string;
 };
 
 type ProfileStatsInfo = { streakDays: number; totalWorkouts: number };
@@ -25,8 +31,8 @@ const fakeResult = {
     profile: {
       username: "parker",
       displayName: "Parker B",
-      bio: "I sure love lifting weights.",
-      profilePic: "https://placekitten.com/200",
+      email: "parkerbedlan@gmail.com",
+      bio: "",
       stats: {
         streakDays: 15,
         totalWorkouts: 420,
@@ -51,10 +57,39 @@ const useProfileStackNavigation = () =>
   >();
 
 const ProfileNavigator = () => {
+  const { navigation: rootNavigation } = useRootScreen();
+  useIsAuth(rootNavigation, useIsFocused());
   return (
-    <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
-      <ProfileStack.Screen name={"ViewProfile"} component={ProfileScreen} />
-      <ProfileStack.Screen name={"EditProfile"} component={EditProfileScreen} />
+    <ProfileStack.Navigator
+      screenOptions={{ headerShown: false }}
+      initialRouteName="ViewProfile"
+    >
+      <ProfileStack.Screen name="ViewProfile" component={ProfileScreen} />
+      <ProfileStack.Screen
+        name="EditProfile"
+        component={EditProfileScreen}
+        options={{
+          headerShown: true,
+          header: ({ navigation: { navigate }, options }) => {
+            return (
+              <View style={tw`flex flex-row items-center border-b`}>
+                <Button
+                  icon={<Icon name="chevron-left" color="#6D28D9" />}
+                  title="Cancel"
+                  type="outline"
+                  buttonStyle={tw`bg-white m-2 w-24`}
+                  titleStyle={tw`text-purple-700`}
+                  onPress={() => navigate("ViewProfile")}
+                />
+                <Text h4 style={tw`text-purple-700`}>
+                  Edit Profile
+                </Text>
+              </View>
+            );
+          },
+          headerTitle: "Edit Profile",
+        }}
+      />
     </ProfileStack.Navigator>
   );
 };
@@ -88,13 +123,14 @@ const ProfileHeader = ({
 }) => {
   const { navigate } = useProfileStackNavigation();
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const profilePicUri = getProfilePicUri(profileHeaderInfo.username);
   return (
     <>
-      <View style={tw`top-0 h-40 bg-purple-200 p-4`}>
+      <View style={tw`top-0 h-40 bg-gray-200 p-4`}>
         <View style={tw`flex flex-row items-start`}>
           <TouchableOpacity onPress={() => setIsModalVisible(true)}>
             <CachelessImage
-              uri={profileHeaderInfo.profilePic}
+              uri={profilePicUri}
               cacheless={false}
               style={tw`rounded-full w-20 h-20 mr-4 mb-4`}
             />
@@ -103,7 +139,9 @@ const ProfileHeader = ({
             style={tw`flex-1 flex flex-row justify-between items-center w-full`}
           >
             <View>
-              <Text h4>{profileHeaderInfo.displayName}</Text>
+              {!profileHeaderInfo.displayName ? null : (
+                <Text h4>{profileHeaderInfo.displayName}</Text>
+              )}
               <Text h4 style={tw`opacity-50`}>
                 @{profileHeaderInfo.username}
               </Text>
@@ -120,10 +158,13 @@ const ProfileHeader = ({
             )}
           </View>
         </View>
-        <Text>{profileHeaderInfo.bio}</Text>
+        <Text>
+          {profileHeaderInfo.bio ||
+            "I love reaching my fitness goals with Fitness Dium!"}
+        </Text>
       </View>
       <ProfilePicModal
-        uri={profileHeaderInfo.profilePic}
+        uri={profilePicUri}
         isModalVisible={isModalVisible}
         setIsModalVisible={setIsModalVisible}
       />
@@ -148,7 +189,7 @@ const ProfilePicModal = ({
       onRequestClose={() => setIsModalVisible(false)}
     >
       <View
-        style={tw`bg-white rounded-lg w-96 h-96 flex justify-center items-center`}
+        style={tw`bg-purple-300 rounded-lg w-96 h-96 flex justify-center items-center`}
       >
         <CachelessImage uri={uri} cacheless={false} style={tw`w-80 h-80`} />
       </View>
@@ -162,7 +203,7 @@ const ProfileBody = ({
   profile: typeof fakeResult.data.profile;
 }) => {
   return (
-    <View style={tw`p-4 bg-purple-100`}>
+    <View style={tw`p-4 bg-gray-50`}>
       <ProfileStats stats={profile.stats} />
       <LineRule />
       <ProfileRegimen />
@@ -227,17 +268,86 @@ const ProfilePosts = () => {
 };
 
 const EditProfileScreen = () => {
-  const { navigate } = useProfileStackNavigation();
+  const navigation = useProfileStackNavigation();
+  const {
+    data: { profile },
+  } = fakeResult;
+  const profilePicUri = getProfilePicUri(profile.username);
+
   return (
-    <CenteredContainer>
-      <Text h1>edit profile screen</Text>
-      <Button
-        icon={<Icon name="check" color="white" />}
-        title="accept changes"
-        buttonStyle={tw`bg-green-600`}
-        onPress={() => navigate("ViewProfile")}
-      />
-    </CenteredContainer>
+    <ScrollView>
+      <Formik
+        initialValues={{
+          displayName: profile.displayName,
+          username: profile.username,
+          email: profile.email,
+          bio: profile.bio,
+        }}
+        onSubmit={(values) => {
+          console.log(values);
+        }}
+      >
+        {() => (
+          <>
+            <View
+              style={tw`rounded-lg p-2 border-4 border-purple-700 m-2 w-56 h-56 flex items-center justify-center`}
+            >
+              <TouchableOpacity>
+                <View
+                  style={tw`absolute w-full h-full z-10 flex items-center justify-center`}
+                >
+                  <Icon name="edit" color="white" size={40} />
+                </View>
+                <CachelessImage
+                  uri={profilePicUri}
+                  style={tw`opacity-80 w-52 h-52`}
+                />
+              </TouchableOpacity>
+            </View>
+            <View style={tw`flex flex-row`}>
+              <View style={tw`w-6/12`}>
+                <FormikInput
+                  name="displayName"
+                  label="Display Name"
+                  placeholder="Joe Mama"
+                  leftIcon={<Icon name="badge" />}
+                  autoCompleteType="name"
+                  autoCapitalize="words"
+                />
+              </View>
+              <View style={tw`w-6/12`}>
+                <FormikInput
+                  name="username"
+                  label="Username"
+                  placeholder="joemama123"
+                  leftIcon={<Icon name="alternate-email" />}
+                  autoCapitalize="none"
+                />
+              </View>
+            </View>
+            <FormikInput
+              name="email"
+              label="Email"
+              placeholder="joe@mama.edu"
+              leftIcon={<Icon name="email" />}
+              autoCompleteType="email"
+            />
+            <FormikInput
+              name="bio"
+              label="Bio"
+              placeholder="I love reaching my fitness goals with Fitness Dium!"
+              multiline
+            />
+            <Button
+              icon={<Icon name="check" color="white" />}
+              title="accept changes"
+              buttonStyle={tw`bg-green-600`}
+              onPress={() => navigation.navigate("ViewProfile")}
+            />
+          </>
+        )}
+      </Formik>
+    </ScrollView>
   );
 };
 

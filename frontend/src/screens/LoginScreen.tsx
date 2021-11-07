@@ -78,6 +78,8 @@ const LoginScreen = () => {
               label="Username or Email"
               placeholder="joe@mama.edu"
               leftIcon={<Icon name="email" />}
+              autoCapitalize="none"
+              autoCompleteType="email"
             />
             <FormikInput
               name="password"
@@ -85,6 +87,7 @@ const LoginScreen = () => {
               placeholder="password123"
               leftIcon={<Icon name="lock" />}
               secureTextEntry={true}
+              autoCompleteType="password"
             />
             <LoginSignupButtonGroup
               onSubmit={handleSubmit}

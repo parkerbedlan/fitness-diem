@@ -53,6 +53,18 @@ export class FitnessAppServer {
     this.app.get("/testimage.png", (_req, res) => {
       res.send(fs.readFileSync(path.join(__dirname, "images/testfile.png")));
     });
+    this.app.get("/profilepic/:username.png", (req, res) => {
+      const filePath = path.join(
+        __dirname,
+        `images/profilepic/${req.params.username}.png`
+      );
+      const fileExists = fs.existsSync(filePath);
+      if (fileExists) {
+        res.send(fs.readFileSync(filePath));
+      } else {
+        res.send("ERROR: no profile pic for that user");
+      }
+    });
     // this.app.use("/images", express.static(path.join(__dirname, "../images")));
   }
 

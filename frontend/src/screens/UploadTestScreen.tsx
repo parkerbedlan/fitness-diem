@@ -1,3 +1,4 @@
+import { useIsFocused } from "@react-navigation/core";
 import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
 import { Platform } from "react-native";
@@ -10,6 +11,8 @@ import { useUploadTestImageMutation } from "../generated/graphql";
 import { serverBaseUrl } from "../utils/constants";
 import { generateRNFile } from "../utils/generateRNFile";
 import { useForceRerender } from "../utils/hooks/useForceRerender";
+import { useIsAuth } from "../utils/hooks/useIsAuth";
+import { useRootScreen } from "../utils/hooks/useRootScreen";
 import { urltoFile } from "../utils/urlToFile";
 
 export const UploadTestName = "UploadTest";
@@ -17,6 +20,8 @@ export const UploadTestName = "UploadTest";
 export type UploadTestParams = undefined;
 
 function UploadTestScreen() {
+  const { navigation } = useRootScreen();
+  useIsAuth(navigation, useIsFocused());
   const initialImage = `${serverBaseUrl}/testimage.png`;
   const [image, setImage] = useState<string>(initialImage);
   const [uploadTestImage] = useUploadTestImageMutation();

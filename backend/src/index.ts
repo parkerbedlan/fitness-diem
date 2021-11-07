@@ -10,8 +10,12 @@ import { PostResolver } from "./resolvers/post";
 import { UserResolver } from "./resolvers/user";
 
 const main = async () => {
-  existsSync(path.join(__dirname, "./images")) ||
-    mkdirSync(path.join(__dirname, "./images"));
+  const fileDirectories = ["./images", "./images/profilepic"];
+  fileDirectories.forEach((directory) => {
+    existsSync(path.join(__dirname, directory)) ||
+      mkdirSync(path.join(__dirname, directory));
+  });
+
   const myServer = new FitnessAppServer(
     __prod__ ? "localhost" : "LAN",
     corsOptions,
