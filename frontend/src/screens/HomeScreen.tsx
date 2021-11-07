@@ -8,6 +8,7 @@ import {
   useLogoutMutation,
   useMeQuery,
 } from "../generated/graphql";
+import { updateLogout } from "../utils/GraphQLUtils";
 import { useIsAuth } from "../utils/hooks/useIsAuth";
 import { useRootScreen } from "./RootScreensManager";
 
@@ -32,15 +33,7 @@ function HomeScreen() {
       <Button
         onPress={() => {
           logout({
-            update: (cache, { data }) => {
-              cache.writeQuery<MeQuery>({
-                query: MeDocument,
-                data: {
-                  __typename: "Query",
-                  me: null,
-                },
-              });
-            },
+            update: updateLogout,
           });
         }}
         title="Log out"
