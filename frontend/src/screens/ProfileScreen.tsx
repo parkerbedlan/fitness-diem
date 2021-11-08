@@ -5,11 +5,18 @@ import {
 } from "@react-navigation/native-stack";
 import { Formik } from "formik";
 import React, { useState } from "react";
-import { ScrollView, TouchableOpacity, View } from "react-native";
-import { Button, Icon, Text } from "react-native-elements";
+import {
+  GestureResponderEvent,
+  Modal,
+  ScrollView,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { Button, Header, Icon, Text } from "react-native-elements";
 import tw from "tailwind-react-native-classnames";
 import { CachelessImage } from "../components/CachelessImage";
 import FormikInput from "../components/FormikInput";
+import { HeaderForSubscreens } from "../components/HeaderForSubscreens";
 import { LineRule } from "../components/LineRule";
 import { ModalTapOutsideToClose } from "../components/ModalTapOutsideToClose";
 import { useMeQuery } from "../generated/graphql";
@@ -72,19 +79,11 @@ const ProfileNavigator = () => {
           headerShown: true,
           header: ({ navigation: { navigate }, options }) => {
             return (
-              <View style={tw`flex flex-row items-center border-b`}>
-                <Button
-                  icon={<Icon name="chevron-left" color="#6D28D9" />}
-                  title="Cancel"
-                  type="outline"
-                  buttonStyle={tw`bg-white m-2 w-24`}
-                  titleStyle={tw`text-purple-700`}
-                  onPress={() => navigate("ViewProfile")}
-                />
-                <Text h4 style={tw`text-purple-700`}>
-                  Edit Profile
-                </Text>
-              </View>
+              <HeaderForSubscreens
+                title="Edit Profile"
+                backLabel="Cancel"
+                handleBack={() => navigate("ViewProfile")}
+              />
             );
           },
           headerTitle: "Edit Profile",
@@ -165,8 +164,8 @@ const ProfileHeader = ({
       </View>
       <ProfilePicModal
         uri={profilePicUri}
-        isModalVisible={isModalVisible}
-        setIsModalVisible={setIsModalVisible}
+        visible={isModalVisible}
+        onRequestClose={() => setIsModalVisible(false)}
       />
     </>
   );
@@ -174,19 +173,18 @@ const ProfileHeader = ({
 
 const ProfilePicModal = ({
   uri,
-  isModalVisible,
-  setIsModalVisible,
+  visible,
+  onRequestClose,
 }: {
   uri: string;
-  isModalVisible: boolean;
-  setIsModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  visible: boolean;
+  onRequestClose: (() => void) | undefined;
 }) => {
   return (
     <ModalTapOutsideToClose
       animationType="slide"
       transparent={true}
-      visible={isModalVisible}
-      onRequestClose={() => setIsModalVisible(false)}
+      {...{ visible, onRequestClose }}
     >
       <View
         style={tw`bg-purple-300 rounded-lg w-96 h-96 flex justify-center items-center`}
@@ -269,85 +267,113 @@ const ProfilePosts = () => {
 
 const EditProfileScreen = () => {
   const navigation = useProfileStackNavigation();
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const {
     data: { profile },
   } = fakeResult;
   const profilePicUri = getProfilePicUri(profile.username);
 
   return (
-    <ScrollView>
-      <Formik
-        initialValues={{
-          displayName: profile.displayName,
-          username: profile.username,
-          email: profile.email,
-          bio: profile.bio,
-        }}
-        onSubmit={(values) => {
-          console.log(values);
-        }}
-      >
-        {() => (
-          <>
-            <View
-              style={tw`rounded-lg p-2 border-4 border-purple-700 m-2 w-56 h-56 flex items-center justify-center`}
-            >
-              <TouchableOpacity>
-                <View
-                  style={tw`absolute w-full h-full z-10 flex items-center justify-center`}
-                >
-                  <Icon name="edit" color="white" size={40} />
+    <>
+      <ScrollView>
+        <Formik
+          initialValues={{
+            displayName: profile.displayName,
+            username: profile.username,
+            email: profile.email,
+            bio: profile.bio,
+          }}
+          onSubmit={(values) => {
+            console.log(values);
+          }}
+        >
+          {() => (
+            <>
+              <View
+                style={tw`rounded-lg border-4 border-purple-700 m-2 w-56 h-56 flex items-center justify-center`}
+              >
+                <TouchableOpacity onPress={() => setIsModalVisible(true)}>
+                  <View
+                    style={tw`absolute w-full h-full z-10 flex items-center justify-center`}
+                  >
+                    <Icon name="edit" color="white" size={40} />
+                  </View>
+                  <CachelessImage
+                    uri={profilePicUri}
+                    style={tw`opacity-80 w-52 h-52`}
+                  />
+                </TouchableOpacity>
+              </View>
+              <View style={tw`flex flex-row`}>
+                <View style={tw`w-6/12`}>
+                  <FormikInput
+                    name="displayName"
+                    label="Display Name"
+                    placeholder="Joe Mama"
+                    leftIcon={<Icon name="badge" />}
+                    autoCompleteType="name"
+                    autoCapitalize="words"
+                  />
                 </View>
-                <CachelessImage
-                  uri={profilePicUri}
-                  style={tw`opacity-80 w-52 h-52`}
-                />
-              </TouchableOpacity>
-            </View>
-            <View style={tw`flex flex-row`}>
-              <View style={tw`w-6/12`}>
-                <FormikInput
-                  name="displayName"
-                  label="Display Name"
-                  placeholder="Joe Mama"
-                  leftIcon={<Icon name="badge" />}
-                  autoCompleteType="name"
-                  autoCapitalize="words"
-                />
+                <View style={tw`w-6/12`}>
+                  <FormikInput
+                    name="username"
+                    label="Username"
+                    placeholder="joemama123"
+                    leftIcon={<Icon name="alternate-email" />}
+                    autoCapitalize="none"
+                  />
+                </View>
               </View>
-              <View style={tw`w-6/12`}>
-                <FormikInput
-                  name="username"
-                  label="Username"
-                  placeholder="joemama123"
-                  leftIcon={<Icon name="alternate-email" />}
-                  autoCapitalize="none"
-                />
-              </View>
-            </View>
-            <FormikInput
-              name="email"
-              label="Email"
-              placeholder="joe@mama.edu"
-              leftIcon={<Icon name="email" />}
-              autoCompleteType="email"
-            />
-            <FormikInput
-              name="bio"
-              label="Bio"
-              placeholder="I love reaching my fitness goals with Fitness Dium!"
-              multiline
-            />
-            <Button
-              icon={<Icon name="check" color="white" />}
-              title="accept changes"
-              buttonStyle={tw`bg-green-600`}
-              onPress={() => navigation.navigate("ViewProfile")}
-            />
-          </>
-        )}
-      </Formik>
-    </ScrollView>
+              <FormikInput
+                name="email"
+                label="Email"
+                placeholder="joe@mama.edu"
+                leftIcon={<Icon name="email" />}
+                autoCompleteType="email"
+              />
+              <FormikInput
+                name="bio"
+                label="Bio"
+                placeholder="I love reaching my fitness goals with Fitness Dium!"
+                multiline
+              />
+              <Button
+                icon={<Icon name="check" color="white" />}
+                title="accept changes"
+                buttonStyle={tw`bg-green-600`}
+                onPress={() => navigation.navigate("ViewProfile")}
+              />
+            </>
+          )}
+        </Formik>
+      </ScrollView>
+      <EditProfilePicModal
+        username={profile.username}
+        visible={isModalVisible}
+        onRequestClose={() => setIsModalVisible(false)}
+      />
+    </>
+  );
+};
+
+const EditProfilePicModal = ({
+  username,
+  visible,
+  onRequestClose,
+}: {
+  username: string;
+  visible: boolean;
+  onRequestClose: () => void;
+}) => {
+  return (
+    <Modal animationType="slide" {...{ visible, onRequestClose }}>
+      <HeaderForSubscreens
+        title="Edit Profile Picture"
+        backLabel="Close"
+        handleBack={onRequestClose}
+      />
+    </Modal>
   );
 };
 
