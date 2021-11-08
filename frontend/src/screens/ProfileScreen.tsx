@@ -66,23 +66,7 @@ const ProfileNavigator = () => {
       initialRouteName="ViewProfile"
     >
       <ProfileStack.Screen name="ViewProfile" component={ViewProfileScreen} />
-      <ProfileStack.Screen
-        name="EditProfile"
-        component={EditProfileScreen}
-        options={{
-          headerShown: true,
-          header: ({ navigation: { navigate }, options }) => {
-            return (
-              <HeaderForSubscreens
-                title="Edit Profile"
-                backLabel="Cancel"
-                handleBack={() => navigate("ViewProfile")}
-              />
-            );
-          },
-          headerTitle: "Edit Profile",
-        }}
-      />
+      <ProfileStack.Screen name="EditProfile" component={EditProfileScreen} />
     </ProfileStack.Navigator>
   );
 };

@@ -7,10 +7,12 @@ export const HeaderForSubscreens = ({
   title,
   backLabel,
   handleBack,
+  rightComponent,
 }: {
   title: string;
   backLabel: string;
   handleBack: (event: GestureResponderEvent) => void;
+  rightComponent?: React.ReactNode;
 }) => {
   return (
     <View style={tw`flex flex-row items-center border-b`}>
@@ -22,9 +24,12 @@ export const HeaderForSubscreens = ({
         titleStyle={tw`text-purple-700`}
         onPress={handleBack}
       />
-      <Text h4 style={tw`text-purple-700`}>
-        {title}
-      </Text>
+      <View style={tw`flex-1 flex flex-row justify-between mr-2 items-center`}>
+        <Text h4 style={tw`text-purple-700`}>
+          {title}
+        </Text>
+        {rightComponent}
+      </View>
     </View>
   );
 };

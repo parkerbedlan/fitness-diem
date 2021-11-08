@@ -10,7 +10,7 @@ import { getProfilePicUri } from "../../utils/getProfilePicUri";
 import { fakeResult, useProfileStackNavigation } from "../ProfileScreen";
 
 export const EditProfileScreen = () => {
-  const navigation = useProfileStackNavigation();
+  const { navigate } = useProfileStackNavigation();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const {
     data: { profile },
@@ -19,20 +19,33 @@ export const EditProfileScreen = () => {
 
   return (
     <>
-      <ScrollView>
-        <Formik
-          initialValues={{
-            displayName: profile.displayName,
-            username: profile.username,
-            email: profile.email,
-            bio: profile.bio,
-          }}
-          onSubmit={(values) => {
-            console.log(values);
-          }}
-        >
-          {() => (
-            <>
+      <Formik
+        initialValues={{
+          displayName: profile.displayName,
+          username: profile.username,
+          email: profile.email,
+          bio: profile.bio,
+        }}
+        onSubmit={(values) => {
+          console.log("submitted", values);
+          throw new Error("edit profile not yet implemented");
+        }}
+      >
+        {({ handleSubmit }) => (
+          <>
+            <HeaderForSubscreens
+              title="Edit Profile"
+              backLabel="Cancel"
+              handleBack={() => navigate("ViewProfile")}
+              rightComponent={
+                <Button
+                  title="Save changes"
+                  buttonStyle={tw`bg-green-600`}
+                  onPress={handleSubmit as () => void}
+                />
+              }
+            />
+            <ScrollView>
               <View
                 style={tw`rounded-lg border-4 border-purple-700 m-2 w-56 h-56 flex items-center justify-center`}
               >
@@ -84,14 +97,14 @@ export const EditProfileScreen = () => {
               />
               <Button
                 icon={<Icon name="check" color="white" />}
-                title="accept changes"
+                title="Save changes"
                 buttonStyle={tw`bg-green-600`}
-                onPress={() => navigation.navigate("ViewProfile")}
+                onPress={handleSubmit as () => void}
               />
-            </>
-          )}
-        </Formik>
-      </ScrollView>
+            </ScrollView>
+          </>
+        )}
+      </Formik>
       <EditProfilePicModal
         username={profile.username}
         visible={isModalVisible}
