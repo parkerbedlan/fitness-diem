@@ -13,7 +13,7 @@ import tw from "tailwind-react-native-classnames";
 import { useLogoutMutation } from "../generated/graphql";
 import HomeScreen, { HomeScreenName } from "../screens/HomeScreen";
 import LoginScreen, { LoginScreenName } from "../screens/LoginScreen";
-import ProfileScreen, { ProfileScreenName } from "../screens/ProfileScreen";
+import { ProfileScreenName, ProfileScreen } from "../screens/ProfileScreen";
 import SignupScreen, { SignupScreenName } from "../screens/SignupScreen";
 import UploadTestScreen, { UploadTestName } from "../screens/UploadTestScreen";
 import { updateLogout } from "../utils/GraphQLUtils";
