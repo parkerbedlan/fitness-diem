@@ -149,10 +149,8 @@ export const EditProfileScreen = () => {
         )}
       </Formik>
       <EditProfilePicModal
-        userId={profileData.me.id}
         visible={isEditPicModalVisible}
         onRequestClose={() => setIsEditPicModalVisible(false)}
-        image={image}
         setImage={setImage}
       />
       <CancelEditsModal
