@@ -1,33 +1,32 @@
+import * as ImagePicker from "expo-image-picker";
 import { Formik } from "formik";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
-  Modal,
   Platform,
   ScrollView,
   TouchableOpacity,
   View,
 } from "react-native";
 import { Button, Icon, Text } from "react-native-elements";
+import * as mime from "react-native-mime-types";
 import tw from "tailwind-react-native-classnames";
 import { CachelessImage } from "../../components/CachelessImage";
 import CenteredContainer from "../../components/CenteredContainer";
 import FormikInput from "../../components/FormikInput";
 import { HeaderForSubscreens } from "../../components/HeaderForSubscreens";
+import { ModalCancelConfirm } from "../../components/ModalCancelConfirm";
 import { ModalTapOutsideToClose } from "../../components/ModalTapOutsideToClose";
 import {
   useEditProfileMutation,
   useEditProfilePicMutation,
   useMeProfileQuery,
 } from "../../generated/graphql";
+import { generateRNFile } from "../../utils/generateRNFile";
 import { getProfilePicUri } from "../../utils/getProfilePicUri";
 import { toErrorMap } from "../../utils/toErrorMap";
-import { useProfileStackNavigation } from "../ProfileScreen";
-import * as ImagePicker from "expo-image-picker";
 import { urltoFile } from "../../utils/urlToFile";
-import * as mime from "react-native-mime-types";
-import { generateRNFile } from "../../utils/generateRNFile";
-import { ModalCancelConfirm } from "../../components/ModalCancelConfirm";
+import { useProfileStackNavigation } from "../ProfileScreen";
 
 export const EditProfileScreen = () => {
   const { navigate } = useProfileStackNavigation();
@@ -189,16 +188,12 @@ const EditableProfilePic = ({
 };
 
 const EditProfilePicModal = ({
-  userId,
   visible,
   onRequestClose,
-  image,
   setImage,
 }: {
-  userId: number;
   visible: boolean;
   onRequestClose: () => void;
-  image: string;
   setImage: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const [editProfilePic] = useEditProfilePicMutation();
@@ -250,6 +245,7 @@ const EditProfilePicModal = ({
       <View style={tw`bg-gray-300 rounded-lg p-4 flex`}>
         <Button
           title="Take photo"
+          icon={<Icon name="photo-camera" color="white" />}
           buttonStyle={tw`mb-2 bg-purple-700`}
           onPress={() => {
             pickImage("camera");
@@ -258,6 +254,7 @@ const EditProfilePicModal = ({
         />
         <Button
           title="Choose existing photo"
+          icon={<Icon name="file-upload" color="white" />}
           buttonStyle={tw`bg-purple-700`}
           onPress={() => {
             pickImage("library");

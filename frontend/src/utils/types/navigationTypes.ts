@@ -22,10 +22,6 @@ import {
   SignupScreenName,
   SignupScreenParams,
 } from "../../screens/SignupScreen";
-import {
-  UploadTestName,
-  UploadTestParams,
-} from "../../screens/UploadTestScreen";
 
 export type RootScreenList = {
   [HomeScreenName]: HomeScreenParams;
