@@ -16,6 +16,13 @@ export type Scalars = {
   Upload: any;
 };
 
+export type EditProfileInput = {
+  bio?: Maybe<Scalars['String']>;
+  displayName?: Maybe<Scalars['String']>;
+  email?: Maybe<Scalars['String']>;
+  username?: Maybe<Scalars['String']>;
+};
+
 export type FieldError = {
   __typename?: 'FieldError';
   field: Scalars['String'];
@@ -27,6 +34,7 @@ export type Mutation = {
   changePassword: UserResponse;
   createPost: Post;
   deletePost: Scalars['Boolean'];
+  editProfile: UserResponse;
   forgotPassword: Scalars['Boolean'];
   login: UserResponse;
   logout: Scalars['Boolean'];
@@ -52,6 +60,11 @@ export type MutationDeletePostArgs = {
 };
 
 
+export type MutationEditProfileArgs = {
+  options: EditProfileInput;
+};
+
+
 export type MutationForgotPasswordArgs = {
   email: Scalars['String'];
 };
@@ -64,7 +77,7 @@ export type MutationLoginArgs = {
 
 
 export type MutationRegisterArgs = {
-  options: UsernamePasswordInput;
+  options: RegisterInput;
 };
 
 
@@ -109,9 +122,18 @@ export type QueryPostArgs = {
   id: Scalars['Int'];
 };
 
+export type RegisterInput = {
+  confirmPassword: Scalars['String'];
+  email: Scalars['String'];
+  password: Scalars['String'];
+  username: Scalars['String'];
+};
+
 export type User = {
   __typename?: 'User';
+  bio?: Maybe<Scalars['String']>;
   createdAt: Scalars['String'];
+  displayName?: Maybe<Scalars['String']>;
   email: Scalars['String'];
   id: Scalars['Float'];
   updatedAt: Scalars['String'];
@@ -122,13 +144,6 @@ export type UserResponse = {
   __typename?: 'UserResponse';
   errors?: Maybe<Array<FieldError>>;
   user?: Maybe<User>;
-};
-
-export type UsernamePasswordInput = {
-  confirmPassword: Scalars['String'];
-  email: Scalars['String'];
-  password: Scalars['String'];
-  username: Scalars['String'];
 };
 
 export type PostSnippetFragment = { __typename?: 'Post', id: number, createdAt: string, updatedAt: string, title: string, textSnippet: string, creator: { __typename?: 'User', id: number, username: string } };
@@ -153,7 +168,7 @@ export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 export type LogoutMutation = { __typename?: 'Mutation', logout: boolean };
 
 export type RegisterMutationVariables = Exact<{
-  options: UsernamePasswordInput;
+  options: RegisterInput;
 }>;
 
 
@@ -289,7 +304,7 @@ export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
 export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
 export type LogoutMutationOptions = Apollo.BaseMutationOptions<LogoutMutation, LogoutMutationVariables>;
 export const RegisterDocument = gql`
-    mutation Register($options: UsernamePasswordInput!) {
+    mutation Register($options: RegisterInput!) {
   register(options: $options) {
     ...RegularUserResponse
   }
