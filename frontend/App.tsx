@@ -2,6 +2,7 @@ import React from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ThemeProvider } from "react-native-elements";
 import LoginScreen, { LoginScreenName } from "./src/screens/LoginScreen";
+import WorkoutsScreen, { WorkoutsScreenName } from "./src/screens/WorkoutsScreen";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen, { HomeScreenName } from "./src/screens/HomeScreen";
@@ -28,6 +29,13 @@ const Navigator = () => {
           headerShown: false,
         }}
       >
+        <Stack.Screen
+          name={WorkoutsScreenName}
+          component={WorkoutsScreen}
+          options={{
+            headerShown: true,
+          }}
+        />
         <Stack.Screen name={LoginScreenName} component={LoginScreen} />
         <Stack.Screen
           name={HomeScreenName}
