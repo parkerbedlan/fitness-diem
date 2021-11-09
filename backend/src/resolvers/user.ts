@@ -58,13 +58,13 @@ export class UserResolver {
     @Arg("options") options: EditProfileInput,
     @Ctx() { req }: MyContext
   ): Promise<UserResponse> {
+    // ignore null/undefined values (reduces payload not needing to repeat unchanged fields)
+    const newValues = deleteNullUndefinedValues(options);
+
+    const validationErrors = await validateFields(newValues);
+    if (validationErrors) return { errors: validationErrors };
+
     try {
-      // ignore null/undefined values (reduces payload not needing to repeat unchanged fields)
-      const newValues = deleteNullUndefinedValues(options);
-
-      const validationErrors = await validateFields(newValues);
-      if (validationErrors) return { errors: validationErrors };
-
       const result = await getConnection()
         .createQueryBuilder()
         .update(User)
@@ -74,9 +74,19 @@ export class UserResolver {
         .execute();
       return { user: result.raw[0] as User };
     } catch (error) {
-      // TODO: add conditionals for each error and give a specific field and message for each error
-      // and use a general error for an else for anything you end up missing
-      console.error(error);
+      if (error.detail.includes("already exists")) {
+        if (error.detail.includes("username")) {
+          return {
+            errors: [
+              { field: "username", message: "That username already exists" },
+            ],
+          };
+        } else if (error.detail.includes("email")) {
+          return {
+            errors: [{ field: "email", message: "That email already exists" }],
+          };
+        }
+      }
       return {
         errors: [{ field: "username", message: error.message as string }],
       };

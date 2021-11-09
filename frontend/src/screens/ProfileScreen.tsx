@@ -4,7 +4,6 @@ import {
   NativeStackNavigationProp,
 } from "@react-navigation/native-stack";
 import React from "react";
-import { HeaderForSubscreens } from "../components/HeaderForSubscreens";
 import { useIsAuth } from "../utils/hooks/useIsAuth";
 import { useRootScreen } from "../utils/hooks/useRootScreen";
 import { EditProfileScreen } from "./profile/EditProfileScreen";

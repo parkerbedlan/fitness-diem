@@ -1,37 +1,74 @@
 import { Formik } from "formik";
 import React, { useState } from "react";
-import { ScrollView, View, TouchableOpacity, Modal } from "react-native";
-import { Icon, Button } from "react-native-elements";
+import {
+  ScrollView,
+  View,
+  TouchableOpacity,
+  Modal,
+  ActivityIndicator,
+} from "react-native";
+import { Icon, Button, Text } from "react-native-elements";
 import tw from "tailwind-react-native-classnames";
 import { CachelessImage } from "../../components/CachelessImage";
+import CenteredContainer from "../../components/CenteredContainer";
 import FormikInput from "../../components/FormikInput";
 import { HeaderForSubscreens } from "../../components/HeaderForSubscreens";
+import {
+  useEditProfileMutation,
+  useMeProfileQuery,
+} from "../../generated/graphql";
 import { getProfilePicUri } from "../../utils/getProfilePicUri";
+import { toErrorMap } from "../../utils/toErrorMap";
 import { fakeResult, useProfileStackNavigation } from "../ProfileScreen";
 
 export const EditProfileScreen = () => {
   const { navigate } = useProfileStackNavigation();
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const {
-    data: { profile },
-  } = fakeResult;
-  const profilePicUri = getProfilePicUri(profile.username);
+  const { data: profileData, loading: profileLoading } = useMeProfileQuery();
+
+  if (profileLoading)
+    return (
+      <CenteredContainer>
+        <ActivityIndicator size="large" color="#10B981" />
+      </CenteredContainer>
+    );
+
+  if (!profileData || !profileData.me)
+    return (
+      <CenteredContainer>
+        <Text h1>You are not logged in.</Text>
+      </CenteredContainer>
+    );
+
+  const profilePicUri = getProfilePicUri(profileData.me.username);
+
+  const { displayName, username, email, bio } = profileData.me;
+  const initialValues = { displayName, username, email, bio };
+
+  const [editProfile] = useEditProfileMutation();
 
   return (
     <>
       <Formik
-        initialValues={{
-          displayName: profile.displayName,
-          username: profile.username,
-          email: profile.email,
-          bio: profile.bio,
-        }}
-        onSubmit={(values) => {
-          console.log("submitted", values);
-          throw new Error("edit profile not yet implemented");
+        initialValues={initialValues}
+        onSubmit={async (values, { setErrors }) => {
+          let filteredValues = { ...values };
+          Object.keys(values).forEach((key) => {
+            if (filteredValues[key] === initialValues[key])
+              delete filteredValues[key];
+          });
+          console.log("submitted", filteredValues);
+          const response = await editProfile({
+            variables: { options: filteredValues },
+          });
+          if (response.data?.editProfile.errors) {
+            setErrors(toErrorMap(response.data.editProfile.errors));
+          } else if (response.data?.editProfile.user) {
+            navigate("ViewProfile");
+          }
         }}
       >
-        {({ handleSubmit }) => (
+        {({ handleSubmit, isSubmitting }) => (
           <>
             <HeaderForSubscreens
               title="Edit Profile"
@@ -42,6 +79,7 @@ export const EditProfileScreen = () => {
                   title="Save changes"
                   buttonStyle={tw`bg-green-600`}
                   onPress={handleSubmit as () => void}
+                  loading={isSubmitting}
                 />
               }
             />
@@ -100,13 +138,14 @@ export const EditProfileScreen = () => {
                 title="Save changes"
                 buttonStyle={tw`bg-green-600`}
                 onPress={handleSubmit as () => void}
+                loading={isSubmitting}
               />
             </ScrollView>
           </>
         )}
       </Formik>
       <EditProfilePicModal
-        username={profile.username}
+        username={profileData.me.username}
         visible={isModalVisible}
         onRequestClose={() => setIsModalVisible(false)}
       />

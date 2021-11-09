@@ -1,11 +1,18 @@
 import React, { useState } from "react";
-import { View, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity, ActivityIndicator } from "react-native";
 import { Icon, Button, Text } from "react-native-elements";
 import tw from "tailwind-react-native-classnames";
 import { CachelessImage } from "../../components/CachelessImage";
+import CenteredContainer from "../../components/CenteredContainer";
 import { LineRule } from "../../components/LineRule";
 import { ModalTapOutsideToClose } from "../../components/ModalTapOutsideToClose";
-import { useMeQuery } from "../../generated/graphql";
+import {
+  EditProfileInput,
+  MeProfileQueryResult,
+  ProfileUserFragment,
+  useMeProfileQuery,
+  useMeQuery,
+} from "../../generated/graphql";
 import { getProfilePicUri } from "../../utils/getProfilePicUri";
 import {
   fakeResult,
@@ -15,17 +22,26 @@ import {
 } from "../ProfileScreen";
 
 export const ViewProfileScreen = () => {
-  const { data: meData } = useMeQuery();
-  const { data: profileData } = fakeResult;
-  const { profile } = profileData;
+  const { data: profileData, loading } = useMeProfileQuery();
+
+  if (loading)
+    return (
+      <CenteredContainer>
+        <ActivityIndicator size="large" color="#10B981" />
+      </CenteredContainer>
+    );
+
+  if (!profileData || !profileData.me)
+    return (
+      <CenteredContainer>
+        <Text h1>You are not logged in.</Text>
+      </CenteredContainer>
+    );
 
   return (
     <>
-      <ProfileHeader
-        profile={profile}
-        editable={meData?.me?.username === profile.username}
-      />
-      <ProfileBody profile={profile} />
+      <ProfileHeader profile={profileData.me} editable={true} />
+      <ProfileBody profile={profileData.me} />
     </>
   );
 };
@@ -34,7 +50,7 @@ const ProfileHeader = ({
   profile: profileHeaderInfo,
   editable,
 }: {
-  profile: ProfileHeaderInfo;
+  profile: ProfileUserFragment;
   editable: boolean;
 }) => {
   const { navigate } = useProfileStackNavigation();
@@ -112,14 +128,15 @@ const ProfilePicModal = ({
   );
 };
 
-const ProfileBody = ({
-  profile,
-}: {
-  profile: typeof fakeResult.data.profile;
-}) => {
+const ProfileBody = ({ profile }: { profile: ProfileUserFragment }) => {
   return (
     <View style={tw`p-4 bg-gray-50`}>
-      <ProfileStats stats={profile.stats} />
+      <ProfileStats
+        stats={{
+          streakDays: 15,
+          totalWorkouts: 420,
+        }}
+      />
       <LineRule />
       <ProfileRegimen />
       <LineRule />
