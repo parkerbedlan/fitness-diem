@@ -9,7 +9,7 @@ export const fieldCriteria = {
     .string()
     .required("Please enter your username")
     .min(4, "Your username must contain at least 4 characters")
-    .max(15, "Your username cannot be more than 15 characters")
+    .max(16, "Your username cannot be more than 16 characters")
     .matches(
       /^[A-Za-z0-9]+$/,
       "Your username can contain letters and numbers only"
@@ -18,6 +18,7 @@ export const fieldCriteria = {
     .string()
     .required("Please enter your password")
     .min(8, "Password must contain at least 8 characters")
+    .max(64, "Password must be less than 64 characters")
     .matches(/.*\d.*/, "Password must contain at least one number")
     .matches(/.*[A-Z].*/, "Password must contain at least one uppercase letter")
     .matches(
