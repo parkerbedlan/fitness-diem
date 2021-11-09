@@ -1,25 +1,17 @@
 import React, { useState } from "react";
-import { View, TouchableOpacity, ActivityIndicator } from "react-native";
-import { Icon, Button, Text } from "react-native-elements";
+import { ActivityIndicator, TouchableOpacity, View } from "react-native";
+import { Button, Icon, Text } from "react-native-elements";
 import tw from "tailwind-react-native-classnames";
 import { CachelessImage } from "../../components/CachelessImage";
 import CenteredContainer from "../../components/CenteredContainer";
 import { LineRule } from "../../components/LineRule";
 import { ModalTapOutsideToClose } from "../../components/ModalTapOutsideToClose";
 import {
-  EditProfileInput,
-  MeProfileQueryResult,
   ProfileUserFragment,
   useMeProfileQuery,
-  useMeQuery,
 } from "../../generated/graphql";
 import { getProfilePicUri } from "../../utils/getProfilePicUri";
-import {
-  fakeResult,
-  ProfileHeaderInfo,
-  ProfileStatsInfo,
-  useProfileStackNavigation,
-} from "../ProfileScreen";
+import { ProfileStatsInfo, useProfileStackNavigation } from "../ProfileScreen";
 
 export const ViewProfileScreen = () => {
   const { data: profileData, loading } = useMeProfileQuery();
@@ -55,7 +47,7 @@ const ProfileHeader = ({
 }) => {
   const { navigate } = useProfileStackNavigation();
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const profilePicUri = getProfilePicUri(profileHeaderInfo.username);
+  const profilePicUri = getProfilePicUri(profileHeaderInfo.id);
   return (
     <>
       <View style={tw`top-0 h-40 bg-gray-200 p-4`}>
@@ -63,8 +55,8 @@ const ProfileHeader = ({
           <TouchableOpacity onPress={() => setIsModalVisible(true)}>
             <CachelessImage
               uri={profilePicUri}
-              cacheless={false}
               style={tw`rounded-full w-20 h-20 mr-4 mb-4`}
+              PlaceholderContent={<Icon name="account-circle" size={60} />}
             />
           </TouchableOpacity>
           <View
@@ -122,7 +114,11 @@ const ProfilePicModal = ({
       <View
         style={tw`bg-purple-300 rounded-lg w-96 h-96 flex justify-center items-center`}
       >
-        <CachelessImage uri={uri} cacheless={false} style={tw`w-80 h-80`} />
+        <CachelessImage
+          uri={uri}
+          style={tw`w-80 h-80`}
+          PlaceholderContent={<Icon name="account-circle" size={300} />}
+        />
       </View>
     </ModalTapOutsideToClose>
   );

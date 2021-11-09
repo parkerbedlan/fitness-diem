@@ -1,0 +1,3 @@
+mutation EditProfilePic($fileUpload: Upload!) {
+  editProfilePic(fileUpload: $fileUpload)
+}

@@ -1,29 +1,37 @@
+import * as ImagePicker from "expo-image-picker";
 import { Formik } from "formik";
 import React, { useState } from "react";
 import {
-  ScrollView,
-  View,
-  TouchableOpacity,
-  Modal,
   ActivityIndicator,
+  Platform,
+  ScrollView,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { Icon, Button, Text } from "react-native-elements";
+import { Button, Icon, Text } from "react-native-elements";
+import * as mime from "react-native-mime-types";
 import tw from "tailwind-react-native-classnames";
 import { CachelessImage } from "../../components/CachelessImage";
 import CenteredContainer from "../../components/CenteredContainer";
 import FormikInput from "../../components/FormikInput";
 import { HeaderForSubscreens } from "../../components/HeaderForSubscreens";
+import { ModalCancelConfirm } from "../../components/ModalCancelConfirm";
+import { ModalTapOutsideToClose } from "../../components/ModalTapOutsideToClose";
 import {
   useEditProfileMutation,
+  useEditProfilePicMutation,
   useMeProfileQuery,
 } from "../../generated/graphql";
+import { generateRNFile } from "../../utils/generateRNFile";
 import { getProfilePicUri } from "../../utils/getProfilePicUri";
 import { toErrorMap } from "../../utils/toErrorMap";
-import { fakeResult, useProfileStackNavigation } from "../ProfileScreen";
+import { urltoFile } from "../../utils/urlToFile";
+import { useProfileStackNavigation } from "../ProfileScreen";
 
 export const EditProfileScreen = () => {
   const { navigate } = useProfileStackNavigation();
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isEditPicModalVisible, setIsEditPicModalVisible] = useState(false);
+  const [isCancelModalVisible, setisCancelModalVisible] = useState(false);
   const { data: profileData, loading: profileLoading } = useMeProfileQuery();
 
   if (profileLoading)
@@ -40,7 +48,8 @@ export const EditProfileScreen = () => {
       </CenteredContainer>
     );
 
-  const profilePicUri = getProfilePicUri(profileData.me.username);
+  const initialImage = getProfilePicUri(profileData.me.id);
+  const [image, setImage] = useState<string>(initialImage);
 
   const { displayName, username, email, bio } = profileData.me;
   const initialValues = { displayName, username, email, bio };
@@ -68,12 +77,18 @@ export const EditProfileScreen = () => {
           }
         }}
       >
-        {({ handleSubmit, isSubmitting }) => (
+        {({ handleSubmit, isSubmitting, dirty }) => (
           <>
             <HeaderForSubscreens
               title="Edit Profile"
               backLabel="Cancel"
-              handleBack={() => navigate("ViewProfile")}
+              handleBack={() => {
+                if (dirty) {
+                  setisCancelModalVisible(true);
+                } else {
+                  navigate("ViewProfile");
+                }
+              }}
               rightComponent={
                 <Button
                   title="Save changes"
@@ -84,21 +99,10 @@ export const EditProfileScreen = () => {
               }
             />
             <ScrollView>
-              <View
-                style={tw`rounded-lg border-4 border-purple-700 m-2 w-56 h-56 flex items-center justify-center`}
-              >
-                <TouchableOpacity onPress={() => setIsModalVisible(true)}>
-                  <View
-                    style={tw`absolute w-full h-full z-10 flex items-center justify-center`}
-                  >
-                    <Icon name="edit" color="white" size={40} />
-                  </View>
-                  <CachelessImage
-                    uri={profilePicUri}
-                    style={tw`w-52 h-52 opacity-80`}
-                  />
-                </TouchableOpacity>
-              </View>
+              <EditableProfilePic
+                uri={image}
+                onPress={() => setIsEditPicModalVisible(true)}
+              />
               <View style={tw`flex flex-row`}>
                 <View style={tw`w-6/12`}>
                   <FormikInput
@@ -145,30 +149,137 @@ export const EditProfileScreen = () => {
         )}
       </Formik>
       <EditProfilePicModal
-        username={profileData.me.username}
-        visible={isModalVisible}
-        onRequestClose={() => setIsModalVisible(false)}
+        visible={isEditPicModalVisible}
+        onRequestClose={() => setIsEditPicModalVisible(false)}
+        setImage={setImage}
+      />
+      <CancelEditsModal
+        visible={isCancelModalVisible}
+        onRequestClose={() => setisCancelModalVisible(false)}
+        onCancel={() => navigate("ViewProfile")}
       />
     </>
   );
 };
 
-const EditProfilePicModal = ({
-  username,
-  visible,
-  onRequestClose,
+const EditableProfilePic = ({
+  uri,
+  onPress,
 }: {
-  username: string;
-  visible: boolean;
-  onRequestClose: () => void;
+  uri: string;
+  onPress: () => void;
 }) => {
   return (
-    <Modal animationType="slide" {...{ visible, onRequestClose }}>
-      <HeaderForSubscreens
-        title="Edit Profile Picture"
-        backLabel="Close"
-        handleBack={onRequestClose}
-      />
-    </Modal>
+    <View
+      style={tw`rounded-lg border-4 border-purple-700 m-2 w-56 h-56 flex items-center justify-center`}
+    >
+      <TouchableOpacity onPress={onPress}>
+        <View
+          style={tw`absolute w-full h-full z-10 flex items-center justify-center`}
+        >
+          <Icon name="edit" color="white" size={40} />
+        </View>
+        <CachelessImage uri={uri} style={tw`w-52 h-52 opacity-80`} />
+      </TouchableOpacity>
+    </View>
+  );
+};
+
+const EditProfilePicModal = ({
+  visible,
+  onRequestClose,
+  setImage,
+}: {
+  visible: boolean;
+  onRequestClose: () => void;
+  setImage: React.Dispatch<React.SetStateAction<string>>;
+}) => {
+  const [editProfilePic] = useEditProfilePicMutation();
+
+  const pickImage = async (location: "camera" | "library") => {
+    let picker: typeof ImagePicker.launchCameraAsync;
+
+    if (location === "camera") {
+      await ImagePicker.requestCameraPermissionsAsync();
+      picker = ImagePicker.launchCameraAsync;
+    } else {
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+      picker = ImagePicker.launchImageLibraryAsync;
+    }
+
+    let result = await picker({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.cancelled) {
+      setImage(result.uri);
+      if (Platform.OS === "web") {
+        const file = await urltoFile(
+          result.uri,
+          "newProfilePic.png",
+          mime.lookup(result.uri) || "image"
+        );
+        console.log("file", file);
+        editProfilePic({ variables: { fileUpload: file } });
+      } else {
+        // const file = generateRNFile(result.uri, `picture-${Date.now()}`);
+        const file = generateRNFile(result.uri, "newProfilePic.png");
+        console.log("file", file);
+        editProfilePic({ variables: { fileUpload: file } });
+      }
+    }
+  };
+
+  return (
+    <ModalTapOutsideToClose
+      {...{ visible, onRequestClose }}
+      animationType="fade"
+    >
+      <View style={tw`bg-gray-300 rounded-lg p-4 flex`}>
+        <Button
+          title="Take photo"
+          icon={<Icon name="photo-camera" color="white" />}
+          buttonStyle={tw`mb-2 bg-purple-700`}
+          onPress={() => {
+            pickImage("camera");
+            onRequestClose();
+          }}
+        />
+        <Button
+          title="Choose existing photo"
+          icon={<Icon name="file-upload" color="white" />}
+          buttonStyle={tw`bg-purple-700`}
+          onPress={() => {
+            pickImage("library");
+            onRequestClose();
+          }}
+        />
+      </View>
+    </ModalTapOutsideToClose>
+  );
+};
+
+const CancelEditsModal = ({
+  visible,
+  onRequestClose,
+  onCancel,
+}: {
+  visible: boolean;
+  onRequestClose: () => void;
+  onCancel: () => void;
+}) => {
+  return (
+    <ModalCancelConfirm
+      {...{ visible, onRequestClose, onCancel }}
+      questionText="Are you sure you want to cancel your changes?"
+      cancelText="Cancel changes"
+      confirmText="Keep editing"
+      onConfirm={onRequestClose}
+    />
   );
 };
