@@ -1,5 +1,5 @@
 import { serverBaseUrl } from "./constants";
 
-export const getProfilePicUri = (username: string) => {
-  return `${serverBaseUrl}/profilepic/${username}.png`;
+export const getProfilePicUri = (userId: number) => {
+  return `${serverBaseUrl}/profilepic/${userId}.png`;
 };

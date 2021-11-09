@@ -26,21 +26,6 @@ export type ProfileHeaderInfo = {
 
 export type ProfileStatsInfo = { streakDays: number; totalWorkouts: number };
 
-export const fakeResult = {
-  data: {
-    profile: {
-      username: "parker",
-      displayName: "Parker B",
-      email: "parkerbedlan@gmail.com",
-      bio: "",
-      stats: {
-        streakDays: 15,
-        totalWorkouts: 420,
-      },
-    },
-  },
-};
-
 type ProfileStackScreenList = {
   ViewProfile: undefined;
   EditProfile: undefined;

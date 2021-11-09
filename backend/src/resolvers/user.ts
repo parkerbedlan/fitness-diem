@@ -23,6 +23,9 @@ import { getConnection } from "typeorm";
 import { EditProfileInput } from "./types/EditProfileInput";
 import { deleteNullUndefinedValues } from "../utils/deleteNullUndefinedValues";
 import { validateFields } from "../utils/validation/validateFields";
+import { FileUpload, GraphQLUpload } from "graphql-upload";
+import { createWriteStream } from "fs";
+import path from "path";
 
 @ObjectType()
 export class FieldError {
@@ -50,6 +53,32 @@ export class UserResolver {
       return user.email;
     }
     return "";
+  }
+
+  @Mutation(() => Boolean)
+  async editProfilePic(
+    @Arg("fileUpload", () => GraphQLUpload)
+    { createReadStream }: FileUpload,
+    @Ctx() { req }: MyContext
+  ) {
+    try {
+      await new Promise((res) =>
+        createReadStream()
+          .pipe(
+            createWriteStream(
+              path.join(
+                __dirname,
+                "../images/profilepic",
+                `${req.session.userId}.png`
+              )
+            )
+          )
+          .on("close", res)
+      );
+    } catch (error) {
+      console.error(error);
+    }
+    return true;
   }
 
   @Mutation(() => UserResponse)

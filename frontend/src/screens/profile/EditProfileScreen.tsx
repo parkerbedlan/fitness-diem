@@ -1,25 +1,32 @@
 import { Formik } from "formik";
 import React, { useState } from "react";
 import {
-  ScrollView,
-  View,
-  TouchableOpacity,
-  Modal,
   ActivityIndicator,
+  Modal,
+  Platform,
+  ScrollView,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { Icon, Button, Text } from "react-native-elements";
+import { Button, Icon, Text } from "react-native-elements";
 import tw from "tailwind-react-native-classnames";
 import { CachelessImage } from "../../components/CachelessImage";
 import CenteredContainer from "../../components/CenteredContainer";
 import FormikInput from "../../components/FormikInput";
 import { HeaderForSubscreens } from "../../components/HeaderForSubscreens";
+import { ModalTapOutsideToClose } from "../../components/ModalTapOutsideToClose";
 import {
   useEditProfileMutation,
+  useEditProfilePicMutation,
   useMeProfileQuery,
 } from "../../generated/graphql";
 import { getProfilePicUri } from "../../utils/getProfilePicUri";
 import { toErrorMap } from "../../utils/toErrorMap";
-import { fakeResult, useProfileStackNavigation } from "../ProfileScreen";
+import { useProfileStackNavigation } from "../ProfileScreen";
+import * as ImagePicker from "expo-image-picker";
+import { urltoFile } from "../../utils/urlToFile";
+import * as mime from "react-native-mime-types";
+import { generateRNFile } from "../../utils/generateRNFile";
 
 export const EditProfileScreen = () => {
   const { navigate } = useProfileStackNavigation();
@@ -40,7 +47,8 @@ export const EditProfileScreen = () => {
       </CenteredContainer>
     );
 
-  const profilePicUri = getProfilePicUri(profileData.me.username);
+  const initialImage = getProfilePicUri(profileData.me.id);
+  const [image, setImage] = useState<string>(initialImage);
 
   const { displayName, username, email, bio } = profileData.me;
   const initialValues = { displayName, username, email, bio };
@@ -94,7 +102,7 @@ export const EditProfileScreen = () => {
                     <Icon name="edit" color="white" size={40} />
                   </View>
                   <CachelessImage
-                    uri={profilePicUri}
+                    uri={image}
                     style={tw`w-52 h-52 opacity-80`}
                   />
                 </TouchableOpacity>
@@ -145,30 +153,87 @@ export const EditProfileScreen = () => {
         )}
       </Formik>
       <EditProfilePicModal
-        username={profileData.me.username}
+        userId={profileData.me.id}
         visible={isModalVisible}
         onRequestClose={() => setIsModalVisible(false)}
+        image={image}
+        setImage={setImage}
       />
     </>
   );
 };
 
 const EditProfilePicModal = ({
-  username,
+  userId,
   visible,
   onRequestClose,
+  image,
+  setImage,
 }: {
-  username: string;
+  userId: number;
   visible: boolean;
   onRequestClose: () => void;
+  image: string;
+  setImage: React.Dispatch<React.SetStateAction<string>>;
 }) => {
+  const [editProfilePic] = useEditProfilePicMutation();
+
+  const pickImage = async (location: "camera" | "library") => {
+    let picker: typeof ImagePicker.launchCameraAsync;
+
+    if (location === "camera") {
+      await ImagePicker.requestCameraPermissionsAsync();
+      picker = ImagePicker.launchCameraAsync;
+    } else {
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+      picker = ImagePicker.launchImageLibraryAsync;
+    }
+
+    let result = await picker({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.cancelled) {
+      setImage(result.uri);
+      if (Platform.OS === "web") {
+        const file = await urltoFile(
+          result.uri,
+          "newProfilePic.png",
+          mime.lookup(result.uri) || "image"
+        );
+        console.log("file", file);
+        editProfilePic({ variables: { fileUpload: file } });
+      } else {
+        // const file = generateRNFile(result.uri, `picture-${Date.now()}`);
+        const file = generateRNFile(result.uri, "newProfilePic.png");
+        console.log("file", file);
+        editProfilePic({ variables: { fileUpload: file } });
+      }
+    }
+  };
+
   return (
-    <Modal animationType="slide" {...{ visible, onRequestClose }}>
-      <HeaderForSubscreens
-        title="Edit Profile Picture"
-        backLabel="Close"
-        handleBack={onRequestClose}
-      />
-    </Modal>
+    <ModalTapOutsideToClose
+      {...{ visible, onRequestClose }}
+      animationType="fade"
+    >
+      <View style={tw`bg-gray-300 rounded-lg p-4 flex`}>
+        <Button
+          title="Take photo"
+          buttonStyle={tw`mb-2 bg-purple-700`}
+          onPress={() => pickImage("camera")}
+        />
+        <Button
+          title="Choose existing photo"
+          buttonStyle={tw`bg-purple-700`}
+          onPress={() => pickImage("library")}
+        />
+      </View>
+    </ModalTapOutsideToClose>
   );
 };

@@ -35,6 +35,7 @@ export type Mutation = {
   createPost: Post;
   deletePost: Scalars['Boolean'];
   editProfile: UserResponse;
+  editProfilePic: Scalars['Boolean'];
   forgotPassword: Scalars['Boolean'];
   login: UserResponse;
   logout: Scalars['Boolean'];
@@ -62,6 +63,11 @@ export type MutationDeletePostArgs = {
 
 export type MutationEditProfileArgs = {
   options: EditProfileInput;
+};
+
+
+export type MutationEditProfilePicArgs = {
+  fileUpload: Scalars['Upload'];
 };
 
 
@@ -162,6 +168,13 @@ export type EditProfileMutationVariables = Exact<{
 
 
 export type EditProfileMutation = { __typename?: 'Mutation', editProfile: { __typename?: 'UserResponse', user?: { __typename?: 'User', id: number, username: string, email: string, bio?: string | null | undefined, displayName?: string | null | undefined } | null | undefined, errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined } };
+
+export type EditProfilePicMutationVariables = Exact<{
+  fileUpload: Scalars['Upload'];
+}>;
+
+
+export type EditProfilePicMutation = { __typename?: 'Mutation', editProfilePic: boolean };
 
 export type LoginMutationVariables = Exact<{
   usernameOrEmail: Scalars['String'];
@@ -301,6 +314,37 @@ export function useEditProfileMutation(baseOptions?: Apollo.MutationHookOptions<
 export type EditProfileMutationHookResult = ReturnType<typeof useEditProfileMutation>;
 export type EditProfileMutationResult = Apollo.MutationResult<EditProfileMutation>;
 export type EditProfileMutationOptions = Apollo.BaseMutationOptions<EditProfileMutation, EditProfileMutationVariables>;
+export const EditProfilePicDocument = gql`
+    mutation EditProfilePic($fileUpload: Upload!) {
+  editProfilePic(fileUpload: $fileUpload)
+}
+    `;
+export type EditProfilePicMutationFn = Apollo.MutationFunction<EditProfilePicMutation, EditProfilePicMutationVariables>;
+
+/**
+ * __useEditProfilePicMutation__
+ *
+ * To run a mutation, you first call `useEditProfilePicMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useEditProfilePicMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [editProfilePicMutation, { data, loading, error }] = useEditProfilePicMutation({
+ *   variables: {
+ *      fileUpload: // value for 'fileUpload'
+ *   },
+ * });
+ */
+export function useEditProfilePicMutation(baseOptions?: Apollo.MutationHookOptions<EditProfilePicMutation, EditProfilePicMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<EditProfilePicMutation, EditProfilePicMutationVariables>(EditProfilePicDocument, options);
+      }
+export type EditProfilePicMutationHookResult = ReturnType<typeof useEditProfilePicMutation>;
+export type EditProfilePicMutationResult = Apollo.MutationResult<EditProfilePicMutation>;
+export type EditProfilePicMutationOptions = Apollo.BaseMutationOptions<EditProfilePicMutation, EditProfilePicMutationVariables>;
 export const LoginDocument = gql`
     mutation Login($usernameOrEmail: String!, $password: String!) {
   login(usernameOrEmail: $usernameOrEmail, password: $password) {
