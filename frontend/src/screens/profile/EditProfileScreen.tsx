@@ -27,10 +27,12 @@ import * as ImagePicker from "expo-image-picker";
 import { urltoFile } from "../../utils/urlToFile";
 import * as mime from "react-native-mime-types";
 import { generateRNFile } from "../../utils/generateRNFile";
+import { ModalCancelConfirm } from "../../components/ModalCancelConfirm";
 
 export const EditProfileScreen = () => {
   const { navigate } = useProfileStackNavigation();
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isEditPicModalVisible, setIsEditPicModalVisible] = useState(false);
+  const [isCancelModalVisible, setisCancelModalVisible] = useState(false);
   const { data: profileData, loading: profileLoading } = useMeProfileQuery();
 
   if (profileLoading)
@@ -76,12 +78,18 @@ export const EditProfileScreen = () => {
           }
         }}
       >
-        {({ handleSubmit, isSubmitting }) => (
+        {({ handleSubmit, isSubmitting, dirty }) => (
           <>
             <HeaderForSubscreens
               title="Edit Profile"
               backLabel="Cancel"
-              handleBack={() => navigate("ViewProfile")}
+              handleBack={() => {
+                if (dirty) {
+                  setisCancelModalVisible(true);
+                } else {
+                  navigate("ViewProfile");
+                }
+              }}
               rightComponent={
                 <Button
                   title="Save changes"
@@ -92,21 +100,10 @@ export const EditProfileScreen = () => {
               }
             />
             <ScrollView>
-              <View
-                style={tw`rounded-lg border-4 border-purple-700 m-2 w-56 h-56 flex items-center justify-center`}
-              >
-                <TouchableOpacity onPress={() => setIsModalVisible(true)}>
-                  <View
-                    style={tw`absolute w-full h-full z-10 flex items-center justify-center`}
-                  >
-                    <Icon name="edit" color="white" size={40} />
-                  </View>
-                  <CachelessImage
-                    uri={image}
-                    style={tw`w-52 h-52 opacity-80`}
-                  />
-                </TouchableOpacity>
-              </View>
+              <EditableProfilePic
+                uri={image}
+                onPress={() => setIsEditPicModalVisible(true)}
+              />
               <View style={tw`flex flex-row`}>
                 <View style={tw`w-6/12`}>
                   <FormikInput
@@ -154,12 +151,40 @@ export const EditProfileScreen = () => {
       </Formik>
       <EditProfilePicModal
         userId={profileData.me.id}
-        visible={isModalVisible}
-        onRequestClose={() => setIsModalVisible(false)}
+        visible={isEditPicModalVisible}
+        onRequestClose={() => setIsEditPicModalVisible(false)}
         image={image}
         setImage={setImage}
       />
+      <CancelEditsModal
+        visible={isCancelModalVisible}
+        onRequestClose={() => setisCancelModalVisible(false)}
+        onCancel={() => navigate("ViewProfile")}
+      />
     </>
+  );
+};
+
+const EditableProfilePic = ({
+  uri,
+  onPress,
+}: {
+  uri: string;
+  onPress: () => void;
+}) => {
+  return (
+    <View
+      style={tw`rounded-lg border-4 border-purple-700 m-2 w-56 h-56 flex items-center justify-center`}
+    >
+      <TouchableOpacity onPress={onPress}>
+        <View
+          style={tw`absolute w-full h-full z-10 flex items-center justify-center`}
+        >
+          <Icon name="edit" color="white" size={40} />
+        </View>
+        <CachelessImage uri={uri} style={tw`w-52 h-52 opacity-80`} />
+      </TouchableOpacity>
+    </View>
   );
 };
 
@@ -226,14 +251,40 @@ const EditProfilePicModal = ({
         <Button
           title="Take photo"
           buttonStyle={tw`mb-2 bg-purple-700`}
-          onPress={() => pickImage("camera")}
+          onPress={() => {
+            pickImage("camera");
+            onRequestClose();
+          }}
         />
         <Button
           title="Choose existing photo"
           buttonStyle={tw`bg-purple-700`}
-          onPress={() => pickImage("library")}
+          onPress={() => {
+            pickImage("library");
+            onRequestClose();
+          }}
         />
       </View>
     </ModalTapOutsideToClose>
+  );
+};
+
+const CancelEditsModal = ({
+  visible,
+  onRequestClose,
+  onCancel,
+}: {
+  visible: boolean;
+  onRequestClose: () => void;
+  onCancel: () => void;
+}) => {
+  return (
+    <ModalCancelConfirm
+      {...{ visible, onRequestClose, onCancel }}
+      questionText="Are you sure you want to cancel your changes?"
+      cancelText="Cancel changes"
+      confirmText="Keep editing"
+      onConfirm={onRequestClose}
+    />
   );
 };
