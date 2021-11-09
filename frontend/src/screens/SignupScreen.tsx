@@ -65,6 +65,7 @@ function SignupScreen() {
               label="Email"
               placeholder="joe@mama.edu"
               leftIcon={<Icon name="email" />}
+              autoCompleteType="email"
             />
             <FormikInput
               name="username"
@@ -78,6 +79,7 @@ function SignupScreen() {
               placeholder="password123"
               leftIcon={<Icon name="lock" />}
               secureTextEntry={true}
+              autoCompleteType="password"
             />
             <FormikInput
               name="confirmPassword"

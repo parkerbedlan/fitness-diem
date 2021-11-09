@@ -1,0 +1,10 @@
+mutation EditProfile($options: EditProfileInput!) {
+  editProfile(options: $options) {
+    user {
+      ...ProfileUser
+    }
+    errors {
+      ...RegularError
+    }
+  }
+}

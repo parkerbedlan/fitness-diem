@@ -1,19 +1,71 @@
+import { useIsFocused, useNavigation } from "@react-navigation/core";
+import {
+  createNativeStackNavigator,
+  NativeStackNavigationProp,
+} from "@react-navigation/native-stack";
 import React from "react";
-import { Text } from "react-native-elements";
-import CenteredContainer from "../components/CenteredContainer";
+import { useIsAuth } from "../utils/hooks/useIsAuth";
+import { useRootScreen } from "../utils/hooks/useRootScreen";
+import { EditProfileScreen } from "./profile/EditProfileScreen";
+import { ViewProfileScreen } from "./profile/ViewProfileScreen";
 
 export const ProfileScreenName = "Profile";
 
 export type ProfileScreenParams = undefined;
 
-function ProfileScreen() {
-  return (
-    <>
-      <CenteredContainer>
-        <Text h1>hi</Text>
-      </CenteredContainer>
-    </>
-  );
-}
+export const ProfileScreen = () => {
+  return <ProfileNavigator />;
+};
 
-export default ProfileScreen;
+export type ProfileHeaderInfo = {
+  username: string;
+  displayName: string;
+  email: string;
+  bio: string;
+};
+
+export type ProfileStatsInfo = { streakDays: number; totalWorkouts: number };
+
+export const fakeResult = {
+  data: {
+    profile: {
+      username: "parker",
+      displayName: "Parker B",
+      email: "parkerbedlan@gmail.com",
+      bio: "",
+      stats: {
+        streakDays: 15,
+        totalWorkouts: 420,
+      },
+    },
+  },
+};
+
+type ProfileStackScreenList = {
+  ViewProfile: undefined;
+  EditProfile: undefined;
+};
+
+const ProfileStack = createNativeStackNavigator<ProfileStackScreenList>();
+
+export const useProfileStackNavigation = () =>
+  useNavigation<
+    NativeStackNavigationProp<
+      ProfileStackScreenList,
+      keyof ProfileStackScreenList
+    >
+  >();
+
+const ProfileNavigator = () => {
+  const { navigation: rootNavigation } = useRootScreen();
+  useIsAuth(rootNavigation, useIsFocused());
+  return (
+    <ProfileStack.Navigator
+      screenOptions={{ headerShown: false }}
+      initialRouteName="ViewProfile"
+    >
+      <ProfileStack.Screen name="ViewProfile" component={ViewProfileScreen} />
+      <ProfileStack.Screen name="EditProfile" component={EditProfileScreen} />
+    </ProfileStack.Navigator>
+  );
+};

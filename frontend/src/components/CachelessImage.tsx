@@ -14,6 +14,7 @@ export const CachelessImage: React.FC<CachelessImageProps> = (props) => {
   return (
     <Image
       {...props}
+      style={props.style || { width: 200, height: 200 }}
       source={{
         ...(props.source as Object),
         uri: cacheless ? `${props.uri}?${new Date()}` : props.uri,

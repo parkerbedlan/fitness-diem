@@ -11,13 +11,18 @@ import {
   Query,
   Resolver,
   Root,
+  UseMiddleware,
 } from "type-graphql";
 import argon2 from "argon2";
 import { COOKIE_NAME, FORGOT_PASSWORD_PREFIX } from "../constants";
-import { validateRegister } from "../utils/validateRegister";
 import { sendEmail } from "../utils/sendEmail";
 import { v4 as uuid } from "uuid";
-import { UsernamePasswordInput } from "./UsernamePasswordInput";
+import { RegisterInput } from "./types/RegisterInput";
+import { isAuth } from "../middleware/isAuth";
+import { getConnection } from "typeorm";
+import { EditProfileInput } from "./types/EditProfileInput";
+import { deleteNullUndefinedValues } from "../utils/deleteNullUndefinedValues";
+import { validateFields } from "../utils/validation/validateFields";
 
 @ObjectType()
 export class FieldError {
@@ -45,6 +50,47 @@ export class UserResolver {
       return user.email;
     }
     return "";
+  }
+
+  @Mutation(() => UserResponse)
+  @UseMiddleware(isAuth)
+  async editProfile(
+    @Arg("options") options: EditProfileInput,
+    @Ctx() { req }: MyContext
+  ): Promise<UserResponse> {
+    // ignore null/undefined values (reduces payload not needing to repeat unchanged fields)
+    const newValues = deleteNullUndefinedValues(options);
+
+    const validationErrors = await validateFields(newValues);
+    if (validationErrors) return { errors: validationErrors };
+
+    try {
+      const result = await getConnection()
+        .createQueryBuilder()
+        .update(User)
+        .set(newValues)
+        .where({ id: req.session.userId })
+        .returning("*")
+        .execute();
+      return { user: result.raw[0] as User };
+    } catch (error) {
+      if (error.detail.includes("already exists")) {
+        if (error.detail.includes("username")) {
+          return {
+            errors: [
+              { field: "username", message: "That username already exists" },
+            ],
+          };
+        } else if (error.detail.includes("email")) {
+          return {
+            errors: [{ field: "email", message: "That email already exists" }],
+          };
+        }
+      }
+      return {
+        errors: [{ field: "username", message: error.message as string }],
+      };
+    }
   }
 
   @Mutation(() => UserResponse)
@@ -127,29 +173,15 @@ export class UserResolver {
   // TODO: use yup or regex for username/password validation
   @Mutation(() => UserResponse)
   async register(
-    @Arg("options") options: UsernamePasswordInput,
+    @Arg("options") options: RegisterInput,
     @Ctx() { req }: MyContext
   ): Promise<UserResponse> {
-    const validationErrors = await validateRegister(options);
+    const validationErrors = await validateFields(options);
     if (validationErrors) return { errors: validationErrors };
 
     const hashedPassword = await argon2.hash(options.password);
     let user;
     try {
-      // optional: query builder for more customized queries
-      // const result = await getConnection()
-      //   .createQueryBuilder()
-      //   .insert()
-      //   .into(User)
-      //   .values({
-      //     username: options.username,
-      //     email: options.email,
-      //     password: hashedPassword,
-      //   })
-      //   .returning("*")
-      //   .execute();
-      // user = result.raw[0];
-
       user = await User.create({
         username: options.username,
         email: options.email,
