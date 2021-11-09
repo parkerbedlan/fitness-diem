@@ -62,13 +62,6 @@ export const RootNavigator: React.FC<RootNavigatorProps> = ({ Drawer }) => {
             drawerIcon: nameToNavIcon("account-circle"),
           }}
         />
-        <Drawer.Screen
-          name={UploadTestName}
-          component={UploadTestScreen}
-          options={{
-            drawerIcon: nameToNavIcon("file-upload"),
-          }}
-        />
         {/* IMPORTANT NOTE: always keep the drawer omissions last in the drawer order!*/}
         <Drawer.Screen
           name={LoginScreenName}

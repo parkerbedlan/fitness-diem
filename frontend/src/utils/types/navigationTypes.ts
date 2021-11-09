@@ -31,7 +31,6 @@ export type RootScreenList = {
   [HomeScreenName]: HomeScreenParams;
   [SignupScreenName]: SignupScreenParams;
   [LoginScreenName]: LoginScreenParams;
-  [UploadTestName]: UploadTestParams;
   [ProfileScreenName]: ProfileScreenParams;
 };
 
