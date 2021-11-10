@@ -61,14 +61,14 @@ export const EditProfileScreen = () => {
       <Formik
         initialValues={initialValues}
         onSubmit={async (values, { setErrors }) => {
-          let filteredValues = { ...values };
+          let changedValues = { ...values };
           Object.keys(values).forEach((key) => {
-            if (filteredValues[key] === initialValues[key])
-              delete filteredValues[key];
+            if (changedValues[key] === initialValues[key])
+              delete changedValues[key];
           });
-          console.log("submitted", filteredValues);
+          console.log("submitted", changedValues);
           const response = await editProfile({
-            variables: { options: filteredValues },
+            variables: { options: changedValues },
           });
           if (response.data?.editProfile.errors) {
             setErrors(toErrorMap(response.data.editProfile.errors));
