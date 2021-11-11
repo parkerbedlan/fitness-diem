@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Image } from "react-native-elements";
 import { PartialBy } from "../../PartialBy";
 import { useCacheyUriStore } from "./useCacheyUriStore";
@@ -10,6 +10,13 @@ type Setter = (cacheyUri: string) => void;
 export const useCacheyImage = (
   baseUri: string
 ): [CacheyImage, Revalidate, Setter] => {
+  const initialize = useCacheyUriStore(
+    (state) => () => state.initialize(baseUri)
+  );
+  useEffect(() => {
+    initialize();
+  }, []);
+
   const revalidate = useCacheyUriStore(
     (state) => () => state.revalidate(baseUri)
   );
@@ -18,9 +25,7 @@ export const useCacheyImage = (
     (state) => (cacheyUri: string) => state.set(baseUri, cacheyUri)
   );
 
-  const CustomCacheyImage: React.FC<Omit<CacheyImageProps, "baseUri">> = (
-    props
-  ) => {
+  const CustomCacheyImage: CacheyImage = (props) => {
     return <CacheyImage {...props} baseUri={baseUri} />;
   };
 

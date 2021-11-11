@@ -7,7 +7,7 @@ type CacheyUri = string;
 
 type CacheyUris = Record<BaseUri, CacheyUri>;
 
-type CacheyState = {
+type CacheyUriStoreState = {
   cacheyUris: CacheyUris;
   initialize: (baseUri: BaseUri) => void;
   revalidate: (baseUri: BaseUri) => void;
@@ -17,28 +17,31 @@ type CacheyState = {
   getAll: () => CacheyUris;
 };
 
-export const useCacheyUriStore = create<CacheyState>((set, get) => ({
+export const useCacheyUriStore = create<CacheyUriStoreState>((set, get) => ({
   cacheyUris: {},
   initialize: (baseUri: BaseUri) => {
-    if (baseUri in get().cacheyUris) return;
-    get().revalidate(baseUri);
+    console.log("initializing", baseUri);
+    if (!(baseUri in get().cacheyUris)) {
+      get().revalidate(baseUri);
+    }
   },
-  revalidate: (baseUri: BaseUri) =>
+  revalidate: (baseUri: BaseUri) => {
+    console.log("revalidating", baseUri);
     set((state) => ({
       cacheyUris: {
         ...state.cacheyUris,
-        [baseUri]: `${baseUri}?${new Date()}`,
+        [baseUri]: `${baseUri}?${new Date().getTime()}`,
       },
-    })),
+    }));
+  },
   revalidateAll: () =>
     set((state) => ({
       cacheyUris: objectMap(
         state.cacheyUris,
-        (_, baseUri) => `${baseUri}?${new Date()}`
+        (_, baseUri) => `${baseUri}?${new Date().getTime()}`
       ),
     })),
   get: (baseUri: BaseUri) => {
-    get().initialize(baseUri);
     return get().cacheyUris[baseUri];
   },
   set: (baseUri: BaseUri, cacheyUri: CacheyUri) =>

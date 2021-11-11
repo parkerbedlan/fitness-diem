@@ -13,6 +13,7 @@ import tw from "tailwind-react-native-classnames";
 import { useLogoutMutation } from "../generated/graphql";
 import HomeScreen, { HomeScreenName } from "../screens/HomeScreen";
 import LoginScreen, { LoginScreenName } from "../screens/LoginScreen";
+import MessagesScreen, { MessagesScreenName } from "../screens/MessagesScreen";
 import { ProfileScreen, ProfileScreenName } from "../screens/ProfileScreen";
 import SignupScreen, { SignupScreenName } from "../screens/SignupScreen";
 import { updateLogout } from "../utils/GraphQLUtils";
@@ -59,6 +60,13 @@ export const RootNavigator: React.FC<RootNavigatorProps> = ({ Drawer }) => {
           component={ProfileScreen}
           options={{
             drawerIcon: nameToNavIcon("account-circle"),
+          }}
+        />
+        <Drawer.Screen
+          name={MessagesScreenName}
+          component={MessagesScreen}
+          options={{
+            drawerIcon: nameToNavIcon("forum"),
           }}
         />
         {/* IMPORTANT NOTE: always keep the drawer omissions last in the drawer order!*/}
