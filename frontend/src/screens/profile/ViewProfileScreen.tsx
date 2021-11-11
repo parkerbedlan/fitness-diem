@@ -105,7 +105,7 @@ const ProfilePicModal = ({
   visible: boolean;
   onRequestClose: (() => void) | undefined;
 }) => {
-  const [CacheyProfilePic, revalidateProfilePic] = useCacheyImage(uri);
+  const [CacheyProfilePic] = useCacheyImage(uri);
   return (
     <ModalTapOutsideToClose
       animationType="slide"

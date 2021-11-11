@@ -12,7 +12,6 @@ import { Button, Icon, Text } from "react-native-elements";
 import * as mime from "react-native-mime-types";
 import tw from "tailwind-react-native-classnames";
 import { useCacheyImage } from "../../utils/hooks/cacheyImage/useCacheyImage";
-import { useCacheyUriStore } from "../../utils/hooks/cacheyImage/useCacheyUriStore";
 import CenteredContainer from "../../components/CenteredContainer";
 import FormikInput from "../../components/FormikInput";
 import { HeaderForSubscreens } from "../../components/HeaderForSubscreens";
