@@ -1,9 +1,10 @@
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { createUploadLink } from "apollo-upload-client";
-import React from "react";
+import React, { useEffect } from "react";
 import { ThemeProvider } from "react-native-elements";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { useCacheyUriStore } from "./src/utils/hooks/cacheyImage/useCacheyUriStore";
 import { RootNavigator } from "./src/components/RootNavigator";
 import { serverBaseUrl } from "./src/utils/constants";
 import { RootScreenList } from "./src/utils/types/navigationTypes";
@@ -20,6 +21,13 @@ const client = new ApolloClient({
 const Drawer = createDrawerNavigator<RootScreenList>();
 
 export default function App() {
+  const revalidateAllCacheyUris = useCacheyUriStore(
+    (state) => state.revalidateAll
+  );
+  useEffect(() => {
+    revalidateAllCacheyUris();
+  }, []);
+
   return (
     <ApolloProvider client={client}>
       <SafeAreaProvider>

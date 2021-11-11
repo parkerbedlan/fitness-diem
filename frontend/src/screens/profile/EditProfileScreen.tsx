@@ -11,7 +11,7 @@ import {
 import { Button, Icon, Text } from "react-native-elements";
 import * as mime from "react-native-mime-types";
 import tw from "tailwind-react-native-classnames";
-import { CachelessImage } from "../../components/CachelessImage";
+import { useCacheyImage } from "../../utils/hooks/cacheyImage/useCacheyImage";
 import CenteredContainer from "../../components/CenteredContainer";
 import FormikInput from "../../components/FormikInput";
 import { HeaderForSubscreens } from "../../components/HeaderForSubscreens";
@@ -48,8 +48,8 @@ export const EditProfileScreen = () => {
       </CenteredContainer>
     );
 
-  const initialImage = getProfilePicUri(profileData.me.id);
-  const [image, setImage] = useState<string>(initialImage);
+  const profilePicUri = getProfilePicUri(profileData.me.id);
+  const [, , setImage] = useCacheyImage(profilePicUri);
 
   const { displayName, username, email, bio } = profileData.me;
   const initialValues = { displayName, username, email, bio };
@@ -100,7 +100,7 @@ export const EditProfileScreen = () => {
             />
             <ScrollView>
               <EditableProfilePic
-                uri={image}
+                uri={profilePicUri}
                 onPress={() => setIsEditPicModalVisible(true)}
               />
               <View style={tw`flex flex-row`}>
@@ -169,6 +169,7 @@ const EditableProfilePic = ({
   uri: string;
   onPress: () => void;
 }) => {
+  const [CacheyProfilePic] = useCacheyImage(uri);
   return (
     <View
       style={tw`rounded-lg border-4 border-purple-700 m-2 w-56 h-56 flex items-center justify-center`}
@@ -179,7 +180,7 @@ const EditableProfilePic = ({
         >
           <Icon name="edit" color="white" size={40} />
         </View>
-        <CachelessImage uri={uri} style={tw`w-52 h-52 opacity-80`} />
+        <CacheyProfilePic style={tw`w-52 h-52 opacity-80`} />
       </TouchableOpacity>
     </View>
   );
@@ -192,7 +193,7 @@ const EditProfilePicModal = ({
 }: {
   visible: boolean;
   onRequestClose: () => void;
-  setImage: React.Dispatch<React.SetStateAction<string>>;
+  setImage: (cacheyUri: string) => void;
 }) => {
   const [editProfilePic] = useEditProfilePicMutation();
 
@@ -227,7 +228,6 @@ const EditProfilePicModal = ({
         console.log("file", file);
         editProfilePic({ variables: { fileUpload: file } });
       } else {
-        // const file = generateRNFile(result.uri, `picture-${Date.now()}`);
         const file = generateRNFile(result.uri, "newProfilePic.png");
         console.log("file", file);
         editProfilePic({ variables: { fileUpload: file } });

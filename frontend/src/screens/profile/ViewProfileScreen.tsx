@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 import { Button, Icon, Text } from "react-native-elements";
 import tw from "tailwind-react-native-classnames";
-import { CachelessImage } from "../../components/CachelessImage";
+import { useCacheyImage } from "../../utils/hooks/cacheyImage/useCacheyImage";
 import CenteredContainer from "../../components/CenteredContainer";
 import { LineRule } from "../../components/LineRule";
 import { ModalTapOutsideToClose } from "../../components/ModalTapOutsideToClose";
@@ -48,13 +48,13 @@ const ProfileHeader = ({
   const { navigate } = useProfileStackNavigation();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const profilePicUri = getProfilePicUri(profileHeaderInfo.id);
+  const [CacheyProfilePic] = useCacheyImage(profilePicUri);
   return (
     <>
       <View style={tw`top-0 h-40 bg-gray-200 p-4`}>
         <View style={tw`flex flex-row items-start`}>
           <TouchableOpacity onPress={() => setIsModalVisible(true)}>
-            <CachelessImage
-              uri={profilePicUri}
+            <CacheyProfilePic
               style={tw`rounded-full w-20 h-20 mr-4 mb-4`}
               PlaceholderContent={<Icon name="account-circle" size={60} />}
             />
@@ -105,6 +105,7 @@ const ProfilePicModal = ({
   visible: boolean;
   onRequestClose: (() => void) | undefined;
 }) => {
+  const [CacheyProfilePic] = useCacheyImage(uri);
   return (
     <ModalTapOutsideToClose
       animationType="slide"
@@ -114,8 +115,7 @@ const ProfilePicModal = ({
       <View
         style={tw`bg-purple-300 rounded-lg w-96 h-96 flex justify-center items-center`}
       >
-        <CachelessImage
-          uri={uri}
+        <CacheyProfilePic
           style={tw`w-80 h-80`}
           PlaceholderContent={<Icon name="account-circle" size={300} />}
         />
