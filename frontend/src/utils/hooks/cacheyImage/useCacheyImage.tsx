@@ -1,19 +1,30 @@
 import React from "react";
-import { ImageStyle, StyleProp } from "react-native";
 import { Image } from "react-native-elements";
-import { PartialBy } from "../utils/PartialBy";
+import { PartialBy } from "../../PartialBy";
 import { useCacheyUriStore } from "./useCacheyUriStore";
 
+type CacheyImage = React.FC<Omit<CacheyImageProps, "baseUri">>;
+type Revalidate = () => void;
+type Setter = (cacheyUri: string) => void;
+
 export const useCacheyImage = (
-  baseUri: string,
-  style: StyleProp<ImageStyle>
-): [revalidate: () => void, cacheyImage: React.ReactElement] => {
+  baseUri: string
+): [CacheyImage, Revalidate, Setter] => {
   const revalidate = useCacheyUriStore(
     (state) => () => state.revalidate(baseUri)
   );
-  const cacheyImage = <CacheyImage baseUri={baseUri} style={style} />;
 
-  return [revalidate, cacheyImage];
+  const setCacheyUri = useCacheyUriStore(
+    (state) => (cacheyUri: string) => state.set(baseUri, cacheyUri)
+  );
+
+  const CustomCacheyImage: React.FC<Omit<CacheyImageProps, "baseUri">> = (
+    props
+  ) => {
+    return <CacheyImage {...props} baseUri={baseUri} />;
+  };
+
+  return [CustomCacheyImage, revalidate, setCacheyUri];
 };
 
 type CacheyImageProps = PartialBy<
@@ -23,7 +34,7 @@ type CacheyImageProps = PartialBy<
 
 const CacheyImage: React.FC<CacheyImageProps> = (props) => {
   const getCacheyUri = useCacheyUriStore(
-    (state) => () => state.getCacheyUri(props.baseUri)
+    (state) => () => state.get(props.baseUri)
   );
   return (
     <Image
