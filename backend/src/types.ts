@@ -9,6 +9,7 @@ import { Redis } from "ioredis";
 declare module "express-session" {
   interface SessionData {
     userId: number;
+    pushToken: string;
   }
 }
 

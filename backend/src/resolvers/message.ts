@@ -19,9 +19,8 @@ export class MessageResolver {
     @Arg("pushToken") pushToken: string,
     @Ctx() { req }: MyContext
   ): Promise<boolean> {
-    console.log(
-      `setting user ${req.session.userId}'s pushToken to ${pushToken}`
-    );
+    req.session.pushToken = pushToken;
+    // console.log(`setting user ${req.session.userId}'s pushToken to ${pushToken}`);
     User.update(req.session.userId!, { pushToken });
     return true;
   }
@@ -32,7 +31,9 @@ export class MessageResolver {
     @Arg("messageText") messageText: string,
     @Ctx() { req, expo }: MyContext
   ): Promise<boolean> {
-    const user = await User.findOne(req.session.userId!);
+    const user = await User.findOne(req.session.userId!, {
+      select: ["pushToken"],
+    });
     const pushToken = user?.pushToken;
 
     if (!pushToken) return false;
@@ -45,9 +46,7 @@ export class MessageResolver {
       data: { withSome: "data" },
     };
 
-    console.log(
-      `sending user ${req.session.userId} with pushToken ${pushToken} the message "${messageText}"`
-    );
+    // console.log(`sending user ${req.session.userId} with pushToken ${pushToken} the message "${messageText}"`);
     expo.sendPushNotificationsAsync([message]);
     return true;
   }
