@@ -24,6 +24,7 @@ const main = async () => {
   );
   await myServer.setup();
   myServer.start();
+  myServer.sendTestNotification("This is a test notification");
 };
 
 main().catch(console.error);

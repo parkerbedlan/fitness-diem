@@ -15,6 +15,7 @@ import path from "path";
 import { graphqlUploadExpress } from "graphql-upload";
 import { getLANipAddress } from "./utils/getLANipAddress";
 import fs from "fs";
+import { Expo, ExpoPushMessage } from "expo-server-sdk";
 
 type HostingMode = "localhost" | "LAN";
 type Resolvers = NonEmptyArray<Function> | NonEmptyArray<string>;
@@ -44,6 +45,30 @@ export class FitnessAppServer {
     this.entities = entities;
   }
 
+  // https://github.com/expo/expo-server-sdk-node
+  public async sendTestNotification(messageText: string) {
+    const pushToken = "ExponentPushToken[WXVEetGVp9awuCdPL616fy]";
+    let expo = new Expo();
+    let messages: ExpoPushMessage[] = [];
+    messages.push({
+      to: pushToken,
+      sound: "default",
+      body: messageText,
+      data: { withSome: "data" },
+    });
+    let chunks = expo.chunkPushNotifications(messages);
+    let tickets = [];
+    for (let chunk of chunks) {
+      try {
+        let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+        console.log(ticketChunk);
+        tickets.push(...ticketChunk);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  }
+
   public async setup() {
     this.configureApp();
     await this.configureOrm();
@@ -65,7 +90,6 @@ export class FitnessAppServer {
         res.send("ERROR: no profile pic for that user");
       }
     });
-    // this.app.use("/images", express.static(path.join(__dirname, "../images")));
   }
 
   public start() {

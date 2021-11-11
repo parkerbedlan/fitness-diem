@@ -32,7 +32,9 @@
     "react-native-screens": "~3.4.0",
     "react-native-web": "~0.13.12",
     "tailwind-react-native-classnames": "^1.4.3",
-    "zustand": "^3.6.5"
+    "zustand": "^3.6.5",
+    "expo-notifications": "~0.12.3",
+    "expo-permissions": "~12.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",
