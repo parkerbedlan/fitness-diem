@@ -1,0 +1,3 @@
+mutation SendMyselfANotification($messageText: String!) {
+  sendMyselfANotification(messageText: $messageText)
+}

@@ -36,6 +36,9 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   bio?: string;
 
+  @Column({ nullable: true })
+  pushToken?: string;
+
   @OneToMany(() => Post, (post) => post.creator)
   posts: Post[];
 

@@ -31,6 +31,7 @@ export type FieldError = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  approveNotifications: Scalars['Boolean'];
   changePassword: UserResponse;
   createPost: Post;
   deletePost: Scalars['Boolean'];
@@ -40,8 +41,14 @@ export type Mutation = {
   login: UserResponse;
   logout: Scalars['Boolean'];
   register: UserResponse;
+  sendMyselfANotification: Scalars['Boolean'];
   updatePost: Post;
   uploadTestImage: Scalars['Boolean'];
+};
+
+
+export type MutationApproveNotificationsArgs = {
+  pushToken: Scalars['String'];
 };
 
 
@@ -84,6 +91,11 @@ export type MutationLoginArgs = {
 
 export type MutationRegisterArgs = {
   options: RegisterInput;
+};
+
+
+export type MutationSendMyselfANotificationArgs = {
+  messageText: Scalars['String'];
 };
 
 
@@ -142,6 +154,7 @@ export type User = {
   displayName?: Maybe<Scalars['String']>;
   email: Scalars['String'];
   id: Scalars['Float'];
+  pushToken?: Maybe<Scalars['String']>;
   updatedAt: Scalars['String'];
   username: Scalars['String'];
 };
@@ -161,6 +174,13 @@ export type RegularErrorFragment = { __typename?: 'FieldError', field: string, m
 export type RegularUserFragment = { __typename?: 'User', id: number, username: string };
 
 export type RegularUserResponseFragment = { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined, user?: { __typename?: 'User', id: number, username: string } | null | undefined };
+
+export type ApproveNotificationsMutationVariables = Exact<{
+  pushToken: Scalars['String'];
+}>;
+
+
+export type ApproveNotificationsMutation = { __typename?: 'Mutation', approveNotifications: boolean };
 
 export type EditProfileMutationVariables = Exact<{
   options: EditProfileInput;
@@ -195,6 +215,13 @@ export type RegisterMutationVariables = Exact<{
 
 
 export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined, user?: { __typename?: 'User', id: number, username: string } | null | undefined } };
+
+export type SendMyselfANotificationMutationVariables = Exact<{
+  messageText: Scalars['String'];
+}>;
+
+
+export type SendMyselfANotificationMutation = { __typename?: 'Mutation', sendMyselfANotification: boolean };
 
 export type UploadTestImageMutationVariables = Exact<{
   fileUpload: Scalars['Upload'];
@@ -275,6 +302,37 @@ export const RegularUserResponseFragmentDoc = gql`
 }
     ${RegularErrorFragmentDoc}
 ${RegularUserFragmentDoc}`;
+export const ApproveNotificationsDocument = gql`
+    mutation ApproveNotifications($pushToken: String!) {
+  approveNotifications(pushToken: $pushToken)
+}
+    `;
+export type ApproveNotificationsMutationFn = Apollo.MutationFunction<ApproveNotificationsMutation, ApproveNotificationsMutationVariables>;
+
+/**
+ * __useApproveNotificationsMutation__
+ *
+ * To run a mutation, you first call `useApproveNotificationsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useApproveNotificationsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [approveNotificationsMutation, { data, loading, error }] = useApproveNotificationsMutation({
+ *   variables: {
+ *      pushToken: // value for 'pushToken'
+ *   },
+ * });
+ */
+export function useApproveNotificationsMutation(baseOptions?: Apollo.MutationHookOptions<ApproveNotificationsMutation, ApproveNotificationsMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ApproveNotificationsMutation, ApproveNotificationsMutationVariables>(ApproveNotificationsDocument, options);
+      }
+export type ApproveNotificationsMutationHookResult = ReturnType<typeof useApproveNotificationsMutation>;
+export type ApproveNotificationsMutationResult = Apollo.MutationResult<ApproveNotificationsMutation>;
+export type ApproveNotificationsMutationOptions = Apollo.BaseMutationOptions<ApproveNotificationsMutation, ApproveNotificationsMutationVariables>;
 export const EditProfileDocument = gql`
     mutation EditProfile($options: EditProfileInput!) {
   editProfile(options: $options) {
@@ -442,6 +500,37 @@ export function useRegisterMutation(baseOptions?: Apollo.MutationHookOptions<Reg
 export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
 export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
 export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
+export const SendMyselfANotificationDocument = gql`
+    mutation SendMyselfANotification($messageText: String!) {
+  sendMyselfANotification(messageText: $messageText)
+}
+    `;
+export type SendMyselfANotificationMutationFn = Apollo.MutationFunction<SendMyselfANotificationMutation, SendMyselfANotificationMutationVariables>;
+
+/**
+ * __useSendMyselfANotificationMutation__
+ *
+ * To run a mutation, you first call `useSendMyselfANotificationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSendMyselfANotificationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [sendMyselfANotificationMutation, { data, loading, error }] = useSendMyselfANotificationMutation({
+ *   variables: {
+ *      messageText: // value for 'messageText'
+ *   },
+ * });
+ */
+export function useSendMyselfANotificationMutation(baseOptions?: Apollo.MutationHookOptions<SendMyselfANotificationMutation, SendMyselfANotificationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SendMyselfANotificationMutation, SendMyselfANotificationMutationVariables>(SendMyselfANotificationDocument, options);
+      }
+export type SendMyselfANotificationMutationHookResult = ReturnType<typeof useSendMyselfANotificationMutation>;
+export type SendMyselfANotificationMutationResult = Apollo.MutationResult<SendMyselfANotificationMutation>;
+export type SendMyselfANotificationMutationOptions = Apollo.BaseMutationOptions<SendMyselfANotificationMutation, SendMyselfANotificationMutationVariables>;
 export const UploadTestImageDocument = gql`
     mutation UploadTestImage($fileUpload: Upload!) {
   uploadTestImage(fileUpload: $fileUpload)

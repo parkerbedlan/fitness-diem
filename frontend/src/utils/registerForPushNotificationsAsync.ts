@@ -4,6 +4,7 @@ import { Platform } from "react-native";
 
 // https://docs.expo.dev/push-notifications/push-notifications-setup/
 export const registerForPushNotificationsAsync = async () => {
+  let token = "";
   if (Constants.isDevice) {
     const { status: existingStatus } =
       await Notifications.getPermissionsAsync();
@@ -16,7 +17,7 @@ export const registerForPushNotificationsAsync = async () => {
       alert("Failed to get push token for push notification!");
       return;
     }
-    const token = (await Notifications.getExpoPushTokenAsync()).data;
+    token = (await Notifications.getExpoPushTokenAsync()).data;
     console.log(token);
     // this.setState({ expoPushToken: token });
   } else {
@@ -31,4 +32,6 @@ export const registerForPushNotificationsAsync = async () => {
       lightColor: "#FF231F7C",
     });
   }
+
+  return token;
 };

@@ -8,7 +8,6 @@ import { useCacheyUriStore } from "./src/utils/hooks/cacheyImage/useCacheyUriSto
 import { RootNavigator } from "./src/components/RootNavigator";
 import { serverBaseUrl } from "./src/utils/constants";
 import { RootScreenList } from "./src/utils/types/navigationTypes";
-import { registerForPushNotificationsAsync } from "./src/utils/registerForPushNotificationsAsync";
 
 const uri = `${serverBaseUrl}/graphql`;
 const link = createUploadLink({ uri });
@@ -27,7 +26,6 @@ export default function App() {
   );
   useEffect(() => {
     revalidateAllCacheyUris();
-    registerForPushNotificationsAsync();
   }, []);
 
   return (
