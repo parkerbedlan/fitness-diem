@@ -47,6 +47,24 @@ export class UserResolver {
     return "";
   }
 
+  @Mutation(() => Boolean)
+  async follow(
+    @Arg('userId') userId: number,
+    @Ctx() {req}: MyContext
+  ) {
+    const myUserId = req.session.userId
+    const theirUserId = userId
+    
+    return true
+  }
+
+  @Query(() => [User])
+  async followers(
+    @Arg('userId') userId: number
+  ) {
+    
+  }
+
   @Mutation(() => UserResponse)
   async changePassword(
     @Arg("token") token: string,
