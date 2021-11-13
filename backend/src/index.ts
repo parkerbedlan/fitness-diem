@@ -2,6 +2,8 @@ import { existsSync, mkdirSync } from "fs";
 import path from "path";
 import "reflect-metadata";
 import { corsOptions, __prod__ } from "./constants";
+import { Conversation } from "./entities/Conversation";
+import { Message } from "./entities/Message";
 import { Post } from "./entities/Post";
 import { User } from "./entities/User";
 import { FitnessAppServer } from "./FitnessAppServer";
@@ -21,10 +23,11 @@ const main = async () => {
     "LAN",
     corsOptions,
     [HelloResolver, UserResolver, PostResolver, MessageResolver],
-    [User, Post]
+    [User, Post, Message, Conversation]
   );
   await myServer.setup();
   myServer.start();
+  // myServer.tester();
   // myServer.sendTestNotification("This is a test notification");
 };
 

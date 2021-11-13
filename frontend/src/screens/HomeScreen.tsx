@@ -24,7 +24,12 @@ function HomeScreen() {
 
   useEffect(() => {
     registerForPushNotificationsAsync().then((pushToken) => {
-      if (pushToken) approveNotifications({ variables: { pushToken } });
+      if (pushToken) {
+        console.log(
+          "--------------------approving notifications--------------------"
+        );
+        approveNotifications({ variables: { pushToken } });
+      }
     });
     Notifications.addNotificationReceivedListener((notif) =>
       console.log("notif", notif.request.identifier, notif.request.content)

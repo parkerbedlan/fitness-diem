@@ -4,10 +4,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
+import { Conversation } from "./Conversation";
 import { Post } from "./Post";
 
 @ObjectType()
@@ -41,6 +43,9 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Post, (post) => post.creator)
   posts: Post[];
+
+  @ManyToMany(() => Conversation, (conversation) => conversation.members)
+  conversations: Conversation[];
 
   @Field(() => String)
   @CreateDateColumn()

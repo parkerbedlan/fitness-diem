@@ -1,13 +1,13 @@
+import { Formik } from "formik";
 import React from "react";
-import { Badge, Button, Icon, Text } from "react-native-elements";
 import { Keyboard, ScrollView, View } from "react-native";
+import { Button, Icon, Text } from "react-native-elements";
 import tw from "tailwind-react-native-classnames";
+import FormikInput from "../../components/FormikInput";
 import { HeaderForSubscreens } from "../../components/HeaderForSubscreens";
 import UncenteredContainer from "../../components/UncenteredContainer";
-import { useMessagesStackScreen } from "../MessagesScreen";
 import { useMeQuery } from "../../generated/graphql";
-import FormikInput from "../../components/FormikInput";
-import { Formik } from "formik";
+import { useMessagesStackScreen } from "../MessagesScreen";
 
 export const ConversationScreenName = "Conversation";
 export type ConversationScreenParams = {

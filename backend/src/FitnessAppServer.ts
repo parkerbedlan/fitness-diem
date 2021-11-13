@@ -1,21 +1,20 @@
-import "reflect-metadata";
-import "dotenv-safe/config";
-import { COOKIE_NAME, __prod__ } from "./constants";
-import express, { Express } from "express";
 import { ApolloServer, ExpressContext } from "apollo-server-express";
-import { buildSchema, NonEmptyArray } from "type-graphql";
-import session from "express-session";
 import connectRedis from "connect-redis";
-import { MyContext } from "./types";
 import cors, { CorsOptions } from "cors";
-import Redis from "ioredis";
-import { corsOptions } from "./constants";
-import { Connection, createConnection, EntitySchema } from "typeorm";
-import path from "path";
-import { graphqlUploadExpress } from "graphql-upload";
-import { getLANipAddress } from "./utils/getLANipAddress";
-import fs from "fs";
+import "dotenv-safe/config";
 import { Expo, ExpoPushMessage } from "expo-server-sdk";
+import express, { Express } from "express";
+import session from "express-session";
+import fs from "fs";
+import { graphqlUploadExpress } from "graphql-upload";
+import Redis from "ioredis";
+import path from "path";
+import "reflect-metadata";
+import { buildSchema, NonEmptyArray } from "type-graphql";
+import { Connection, createConnection, EntitySchema } from "typeorm";
+import { COOKIE_NAME, corsOptions, __prod__ } from "./constants";
+import { MyContext } from "./types";
+import { getLANipAddress } from "./utils/getLANipAddress";
 
 type HostingMode = "localhost" | "LAN";
 type Resolvers = NonEmptyArray<Function> | NonEmptyArray<string>;
@@ -44,6 +43,12 @@ export class FitnessAppServer {
     this.corsOptions = corsOptions;
     this.resolvers = resolvers;
     this.entities = entities;
+  }
+
+  public async tester() {
+    console.log("----------------------------------------------");
+
+    console.log("----------------------------------------------");
   }
 
   // https://github.com/expo/expo-server-sdk-node
