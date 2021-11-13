@@ -20,13 +20,13 @@ type CacheyUriStoreState = {
 export const useCacheyUriStore = create<CacheyUriStoreState>((set, get) => ({
   cacheyUris: {},
   initialize: (baseUri: BaseUri) => {
-    console.log("initializing", baseUri);
+    // console.log("initializing", baseUri);
     if (!(baseUri in get().cacheyUris)) {
       get().revalidate(baseUri);
     }
   },
   revalidate: (baseUri: BaseUri) => {
-    console.log("revalidating", baseUri);
+    // console.log("revalidating", baseUri);
     set((state) => ({
       cacheyUris: {
         ...state.cacheyUris,

@@ -1,4 +1,4 @@
-import { useIsFocused } from "@react-navigation/core";
+import { useFocusEffect, useIsFocused } from "@react-navigation/core";
 import * as Notifications from "expo-notifications";
 import React, { useEffect } from "react";
 import { ActivityIndicator } from "react-native";
@@ -11,14 +11,6 @@ import {
 import { useIsAuth } from "../utils/hooks/useIsAuth";
 import { useRootScreen } from "../utils/hooks/useRootScreen";
 import { registerForPushNotificationsAsync } from "../utils/registerForPushNotificationsAsync";
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-  }),
-});
 
 export const HomeScreenName = "Home";
 
@@ -45,6 +37,16 @@ function HomeScreen() {
       )
     );
   }, []);
+
+  useFocusEffect(() => {
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: true,
+      }),
+    });
+  });
 
   return (
     <CenteredContainer>

@@ -11,7 +11,7 @@ import {
   useMeProfileQuery,
 } from "../../generated/graphql";
 import { getProfilePicUri } from "../../utils/getProfilePicUri";
-import { ProfileStatsInfo, useProfileStackNavigation } from "../ProfileScreen";
+import { ProfileStatsInfo, useProfileStackScreen } from "../ProfileScreen";
 
 export const ViewProfileScreen = () => {
   const { data: profileData, loading } = useMeProfileQuery();
@@ -45,7 +45,9 @@ const ProfileHeader = ({
   profile: ProfileUserFragment;
   editable: boolean;
 }) => {
-  const { navigate } = useProfileStackNavigation();
+  const {
+    navigation: { navigate },
+  } = useProfileStackScreen();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const profilePicUri = getProfilePicUri(profileHeaderInfo.id);
   const [CacheyProfilePic] = useCacheyImage(profilePicUri);
