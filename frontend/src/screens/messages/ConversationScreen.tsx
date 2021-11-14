@@ -90,7 +90,7 @@ const MessageBubble = ({
   if (!isMe)
     return (
       <View style={tw`flex flex-row`}>
-        <View style={tw`m-1`}>
+        <View style={tw`m-1 max-w-xs`}>
           <Text style={tw`opacity-50`}>{username}</Text>
           <View style={tw`flex-shrink bg-gray-300 px-4 py-2 rounded-lg`}>
             <Text style={tw`text-black text-base`}>{body}</Text>

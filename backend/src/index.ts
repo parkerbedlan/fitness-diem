@@ -7,6 +7,7 @@ import { Message } from "./entities/Message";
 import { Post } from "./entities/Post";
 import { User } from "./entities/User";
 import { FitnessAppServer } from "./FitnessAppServer";
+import { ConversationResolver } from "./resolvers/conversation";
 import { HelloResolver } from "./resolvers/hello";
 import { MessageResolver } from "./resolvers/message";
 import { PostResolver } from "./resolvers/post";
@@ -20,14 +21,20 @@ const main = async () => {
   });
 
   const myServer = new FitnessAppServer(
-    "LAN",
+    "localhost",
     corsOptions,
-    [HelloResolver, UserResolver, PostResolver, MessageResolver],
+    [
+      HelloResolver,
+      UserResolver,
+      PostResolver,
+      MessageResolver,
+      ConversationResolver,
+    ],
     [User, Post, Message, Conversation]
   );
   await myServer.setup();
   myServer.start();
-  // myServer.tester();
+  myServer.tester();
   // myServer.sendTestNotification("This is a test notification");
 };
 

@@ -22,6 +22,9 @@ export class Conversation extends BaseEntity {
   @Column({ nullable: true })
   title?: string;
 
+  @Field()
+  lastMessagePreview: string;
+
   @Field(() => [User])
   @ManyToMany(() => User, (user) => user.conversations)
   @JoinTable()

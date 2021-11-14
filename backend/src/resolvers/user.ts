@@ -56,6 +56,17 @@ export class UserResolver {
   }
 
   @Mutation(() => Boolean)
+  @UseMiddleware(isAuth)
+  async approveNotifications(
+    @Arg("pushToken") pushToken: string,
+    @Ctx() { req }: MyContext
+  ): Promise<boolean> {
+    req.session.pushToken = pushToken;
+    User.update(req.session.userId!, { pushToken });
+    return true;
+  }
+
+  @Mutation(() => Boolean)
   async editProfilePic(
     @Arg("fileUpload", () => GraphQLUpload)
     { createReadStream }: FileUpload,

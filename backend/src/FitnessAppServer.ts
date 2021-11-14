@@ -11,8 +11,15 @@ import Redis from "ioredis";
 import path from "path";
 import "reflect-metadata";
 import { buildSchema, NonEmptyArray } from "type-graphql";
-import { Connection, createConnection, EntitySchema } from "typeorm";
+import {
+  Connection,
+  createConnection,
+  EntitySchema,
+  getConnection,
+} from "typeorm";
 import { COOKIE_NAME, corsOptions, __prod__ } from "./constants";
+import { Message } from "./entities/Message";
+import { User } from "./entities/User";
 import { MyContext } from "./types";
 import { getLANipAddress } from "./utils/getLANipAddress";
 
@@ -47,6 +54,21 @@ export class FitnessAppServer {
 
   public async tester() {
     console.log("----------------------------------------------");
+    const conversationId = 3;
+    const lastMessage = await getConnection()
+      .getRepository(Message)
+      .createQueryBuilder("message")
+      .leftJoinAndSelect("message.conversation", "conversation")
+      .where("conversation.id = :convoId", { convoId: conversationId })
+      .leftJoinAndSelect("message.sender", "sender")
+      .select(["message.body", "sender.username"])
+      .getOne();
+    const body = lastMessage?.body!;
+    const username = lastMessage?.sender.username;
+    const realBody = body.length < 20 ? body : body?.substring(0, 20) + "...";
+    console.log(`${username}: ${realBody}`);
+
+    console.log(await User.find({ select: ["id", "username"] }));
 
     console.log("----------------------------------------------");
   }

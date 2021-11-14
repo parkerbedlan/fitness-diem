@@ -1,0 +1,12 @@
+query GetConversationPreviews {
+  getConversationPreviews {
+    id
+    title
+    members {
+      id
+      username
+      displayName
+    }
+    lastMessagePreview
+  }
+}

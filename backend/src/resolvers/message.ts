@@ -3,7 +3,9 @@ import {
   Arg,
   Ctx,
   FieldResolver,
+  Int,
   Mutation,
+  ObjectType,
   Query,
   Resolver,
   Root,
@@ -21,24 +23,11 @@ import { pushToMany } from "../utils/pushToMany";
 export class MessageResolver {
   @FieldResolver(() => User)
   async sender(@Root() message: Message) {
-    const messageWithSender = await Message.findOne({
-      where: { id: message.id },
+    const messageWithSender = await Message.findOne(message.id, {
+      select: ["id"],
       relations: ["sender"],
-      select: ["id", "sender"],
     });
     return messageWithSender?.sender;
-  }
-
-  @Mutation(() => Boolean)
-  @UseMiddleware(isAuth)
-  async approveNotifications(
-    @Arg("pushToken") pushToken: string,
-    @Ctx() { req }: MyContext
-  ): Promise<boolean> {
-    req.session.pushToken = pushToken;
-    // console.log(`setting user ${req.session.userId}'s pushToken to ${pushToken}`);
-    User.update(req.session.userId!, { pushToken });
-    return true;
   }
 
   @Mutation(() => Boolean)
@@ -70,7 +59,7 @@ export class MessageResolver {
   @Mutation(() => Boolean)
   @UseMiddleware(isAuth)
   async sendMessage(
-    @Arg("conversationId") conversationId: number,
+    @Arg("conversationId", () => Int) conversationId: number,
     @Arg("body") body: string,
     @Ctx() { req, expo }: MyContext
   ) {
@@ -115,45 +104,5 @@ export class MessageResolver {
     pushToMany(expo, pushTokens, notif);
 
     return true;
-  }
-
-  @Mutation(() => Number)
-  @UseMiddleware(isAuth)
-  async startConversation(
-    @Arg("memberIds", () => [Number]) memberIds: number[],
-    @Ctx() { req }: MyContext
-  ) {
-    const realMemberIds = [...memberIds, req.session.userId];
-    const newConversation = await Conversation.create({
-      members: realMemberIds.map((id) => ({ id })),
-    }).save();
-    return newConversation.id;
-
-    // TODO: send notif telling members they got added to a group if 3+ members?
-  }
-
-  @Query(() => Conversation)
-  @UseMiddleware(isAuth)
-  async getConversation(
-    @Arg("conversationId") conversationId: number
-    // @Ctx() { req, expo }: MyContext
-  ) {
-    // TODO: verify the user is in the conversation
-    return await Conversation.findOne({
-      where: { id: conversationId },
-      relations: ["messages", "members"],
-    });
-  }
-
-  @Query(() => [Conversation])
-  @UseMiddleware(isAuth)
-  async getConversationPreviews(@Ctx() { req }: MyContext) {
-    const user = await User.findOne({
-      select: ["id"],
-      where: { id: req.session.userId },
-      relations: ["conversations"],
-    });
-    console.log(user);
-    return user?.conversations;
   }
 }
