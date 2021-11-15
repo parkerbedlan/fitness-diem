@@ -1,8 +1,16 @@
 import { useFocusEffect } from "@react-navigation/core";
 import * as Notifications from "expo-notifications";
+import { AndroidNotificationPriority } from "expo-notifications";
 import { Formik } from "formik";
-import React, { useRef } from "react";
-import { ActivityIndicator, Keyboard, ScrollView, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  ActivityIndicator,
+  Keyboard,
+  ScrollView,
+  View,
+  AppState,
+  AppStateStatus,
+} from "react-native";
 import { Button, Icon, Text } from "react-native-elements";
 import tw from "tailwind-react-native-classnames";
 import CenteredContainer from "../../components/CenteredContainer";
@@ -22,15 +30,22 @@ export type ConversationScreenParams = {
 };
 
 export const ConversationScreen = () => {
+  // useAppFocusEffect (updateMessages)
+  const appState = useRef(AppState.currentState);
   useFocusEffect(() => {
-    Keyboard.addListener("keyboardDidShow", () => {
-      setTimeout(() => scrollDown(), 20);
-    });
+    const changeListener = (nextAppState: AppStateStatus) => {
+      appState.current = nextAppState;
+      console.log("AppState", appState.current);
+      if (appState.current === "active") onFocusRefetch();
+    };
+
+    AppState.addEventListener("change", changeListener);
     return () => {
-      Keyboard.removeAllListeners("keyboardDidShow");
+      AppState.removeEventListener("change", changeListener);
     };
   });
 
+  // fetch data
   const { data: meData } = useMeQuery();
   const {
     route,
@@ -42,11 +57,25 @@ export const ConversationScreen = () => {
   });
   const [sendMessage] = useSendMessageMutation();
 
-  const scrollViewRef = useRef(null);
-
-  const notifListener: any = useRef();
-  useFocusEffect(() => {
+  const onFocusRefetch = () => {
     fetchMore({});
+    (async () => {
+      const presented = await Notifications.getPresentedNotificationsAsync();
+      presented
+        .filter(
+          (notif) =>
+            notif.request.content.data.conversationId === conversationId
+        )
+        .forEach((notif) =>
+          Notifications.dismissNotificationAsync(notif.request.identifier)
+        );
+    })();
+  };
+  useFocusEffect(onFocusRefetch);
+
+  // notification stuff
+  const notifListener: any = useRef();
+  const subscribeToNotifs = () => {
     Notifications.setNotificationHandler({
       handleNotification: async () => ({
         shouldShowAlert: false,
@@ -54,8 +83,10 @@ export const ConversationScreen = () => {
         shouldSetBadge: false,
       }),
     });
+
     notifListener.current = Notifications.addNotificationReceivedListener(
       (notif) => {
+        Notifications.dismissNotificationAsync(notif.request.identifier);
         console.log(
           "notif-convo-screen",
           notif.request.identifier,
@@ -64,16 +95,29 @@ export const ConversationScreen = () => {
         fetchMore({});
       }
     );
-
-    return () => {
-      Notifications.removeNotificationSubscription(notifListener.current);
-    };
+  };
+  const unsubscribeFromNotifs = () => {
+    Notifications.removeNotificationSubscription(notifListener.current);
+  };
+  useFocusEffect(() => {
+    subscribeToNotifs();
+    return () => unsubscribeFromNotifs();
   });
 
+  // scroll stuff
+  const scrollViewRef = useRef(null);
   const scrollDown = () => {
     if (scrollViewRef.current)
       (scrollViewRef.current as any).scrollToEnd({ animated: false });
   };
+  useFocusEffect(() => {
+    Keyboard.addListener("keyboardDidShow", () => {
+      setTimeout(() => scrollDown(), 20);
+    });
+    return () => {
+      Keyboard.removeAllListeners("keyboardDidShow");
+    };
+  });
 
   if (!data)
     return (

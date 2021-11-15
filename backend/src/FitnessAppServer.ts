@@ -62,13 +62,13 @@ export class FitnessAppServer {
       })
     );
 
-    const asdf = new MessageResolver();
-    asdf.sendMessage(3, "ooga booga 7", {
-      req: {
-        session: { userId: 1 },
-      },
-      expo: this.expo,
-    } as MyContext);
+    // const asdf = new MessageResolver();
+    // asdf.sendMessage(3, "ooga booga 15", {
+    //   req: {
+    //     session: { userId: 1 },
+    //   },
+    //   expo: this.expo,
+    // } as MyContext);
 
     // const asdf = new ConversationResolver();
     // console.log(
