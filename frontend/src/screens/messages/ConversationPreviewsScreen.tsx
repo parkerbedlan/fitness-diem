@@ -1,7 +1,7 @@
 import { useFocusEffect, useIsFocused } from "@react-navigation/core";
 import { format } from "date-fns";
 import * as Notifications from "expo-notifications";
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { Button, Icon, Text } from "react-native-elements";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
@@ -25,9 +25,8 @@ export type ConversationPreviewsScreenParams = undefined;
 export const ConversationPreviewsScreen = () => {
   const { navigation } = useRootScreen();
   useIsAuth(navigation, useIsFocused());
-  const { data: meData, loading: meLoading } = useMeQuery();
-  const { data, loading, refetch, previousData } =
-    useGetConversationPreviewsQuery();
+  const { data: meData } = useMeQuery();
+  const { data, refetch, previousData } = useGetConversationPreviewsQuery();
   const convoPreviews = data?.getConversationPreviews;
 
   const notifListener: any = useRef();
@@ -92,9 +91,10 @@ const ConversationPreview = ({
   conversation: GetConversationPreviewsQuery["getConversationPreviews"][number];
 }) => {
   const { data: meData } = useMeQuery();
-  const user = conversation.members.find(
-    (member) => member.id !== meData!.me!.id
-  )!;
+  const user =
+    conversation.members.length === 1
+      ? conversation.members[0]
+      : conversation.members.find((member) => member.id !== meData!.me!.id)!;
   const lastMessagePreview = conversation.lastMessagePreview;
   const profilePicUri = getProfilePicUri(user.id);
   const [UserPic] = useCacheyImage(profilePicUri);

@@ -1,0 +1,3 @@
+mutation StartConversationByUsername($username: String!) {
+  startConversationByUsername(username: $username)
+}

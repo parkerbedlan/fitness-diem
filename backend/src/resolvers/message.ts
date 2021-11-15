@@ -101,7 +101,7 @@ export class MessageResolver {
 
     console.log(pushTokens, notif);
 
-    pushToMany(expo, pushTokens, notif);
+    if (pushTokens) pushToMany(expo, pushTokens, notif);
 
     return true;
   }

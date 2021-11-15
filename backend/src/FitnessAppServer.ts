@@ -11,19 +11,14 @@ import Redis from "ioredis";
 import path from "path";
 import "reflect-metadata";
 import { buildSchema, NonEmptyArray } from "type-graphql";
-import {
-  Connection,
-  createConnection,
-  EntitySchema,
-  getConnection,
-} from "typeorm";
+import { Connection, createConnection, EntitySchema } from "typeorm";
 import { COOKIE_NAME, corsOptions, __prod__ } from "./constants";
 import { Conversation } from "./entities/Conversation";
 import { User } from "./entities/User";
+import { ConversationResolver } from "./resolvers/conversation";
 import { MessageResolver } from "./resolvers/message";
 import { MyContext } from "./types";
 import { getLANipAddress } from "./utils/getLANipAddress";
-import { pushToMany } from "./utils/pushToMany";
 
 type HostingMode = "localhost" | "LAN";
 type Resolvers = NonEmptyArray<Function> | NonEmptyArray<string>;
@@ -58,6 +53,7 @@ export class FitnessAppServer {
     console.log("----------------------------------------------");
 
     console.log(await User.find({ select: ["id", "username", "pushToken"] }));
+    // await Conversation.delete(6);
     console.log(
       await Conversation.find({
         select: ["id"],
@@ -67,12 +63,19 @@ export class FitnessAppServer {
     );
 
     const asdf = new MessageResolver();
-    asdf.sendMessage(3, "ooga booga 4", {
+    asdf.sendMessage(3, "ooga booga 7", {
       req: {
         session: { userId: 1 },
       },
       expo: this.expo,
     } as MyContext);
+
+    // const asdf = new ConversationResolver();
+    // console.log(
+    //   await asdf.getConversationPreviews({
+    //     req: { session: { userId: 2 } },
+    //   } as MyContext)
+    // );
 
     // const pushTokens = await getConnection()
     //   .getRepository(Conversation)

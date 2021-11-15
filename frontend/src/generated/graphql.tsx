@@ -68,6 +68,7 @@ export type Mutation = {
   sendMessage: Scalars['Boolean'];
   sendMyselfANotification: Scalars['Boolean'];
   startConversation: Scalars['Int'];
+  startConversationByUsername: Scalars['Int'];
   updatePost: Post;
   uploadTestImage: Scalars['Boolean'];
 };
@@ -133,6 +134,11 @@ export type MutationSendMyselfANotificationArgs = {
 
 export type MutationStartConversationArgs = {
   memberIds: Array<Scalars['Int']>;
+};
+
+
+export type MutationStartConversationByUsernameArgs = {
+  username: Scalars['String'];
 };
 
 
@@ -280,6 +286,13 @@ export type StartConversationMutationVariables = Exact<{
 
 
 export type StartConversationMutation = { __typename?: 'Mutation', startConversation: number };
+
+export type StartConversationByUsernameMutationVariables = Exact<{
+  username: Scalars['String'];
+}>;
+
+
+export type StartConversationByUsernameMutation = { __typename?: 'Mutation', startConversationByUsername: number };
 
 export type UploadTestImageMutationVariables = Exact<{
   fileUpload: Scalars['Upload'];
@@ -664,6 +677,37 @@ export function useStartConversationMutation(baseOptions?: Apollo.MutationHookOp
 export type StartConversationMutationHookResult = ReturnType<typeof useStartConversationMutation>;
 export type StartConversationMutationResult = Apollo.MutationResult<StartConversationMutation>;
 export type StartConversationMutationOptions = Apollo.BaseMutationOptions<StartConversationMutation, StartConversationMutationVariables>;
+export const StartConversationByUsernameDocument = gql`
+    mutation StartConversationByUsername($username: String!) {
+  startConversationByUsername(username: $username)
+}
+    `;
+export type StartConversationByUsernameMutationFn = Apollo.MutationFunction<StartConversationByUsernameMutation, StartConversationByUsernameMutationVariables>;
+
+/**
+ * __useStartConversationByUsernameMutation__
+ *
+ * To run a mutation, you first call `useStartConversationByUsernameMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useStartConversationByUsernameMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [startConversationByUsernameMutation, { data, loading, error }] = useStartConversationByUsernameMutation({
+ *   variables: {
+ *      username: // value for 'username'
+ *   },
+ * });
+ */
+export function useStartConversationByUsernameMutation(baseOptions?: Apollo.MutationHookOptions<StartConversationByUsernameMutation, StartConversationByUsernameMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<StartConversationByUsernameMutation, StartConversationByUsernameMutationVariables>(StartConversationByUsernameDocument, options);
+      }
+export type StartConversationByUsernameMutationHookResult = ReturnType<typeof useStartConversationByUsernameMutation>;
+export type StartConversationByUsernameMutationResult = Apollo.MutationResult<StartConversationByUsernameMutation>;
+export type StartConversationByUsernameMutationOptions = Apollo.BaseMutationOptions<StartConversationByUsernameMutation, StartConversationByUsernameMutationVariables>;
 export const UploadTestImageDocument = gql`
     mutation UploadTestImage($fileUpload: Upload!) {
   uploadTestImage(fileUpload: $fileUpload)

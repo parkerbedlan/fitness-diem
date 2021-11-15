@@ -1,6 +1,5 @@
 import { useFocusEffect } from "@react-navigation/core";
 import * as Notifications from "expo-notifications";
-
 import { Formik } from "formik";
 import React, { useRef } from "react";
 import { ActivityIndicator, Keyboard, ScrollView, View } from "react-native";
@@ -23,13 +22,22 @@ export type ConversationScreenParams = {
 };
 
 export const ConversationScreen = () => {
-  const { data: meData, loading: meLoading } = useMeQuery();
+  useFocusEffect(() => {
+    Keyboard.addListener("keyboardDidShow", () => {
+      setTimeout(() => scrollDown(), 20);
+    });
+    return () => {
+      Keyboard.removeAllListeners("keyboardDidShow");
+    };
+  });
+
+  const { data: meData } = useMeQuery();
   const {
     route,
     navigation: { navigate },
   } = useMessagesStackScreen();
   const conversationId = route.params?.conversationId!;
-  const { data, loading, fetchMore } = useGetConversationQuery({
+  const { data, fetchMore, loading } = useGetConversationQuery({
     variables: { conversationId },
   });
   const [sendMessage] = useSendMessageMutation();
@@ -62,6 +70,11 @@ export const ConversationScreen = () => {
     };
   });
 
+  const scrollDown = () => {
+    if (scrollViewRef.current)
+      (scrollViewRef.current as any).scrollToEnd({ animated: false });
+  };
+
   if (!data)
     return (
       <CenteredContainer>
@@ -85,11 +98,19 @@ export const ConversationScreen = () => {
 
   const conversation = data?.getConversation;
 
-  const user = conversation.members.find(
-    (member) => member.id !== meData!.me!.id
-  )!;
+  const user =
+    conversation.members.length === 1
+      ? conversation.members[0]
+      : conversation.members.find((member) => member.id !== meData!.me!.id)!;
 
   const messages = conversation.messages;
+
+  if (!user)
+    return (
+      <CenteredContainer>
+        <ActivityIndicator size="large" color="#10B981" />
+      </CenteredContainer>
+    );
 
   return (
     <>
@@ -105,10 +126,8 @@ export const ConversationScreen = () => {
       />
       <ScrollView
         ref={scrollViewRef}
-        onContentSizeChange={() => {
-          if (scrollViewRef.current)
-            (scrollViewRef.current as any).scrollToEnd({ animated: true });
-        }}
+        onContentSizeChange={() => scrollDown()}
+        style={tw`bg-gray-50`}
       >
         <UncenteredContainer>
           {messages.map((message) => (
@@ -132,7 +151,6 @@ export const ConversationScreen = () => {
             fetchMore({});
           }
           resetForm();
-          Keyboard.dismiss();
         }}
       >
         {({ handleSubmit }) => (
@@ -144,6 +162,7 @@ export const ConversationScreen = () => {
               icon={<Icon name="send" color="white" />}
               buttonStyle={tw`bg-purple-600`}
               onPress={() => handleSubmit()}
+              loading={loading}
             />
           </View>
         )}

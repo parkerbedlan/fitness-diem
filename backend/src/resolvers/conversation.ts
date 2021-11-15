@@ -31,6 +31,8 @@ export class ConversationResolver {
       .orderBy("message.createdAt", "DESC")
       .select(["sender.username", "message.body", "message.createdAt"])
       .getOne();
+    if (!lastMessage)
+      return { display: "No messages yet!", createdAt: conversation.createdAt };
     const body = lastMessage?.body!;
     const username = lastMessage?.sender.username;
     const realBody = body.length < 20 ? body : body?.substring(0, 20) + "...";

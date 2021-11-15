@@ -2,6 +2,7 @@ import { Field, ObjectType } from "type-graphql";
 import {
   BaseEntity,
   Column,
+  CreateDateColumn,
   Entity,
   JoinTable,
   ManyToMany,
@@ -42,4 +43,8 @@ export class Conversation extends BaseEntity {
   @Field(() => [Message])
   @OneToMany(() => Message, (message) => message.conversation)
   messages: Message[];
+
+  @Field(() => String)
+  @CreateDateColumn()
+  createdAt: Date;
 }
