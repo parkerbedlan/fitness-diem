@@ -26,10 +26,12 @@ import { generateRNFile } from "../../utils/generateRNFile";
 import { getProfilePicUri } from "../../utils/getProfilePicUri";
 import { toErrorMap } from "../../utils/toErrorMap";
 import { urltoFile } from "../../utils/urlToFile";
-import { useProfileStackNavigation } from "../ProfileScreen";
+import { useProfileStackScreen } from "../ProfileScreen";
 
 export const EditProfileScreen = () => {
-  const { navigate } = useProfileStackNavigation();
+  const {
+    navigation: { navigate },
+  } = useProfileStackScreen();
   const [isEditPicModalVisible, setIsEditPicModalVisible] = useState(false);
   const [isCancelModalVisible, setisCancelModalVisible] = useState(false);
   const { data: profileData, loading: profileLoading } = useMeProfileQuery();

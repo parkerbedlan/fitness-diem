@@ -1,0 +1,3 @@
+mutation StartConversation($memberIds: [Int!]!) {
+  startConversation(memberIds: $memberIds)
+}

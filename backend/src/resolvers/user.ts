@@ -56,6 +56,17 @@ export class UserResolver {
   }
 
   @Mutation(() => Boolean)
+  @UseMiddleware(isAuth)
+  async approveNotifications(
+    @Arg("pushToken") pushToken: string,
+    @Ctx() { req }: MyContext
+  ): Promise<boolean> {
+    req.session.pushToken = pushToken;
+    User.update(req.session.userId!, { pushToken });
+    return true;
+  }
+
+  @Mutation(() => Boolean)
   async editProfilePic(
     @Arg("fileUpload", () => GraphQLUpload)
     { createReadStream }: FileUpload,
@@ -268,7 +279,9 @@ export class UserResolver {
   }
 
   @Mutation(() => Boolean)
-  logout(@Ctx() { req, res: response }: MyContext) {
+  async logout(@Ctx() { req, res: response }: MyContext) {
+    await User.update(req.session.userId!, { pushToken: undefined });
+
     return new Promise((resolve) =>
       req.session.destroy((err) => {
         response.clearCookie(COOKIE_NAME);

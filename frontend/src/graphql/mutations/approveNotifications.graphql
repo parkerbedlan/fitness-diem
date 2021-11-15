@@ -1,0 +1,3 @@
+mutation ApproveNotifications($pushToken: String!) {
+  approveNotifications(pushToken: $pushToken)
+}

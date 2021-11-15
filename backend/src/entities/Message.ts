@@ -6,38 +6,30 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from "typeorm";
+import { Conversation } from "./Conversation";
 import { User } from "./User";
 
 @ObjectType()
 @Entity()
-export class Post extends BaseEntity {
+export class Message extends BaseEntity {
   @Field()
   @PrimaryGeneratedColumn()
   id!: number;
 
   @Field()
   @Column()
-  title!: string;
+  body: string;
+
+  @Field(() => Conversation)
+  @ManyToOne(() => Conversation, (conversation) => conversation.messages)
+  conversation: Conversation;
 
   @Field()
-  @Column()
-  text!: string;
-
-  @Field()
-  @Column()
-  creatorId: number;
-
-  @Field(() => User)
-  @ManyToOne(() => User, (user) => user.posts)
-  creator: User;
+  @ManyToOne(() => User)
+  sender: User;
 
   @Field(() => String)
   @CreateDateColumn()
   createdAt: Date;
-
-  @Field(() => String)
-  @UpdateDateColumn()
-  updatedAt: Date;
 }

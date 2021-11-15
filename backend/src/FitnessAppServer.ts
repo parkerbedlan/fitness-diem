@@ -1,20 +1,24 @@
-import "reflect-metadata";
-import "dotenv-safe/config";
-import { COOKIE_NAME, __prod__ } from "./constants";
-import express, { Express } from "express";
 import { ApolloServer, ExpressContext } from "apollo-server-express";
-import { buildSchema, NonEmptyArray } from "type-graphql";
-import session from "express-session";
 import connectRedis from "connect-redis";
-import { MyContext } from "./types";
 import cors, { CorsOptions } from "cors";
-import Redis from "ioredis";
-import { corsOptions } from "./constants";
-import { Connection, createConnection, EntitySchema } from "typeorm";
-import path from "path";
-import { graphqlUploadExpress } from "graphql-upload";
-import { getLANipAddress } from "./utils/getLANipAddress";
+import "dotenv-safe/config";
+import { Expo, ExpoPushMessage } from "expo-server-sdk";
+import express, { Express } from "express";
+import session from "express-session";
 import fs from "fs";
+import { graphqlUploadExpress } from "graphql-upload";
+import Redis from "ioredis";
+import path from "path";
+import "reflect-metadata";
+import { buildSchema, NonEmptyArray } from "type-graphql";
+import { Connection, createConnection, EntitySchema } from "typeorm";
+import { COOKIE_NAME, corsOptions, __prod__ } from "./constants";
+import { Conversation } from "./entities/Conversation";
+import { User } from "./entities/User";
+import { ConversationResolver } from "./resolvers/conversation";
+import { MessageResolver } from "./resolvers/message";
+import { MyContext } from "./types";
+import { getLANipAddress } from "./utils/getLANipAddress";
 
 type HostingMode = "localhost" | "LAN";
 type Resolvers = NonEmptyArray<Function> | NonEmptyArray<string>;
@@ -28,6 +32,7 @@ export class FitnessAppServer {
   redis: Redis.Redis;
   RedisStore: connectRedis.RedisStore;
   apolloServer: ApolloServer<ExpressContext>;
+  expo: Expo;
 
   resolvers: Resolvers;
   entities?: Entities;
@@ -38,34 +43,92 @@ export class FitnessAppServer {
     resolvers: Resolvers,
     entities?: Entities
   ) {
-    this.hostingMode = hostingMode;
+    this.hostingMode = __prod__ ? "localhost" : hostingMode;
     this.corsOptions = corsOptions;
     this.resolvers = resolvers;
     this.entities = entities;
+  }
+
+  public async tester() {
+    console.log("----------------------------------------------");
+
+    console.log(await User.find({ select: ["id", "username", "pushToken"] }));
+    // await Conversation.delete(6);
+    console.log(
+      await Conversation.find({
+        select: ["id"],
+        relations: ["members"],
+        loadRelationIds: true,
+      })
+    );
+
+    // const asdf = new MessageResolver();
+    // asdf.sendMessage(3, "ooga booga 16", {
+    //   req: {
+    //     session: { userId: 1 },
+    //   },
+    //   expo: this.expo,
+    // } as MyContext);
+
+    // const asdf = new ConversationResolver();
+    // console.log(
+    //   await asdf.getConversationPreviews({
+    //     req: { session: { userId: 2 } },
+    //   } as MyContext)
+    // );
+
+    // const pushTokens = await getConnection()
+    //   .getRepository(Conversation)
+    //   .createQueryBuilder("convo")
+    //   .leftJoinAndSelect("convo.members", "members")
+    //   .where("convo.id = :convoId", { convoId: 3 })
+    //   .andWhere("members.id != :senderId", { senderId: 1 })
+    //   .select(["convo.id", "members.pushToken"])
+    //   .getOne()
+    //   .then((response) => response?.members.map((member) => member.pushToken));
+    // console.log(pushTokens);
+
+    // pushToMany(this.expo, ["ExponentPushToken[WXVEetGVp9awuCdPL616fy]"], {
+    //   sound: "default",
+    //   title: "Test notification",
+    //   body: "blah blah blah",
+    //   data: { withSome: "data" },
+    // });
+
+    console.log("----------------------------------------------");
+  }
+
+  // https://github.com/expo/expo-server-sdk-node
+  public async sendTestNotification(messageText: string) {
+    const pushToken = "ExponentPushToken[WXVEetGVp9awuCdPL616fy]";
+    let messages: ExpoPushMessage[] = [];
+    messages.push({
+      to: pushToken,
+      sound: "default",
+      title: "Test notification",
+      body: messageText,
+      data: { withSome: "data" },
+    });
+    let chunks = this.expo.chunkPushNotifications(messages);
+    let tickets = [];
+    for (let chunk of chunks) {
+      try {
+        let ticketChunk = await this.expo.sendPushNotificationsAsync(chunk);
+        console.log(ticketChunk);
+        tickets.push(...ticketChunk);
+      } catch (error) {
+        console.error(error);
+      }
+    }
   }
 
   public async setup() {
     this.configureApp();
     await this.configureOrm();
     this.configureSessionCookies();
+    this.configureExpo();
     await this.configureApolloServer();
-
-    this.app.get("/testimage.png", (_req, res) => {
-      res.send(fs.readFileSync(path.join(__dirname, "images/testfile.png")));
-    });
-    this.app.get("/profilepic/:username.png", (req, res) => {
-      const filePath = path.join(
-        __dirname,
-        `images/profilepic/${req.params.username}.png`
-      );
-      const fileExists = fs.existsSync(filePath);
-      if (fileExists) {
-        res.send(fs.readFileSync(filePath));
-      } else {
-        res.send("ERROR: no profile pic for that user");
-      }
-    });
-    // this.app.use("/images", express.static(path.join(__dirname, "../images")));
+    this.configureFileManagement();
   }
 
   public start() {
@@ -137,6 +200,7 @@ export class FitnessAppServer {
         req,
         res,
         redis: this.redis,
+        expo: this.expo,
       }),
     });
 
@@ -145,6 +209,28 @@ export class FitnessAppServer {
     this.apolloServer.applyMiddleware({
       app: this.app,
       cors: false,
+    });
+  }
+
+  private configureExpo() {
+    this.expo = new Expo();
+  }
+
+  private configureFileManagement() {
+    this.app.get("/testimage.png", (_req, res) => {
+      res.send(fs.readFileSync(path.join(__dirname, "images/testfile.png")));
+    });
+    this.app.get("/profilepic/:username.png", (req, res) => {
+      const filePath = path.join(
+        __dirname,
+        `images/profilepic/${req.params.username}.png`
+      );
+      const fileExists = fs.existsSync(filePath);
+      if (fileExists) {
+        res.send(fs.readFileSync(filePath));
+      } else {
+        res.send("ERROR: no profile pic for that user");
+      }
     });
   }
 }

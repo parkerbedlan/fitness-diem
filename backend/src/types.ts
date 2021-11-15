@@ -1,3 +1,4 @@
+import Expo from "expo-server-sdk";
 import { Request, Response } from "express";
 import { Session } from "express-session";
 import { Redis } from "ioredis";
@@ -8,6 +9,7 @@ import { Redis } from "ioredis";
 declare module "express-session" {
   interface SessionData {
     userId: number;
+    pushToken: string;
   }
 }
 
@@ -15,4 +17,5 @@ export type MyContext = {
   req: Request & { session: Session };
   res: Response;
   redis: Redis;
+  expo: Expo;
 };

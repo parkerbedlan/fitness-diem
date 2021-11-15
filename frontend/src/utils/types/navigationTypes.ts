@@ -15,6 +15,10 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { HomeScreenName, HomeScreenParams } from "../../screens/HomeScreen";
 import { LoginScreenName, LoginScreenParams } from "../../screens/LoginScreen";
 import {
+  MessagesScreenName,
+  MessagesScreenParams,
+} from "../../screens/MessagesScreen";
+import {
   ProfileScreenName,
   ProfileScreenParams,
 } from "../../screens/ProfileScreen";
@@ -28,6 +32,7 @@ export type RootScreenList = {
   [SignupScreenName]: SignupScreenParams;
   [LoginScreenName]: LoginScreenParams;
   [ProfileScreenName]: ProfileScreenParams;
+  [MessagesScreenName]: MessagesScreenParams;
 };
 
 export type RootNavigation = NativeStackNavigationProp<

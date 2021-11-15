@@ -5,6 +5,7 @@ import {
 } from "@react-navigation/native-stack";
 import React from "react";
 import { useIsAuth } from "../utils/hooks/useIsAuth";
+import { useNavigator } from "../utils/hooks/useNavigator";
 import { useRootScreen } from "../utils/hooks/useRootScreen";
 import { EditProfileScreen } from "./profile/EditProfileScreen";
 import { ViewProfileScreen } from "./profile/ViewProfileScreen";
@@ -31,15 +32,8 @@ type ProfileStackScreenList = {
   EditProfile: undefined;
 };
 
-const ProfileStack = createNativeStackNavigator<ProfileStackScreenList>();
-
-export const useProfileStackNavigation = () =>
-  useNavigation<
-    NativeStackNavigationProp<
-      ProfileStackScreenList,
-      keyof ProfileStackScreenList
-    >
-  >();
+export const { Stack: ProfileStack, useScreen: useProfileStackScreen } =
+  useNavigator<ProfileStackScreenList>();
 
 const ProfileNavigator = () => {
   const { navigation: rootNavigation } = useRootScreen();
