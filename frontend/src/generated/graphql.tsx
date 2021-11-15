@@ -16,6 +16,15 @@ export type Scalars = {
   Upload: any;
 };
 
+export type Conversation = {
+  __typename?: 'Conversation';
+  id: Scalars['Float'];
+  lastMessagePreview: MessagePreview;
+  members: Array<User>;
+  messages: Array<Message>;
+  title?: Maybe<Scalars['String']>;
+};
+
 export type EditProfileInput = {
   bio?: Maybe<Scalars['String']>;
   displayName?: Maybe<Scalars['String']>;
@@ -27,6 +36,21 @@ export type FieldError = {
   __typename?: 'FieldError';
   field: Scalars['String'];
   message: Scalars['String'];
+};
+
+export type Message = {
+  __typename?: 'Message';
+  body: Scalars['String'];
+  conversation: Conversation;
+  createdAt: Scalars['String'];
+  id: Scalars['Float'];
+  sender: User;
+};
+
+export type MessagePreview = {
+  __typename?: 'MessagePreview';
+  createdAt: Scalars['String'];
+  display: Scalars['String'];
 };
 
 export type Mutation = {
@@ -41,7 +65,9 @@ export type Mutation = {
   login: UserResponse;
   logout: Scalars['Boolean'];
   register: UserResponse;
+  sendMessage: Scalars['Boolean'];
   sendMyselfANotification: Scalars['Boolean'];
+  startConversation: Scalars['Int'];
   updatePost: Post;
   uploadTestImage: Scalars['Boolean'];
 };
@@ -94,8 +120,19 @@ export type MutationRegisterArgs = {
 };
 
 
+export type MutationSendMessageArgs = {
+  body: Scalars['String'];
+  conversationId: Scalars['Int'];
+};
+
+
 export type MutationSendMyselfANotificationArgs = {
   messageText: Scalars['String'];
+};
+
+
+export type MutationStartConversationArgs = {
+  memberIds: Array<Scalars['Int']>;
 };
 
 
@@ -129,10 +166,17 @@ export type PostOptions = {
 
 export type Query = {
   __typename?: 'Query';
+  getConversation: Conversation;
+  getConversationPreviews: Array<Conversation>;
   hello: Scalars['String'];
   me?: Maybe<User>;
   post?: Maybe<Post>;
   posts: Array<Post>;
+};
+
+
+export type QueryGetConversationArgs = {
+  conversationId: Scalars['Int'];
 };
 
 
@@ -154,7 +198,6 @@ export type User = {
   displayName?: Maybe<Scalars['String']>;
   email: Scalars['String'];
   id: Scalars['Float'];
-  pushToken?: Maybe<Scalars['String']>;
   updatedAt: Scalars['String'];
   username: Scalars['String'];
 };
@@ -216,6 +259,14 @@ export type RegisterMutationVariables = Exact<{
 
 export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined, user?: { __typename?: 'User', id: number, username: string } | null | undefined } };
 
+export type SendMessageMutationVariables = Exact<{
+  body: Scalars['String'];
+  conversationId: Scalars['Int'];
+}>;
+
+
+export type SendMessageMutation = { __typename?: 'Mutation', sendMessage: boolean };
+
 export type SendMyselfANotificationMutationVariables = Exact<{
   messageText: Scalars['String'];
 }>;
@@ -223,12 +274,31 @@ export type SendMyselfANotificationMutationVariables = Exact<{
 
 export type SendMyselfANotificationMutation = { __typename?: 'Mutation', sendMyselfANotification: boolean };
 
+export type StartConversationMutationVariables = Exact<{
+  memberIds: Array<Scalars['Int']> | Scalars['Int'];
+}>;
+
+
+export type StartConversationMutation = { __typename?: 'Mutation', startConversation: number };
+
 export type UploadTestImageMutationVariables = Exact<{
   fileUpload: Scalars['Upload'];
 }>;
 
 
 export type UploadTestImageMutation = { __typename?: 'Mutation', uploadTestImage: boolean };
+
+export type GetConversationQueryVariables = Exact<{
+  conversationId: Scalars['Int'];
+}>;
+
+
+export type GetConversationQuery = { __typename?: 'Query', getConversation: { __typename?: 'Conversation', id: number, title?: string | null | undefined, members: Array<{ __typename?: 'User', id: number, username: string, displayName?: string | null | undefined }>, messages: Array<{ __typename?: 'Message', id: number, body: string, createdAt: string, sender: { __typename?: 'User', id: number, username: string, displayName?: string | null | undefined } }> } };
+
+export type GetConversationPreviewsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetConversationPreviewsQuery = { __typename?: 'Query', getConversationPreviews: Array<{ __typename?: 'Conversation', id: number, title?: string | null | undefined, members: Array<{ __typename?: 'User', id: number, username: string, displayName?: string | null | undefined }>, lastMessagePreview: { __typename?: 'MessagePreview', createdAt: string, display: string } }> };
 
 export type HelloQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -500,6 +570,38 @@ export function useRegisterMutation(baseOptions?: Apollo.MutationHookOptions<Reg
 export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
 export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
 export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
+export const SendMessageDocument = gql`
+    mutation SendMessage($body: String!, $conversationId: Int!) {
+  sendMessage(body: $body, conversationId: $conversationId)
+}
+    `;
+export type SendMessageMutationFn = Apollo.MutationFunction<SendMessageMutation, SendMessageMutationVariables>;
+
+/**
+ * __useSendMessageMutation__
+ *
+ * To run a mutation, you first call `useSendMessageMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSendMessageMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [sendMessageMutation, { data, loading, error }] = useSendMessageMutation({
+ *   variables: {
+ *      body: // value for 'body'
+ *      conversationId: // value for 'conversationId'
+ *   },
+ * });
+ */
+export function useSendMessageMutation(baseOptions?: Apollo.MutationHookOptions<SendMessageMutation, SendMessageMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SendMessageMutation, SendMessageMutationVariables>(SendMessageDocument, options);
+      }
+export type SendMessageMutationHookResult = ReturnType<typeof useSendMessageMutation>;
+export type SendMessageMutationResult = Apollo.MutationResult<SendMessageMutation>;
+export type SendMessageMutationOptions = Apollo.BaseMutationOptions<SendMessageMutation, SendMessageMutationVariables>;
 export const SendMyselfANotificationDocument = gql`
     mutation SendMyselfANotification($messageText: String!) {
   sendMyselfANotification(messageText: $messageText)
@@ -531,6 +633,37 @@ export function useSendMyselfANotificationMutation(baseOptions?: Apollo.Mutation
 export type SendMyselfANotificationMutationHookResult = ReturnType<typeof useSendMyselfANotificationMutation>;
 export type SendMyselfANotificationMutationResult = Apollo.MutationResult<SendMyselfANotificationMutation>;
 export type SendMyselfANotificationMutationOptions = Apollo.BaseMutationOptions<SendMyselfANotificationMutation, SendMyselfANotificationMutationVariables>;
+export const StartConversationDocument = gql`
+    mutation StartConversation($memberIds: [Int!]!) {
+  startConversation(memberIds: $memberIds)
+}
+    `;
+export type StartConversationMutationFn = Apollo.MutationFunction<StartConversationMutation, StartConversationMutationVariables>;
+
+/**
+ * __useStartConversationMutation__
+ *
+ * To run a mutation, you first call `useStartConversationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useStartConversationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [startConversationMutation, { data, loading, error }] = useStartConversationMutation({
+ *   variables: {
+ *      memberIds: // value for 'memberIds'
+ *   },
+ * });
+ */
+export function useStartConversationMutation(baseOptions?: Apollo.MutationHookOptions<StartConversationMutation, StartConversationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<StartConversationMutation, StartConversationMutationVariables>(StartConversationDocument, options);
+      }
+export type StartConversationMutationHookResult = ReturnType<typeof useStartConversationMutation>;
+export type StartConversationMutationResult = Apollo.MutationResult<StartConversationMutation>;
+export type StartConversationMutationOptions = Apollo.BaseMutationOptions<StartConversationMutation, StartConversationMutationVariables>;
 export const UploadTestImageDocument = gql`
     mutation UploadTestImage($fileUpload: Upload!) {
   uploadTestImage(fileUpload: $fileUpload)
@@ -562,6 +695,101 @@ export function useUploadTestImageMutation(baseOptions?: Apollo.MutationHookOpti
 export type UploadTestImageMutationHookResult = ReturnType<typeof useUploadTestImageMutation>;
 export type UploadTestImageMutationResult = Apollo.MutationResult<UploadTestImageMutation>;
 export type UploadTestImageMutationOptions = Apollo.BaseMutationOptions<UploadTestImageMutation, UploadTestImageMutationVariables>;
+export const GetConversationDocument = gql`
+    query GetConversation($conversationId: Int!) {
+  getConversation(conversationId: $conversationId) {
+    id
+    title
+    members {
+      id
+      username
+      displayName
+    }
+    messages {
+      id
+      body
+      createdAt
+      sender {
+        id
+        username
+        displayName
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetConversationQuery__
+ *
+ * To run a query within a React component, call `useGetConversationQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetConversationQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetConversationQuery({
+ *   variables: {
+ *      conversationId: // value for 'conversationId'
+ *   },
+ * });
+ */
+export function useGetConversationQuery(baseOptions: Apollo.QueryHookOptions<GetConversationQuery, GetConversationQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetConversationQuery, GetConversationQueryVariables>(GetConversationDocument, options);
+      }
+export function useGetConversationLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetConversationQuery, GetConversationQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetConversationQuery, GetConversationQueryVariables>(GetConversationDocument, options);
+        }
+export type GetConversationQueryHookResult = ReturnType<typeof useGetConversationQuery>;
+export type GetConversationLazyQueryHookResult = ReturnType<typeof useGetConversationLazyQuery>;
+export type GetConversationQueryResult = Apollo.QueryResult<GetConversationQuery, GetConversationQueryVariables>;
+export const GetConversationPreviewsDocument = gql`
+    query GetConversationPreviews {
+  getConversationPreviews {
+    id
+    title
+    members {
+      id
+      username
+      displayName
+    }
+    lastMessagePreview {
+      createdAt
+      display
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetConversationPreviewsQuery__
+ *
+ * To run a query within a React component, call `useGetConversationPreviewsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetConversationPreviewsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetConversationPreviewsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetConversationPreviewsQuery(baseOptions?: Apollo.QueryHookOptions<GetConversationPreviewsQuery, GetConversationPreviewsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetConversationPreviewsQuery, GetConversationPreviewsQueryVariables>(GetConversationPreviewsDocument, options);
+      }
+export function useGetConversationPreviewsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetConversationPreviewsQuery, GetConversationPreviewsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetConversationPreviewsQuery, GetConversationPreviewsQueryVariables>(GetConversationPreviewsDocument, options);
+        }
+export type GetConversationPreviewsQueryHookResult = ReturnType<typeof useGetConversationPreviewsQuery>;
+export type GetConversationPreviewsLazyQueryHookResult = ReturnType<typeof useGetConversationPreviewsLazyQuery>;
+export type GetConversationPreviewsQueryResult = Apollo.QueryResult<GetConversationPreviewsQuery, GetConversationPreviewsQueryVariables>;
 export const HelloDocument = gql`
     query Hello {
   hello

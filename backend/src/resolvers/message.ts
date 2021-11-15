@@ -5,8 +5,6 @@ import {
   FieldResolver,
   Int,
   Mutation,
-  ObjectType,
-  Query,
   Resolver,
   Root,
   UseMiddleware,
@@ -76,9 +74,9 @@ export class MessageResolver {
     const pushTokens = (await getConnection()
       .getRepository(Conversation)
       .createQueryBuilder("convo")
-      .where("convo.id = :convoId", { convoId: conversationId })
       .leftJoinAndSelect("convo.members", "members")
-      .where("members.id != :senderId", { senderId: req.session.userId })
+      .where("convo.id = :convoId", { convoId: conversationId })
+      .andWhere("members.id != :senderId", { senderId: req.session.userId })
       .select(["convo.id", "members.pushToken"])
       .getOne()
       .then((response) =>
@@ -100,6 +98,8 @@ export class MessageResolver {
         body,
       },
     };
+
+    console.log(pushTokens, notif);
 
     pushToMany(expo, pushTokens, notif);
 

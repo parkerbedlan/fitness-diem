@@ -1,60 +1,136 @@
+import { useFocusEffect } from "@react-navigation/core";
+import * as Notifications from "expo-notifications";
+
 import { Formik } from "formik";
-import React from "react";
-import { Keyboard, ScrollView, View } from "react-native";
+import React, { useRef } from "react";
+import { ActivityIndicator, Keyboard, ScrollView, View } from "react-native";
 import { Button, Icon, Text } from "react-native-elements";
 import tw from "tailwind-react-native-classnames";
+import CenteredContainer from "../../components/CenteredContainer";
 import FormikInput from "../../components/FormikInput";
 import { HeaderForSubscreens } from "../../components/HeaderForSubscreens";
 import UncenteredContainer from "../../components/UncenteredContainer";
-import { useMeQuery } from "../../generated/graphql";
+import {
+  useGetConversationQuery,
+  useMeQuery,
+  useSendMessageMutation,
+} from "../../generated/graphql";
 import { useMessagesStackScreen } from "../MessagesScreen";
 
 export const ConversationScreenName = "Conversation";
 export type ConversationScreenParams = {
-  userId: number;
+  conversationId: number;
 };
 
 export const ConversationScreen = () => {
+  const { data: meData, loading: meLoading } = useMeQuery();
   const {
     route,
     navigation: { navigate },
   } = useMessagesStackScreen();
-  const userId = route.params?.userId;
+  const conversationId = route.params?.conversationId!;
+  const { data, loading, fetchMore } = useGetConversationQuery({
+    variables: { conversationId },
+  });
+  const [sendMessage] = useSendMessageMutation();
+
+  const scrollViewRef = useRef(null);
+
+  const notifListener: any = useRef();
+  useFocusEffect(() => {
+    fetchMore({});
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowAlert: false,
+        shouldPlaySound: false,
+        shouldSetBadge: false,
+      }),
+    });
+    notifListener.current = Notifications.addNotificationReceivedListener(
+      (notif) => {
+        console.log(
+          "notif-convo-screen",
+          notif.request.identifier,
+          notif.request.content
+        );
+        fetchMore({});
+      }
+    );
+
+    return () => {
+      Notifications.removeNotificationSubscription(notifListener.current);
+    };
+  });
+
+  if (!data)
+    return (
+      <CenteredContainer>
+        <ActivityIndicator size="large" color="#10B981" />
+      </CenteredContainer>
+    );
+
+  if (!meData || !meData.me)
+    return (
+      <CenteredContainer>
+        <Text h1>You are not logged in.</Text>
+      </CenteredContainer>
+    );
+
+  if (!data || !data.getConversation)
+    return (
+      <CenteredContainer>
+        <Text h1>This conversation does not exist.</Text>
+      </CenteredContainer>
+    );
+
+  const conversation = data?.getConversation;
+
+  const user = conversation.members.find(
+    (member) => member.id !== meData!.me!.id
+  )!;
+
+  const messages = conversation.messages;
 
   return (
     <>
       <HeaderForSubscreens
         backLabel="Back"
-        title={`username of user ${userId} here`}
+        title={
+          <View style={tw`flex`}>
+            <Text h4>{user.displayName}</Text>
+            <Text>@{user.username}</Text>
+          </View>
+        }
         handleBack={() => navigate("ConversationPreviews")}
       />
-      <ScrollView>
+      <ScrollView
+        ref={scrollViewRef}
+        onContentSizeChange={() => {
+          if (scrollViewRef.current)
+            (scrollViewRef.current as any).scrollToEnd({ animated: true });
+        }}
+      >
         <UncenteredContainer>
-          <MessageBubble username="joe" body="hi" />
-          <MessageBubble username="joe" body="hi" />
-          <MessageBubble
-            username="parker"
-            body="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut eu
-                cursus urna, in sollicitudin purus. Praesent ornare mattis urna
-                id interdum. Aliquam quis rhoncus odio, eu tincidunt dolor. In
-                sed egestas felis. Vestibulum quis varius felis. Etiam ut risus
-                ut lacus convallis ultricies sit amet quis metus. Suspendisse
-                libero nisl, suscipit at nisl sit amet, ultrices finibus velit.
-                Etiam quis posuere augue. Integer imperdiet nulla id diam
-                consequat interdum. Sed a justo quis elit iaculis rutrum.
-                Aliquam sollicitudin vel elit eget sagittis. Sed porta risus ut
-                urna fermentum, ut vulputate risus suscipit. Ut maximus lacinia
-                sem, quis mattis magna placerat et. In fermentum, diam eu
-                eleifend accumsan, justo nisl placerat purus, eget semper tellus
-                mauris eget urna. Etiam ultrices hendrerit arcu vitae tincidunt.
-                Vestibulum mattis tortor quis lacus posuere dictum."
-          />
+          {messages.map((message) => (
+            <MessageBubble
+              key={message.id}
+              username={message.sender.username}
+              body={message.body}
+            />
+          ))}
         </UncenteredContainer>
       </ScrollView>
       <Formik
         initialValues={{ message: "" }}
-        onSubmit={(values, { resetForm }) => {
-          console.log("message", values.message);
+        onSubmit={async (values, { resetForm }) => {
+          const response = await sendMessage({
+            variables: { conversationId, body: values.message },
+          });
+          if (!response.data?.sendMessage) {
+            console.error(response.errors);
+          } else if (response.data?.sendMessage) {
+            fetchMore({});
+          }
           resetForm();
           Keyboard.dismiss();
         }}

@@ -9,7 +9,7 @@ export const HeaderForSubscreens = ({
   handleBack,
   rightComponent,
 }: {
-  title: string;
+  title: string | React.ReactNode;
   backLabel: string;
   handleBack: (event: GestureResponderEvent) => void;
   rightComponent?: React.ReactNode;

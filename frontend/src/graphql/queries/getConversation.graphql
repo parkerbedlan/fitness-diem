@@ -1,0 +1,21 @@
+query GetConversation($conversationId: Int!) {
+  getConversation(conversationId: $conversationId) {
+    id
+    title
+    members {
+      id
+      username
+      displayName
+    }
+    messages {
+      id
+      body
+      createdAt
+      sender {
+        id
+        username
+        displayName
+      }
+    }
+  }
+}

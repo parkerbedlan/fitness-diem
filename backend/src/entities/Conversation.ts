@@ -12,6 +12,15 @@ import { Message } from "./Message";
 import { User } from "./User";
 
 @ObjectType()
+export class MessagePreview {
+  @Field(() => String)
+  createdAt: Date;
+
+  @Field()
+  display: string;
+}
+
+@ObjectType()
 @Entity()
 export class Conversation extends BaseEntity {
   @Field()
@@ -23,7 +32,7 @@ export class Conversation extends BaseEntity {
   title?: string;
 
   @Field()
-  lastMessagePreview: string;
+  lastMessagePreview: MessagePreview;
 
   @Field(() => [User])
   @ManyToMany(() => User, (user) => user.conversations)

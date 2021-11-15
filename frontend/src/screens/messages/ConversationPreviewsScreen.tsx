@@ -1,18 +1,22 @@
-import React from "react";
 import { useFocusEffect, useIsFocused } from "@react-navigation/core";
+import { format } from "date-fns";
 import * as Notifications from "expo-notifications";
-import { ActivityIndicator, Platform, View } from "react-native";
+import React, { useEffect, useRef } from "react";
+import { ActivityIndicator, View } from "react-native";
 import { Button, Icon, Text } from "react-native-elements";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 import tw from "tailwind-react-native-classnames";
 import CenteredContainer from "../../components/CenteredContainer";
 import UncenteredContainer from "../../components/UncenteredContainer";
-import { useMeQuery } from "../../generated/graphql";
+import {
+  GetConversationPreviewsQuery,
+  useGetConversationPreviewsQuery,
+  useMeQuery,
+} from "../../generated/graphql";
 import { getProfilePicUri } from "../../utils/getProfilePicUri";
 import { useCacheyImage } from "../../utils/hooks/cacheyImage/useCacheyImage";
 import { useIsAuth } from "../../utils/hooks/useIsAuth";
 import { useRootScreen } from "../../utils/hooks/useRootScreen";
-import { format } from "date-fns";
 import { useMessagesStackScreen } from "../MessagesScreen";
 
 export const ConversationPreviewsScreenName = "ConversationPreviews";
@@ -22,7 +26,15 @@ export const ConversationPreviewsScreen = () => {
   const { navigation } = useRootScreen();
   useIsAuth(navigation, useIsFocused());
   const { data: meData, loading: meLoading } = useMeQuery();
+  const { data, loading, refetch, previousData } =
+    useGetConversationPreviewsQuery();
+  const convoPreviews = data?.getConversationPreviews;
+
+  const notifListener: any = useRef();
   useFocusEffect(() => {
+    if (data !== previousData) {
+      refetch();
+    }
     Notifications.setNotificationHandler({
       handleNotification: async () => ({
         shouldShowAlert: false,
@@ -30,9 +42,22 @@ export const ConversationPreviewsScreen = () => {
         shouldSetBadge: true,
       }),
     });
+    notifListener.current = Notifications.addNotificationReceivedListener(
+      (notif) => {
+        console.log(
+          "notif-previews-screen",
+          notif.request.identifier,
+          notif.request.content
+        );
+        refetch();
+      }
+    );
+    return () => {
+      Notifications.removeNotificationSubscription(notifListener.current);
+    };
   });
 
-  if (meLoading)
+  if (!data)
     return (
       <CenteredContainer>
         <ActivityIndicator size="large" color="#10B981" />
@@ -49,14 +74,12 @@ export const ConversationPreviewsScreen = () => {
   return (
     <UncenteredContainer>
       <ScrollView>
-        <ConversationPreview
-          user={{ userId: 2, username: "joe", displayName: "Joe Mama" }}
-          lastMessage={{ date: 1636654349096, snippet: "heyy" }}
-        />
-        <ConversationPreview
-          user={{ userId: 1, username: "parker", displayName: "Pk" }}
-          lastMessage={{ date: 1636655076493, snippet: "hello" }}
-        />
+        {convoPreviews?.map((convoPreview) => (
+          <ConversationPreview
+            key={convoPreview.id}
+            conversation={convoPreview}
+          />
+        ))}
       </ScrollView>
       <NewMessageButton />
     </UncenteredContainer>
@@ -64,13 +87,17 @@ export const ConversationPreviewsScreen = () => {
 };
 
 const ConversationPreview = ({
-  user,
-  lastMessage,
+  conversation,
 }: {
-  user: { userId: number; username: string; displayName: string };
-  lastMessage: { date: number; snippet: string };
+  conversation: GetConversationPreviewsQuery["getConversationPreviews"][number];
 }) => {
-  const [UserPic] = useCacheyImage(getProfilePicUri(user.userId));
+  const { data: meData } = useMeQuery();
+  const user = conversation.members.find(
+    (member) => member.id !== meData!.me!.id
+  )!;
+  const lastMessagePreview = conversation.lastMessagePreview;
+  const profilePicUri = getProfilePicUri(user.id);
+  const [UserPic] = useCacheyImage(profilePicUri);
   const {
     navigation: { navigate },
   } = useMessagesStackScreen();
@@ -91,27 +118,41 @@ const ConversationPreview = ({
   return (
     <>
       <View style={tw`flex flex-row justify-start w-full bg-gray-200 mb-2`}>
-        <TouchableOpacity style={tw`rounded-full w-20 h-20 mr-4`}>
-          <UserPic style={tw`rounded-full w-20 h-20 mr-4`} />
+        <TouchableOpacity
+          style={tw`rounded-full w-20 h-20 mr-4`}
+          onPress={() => {
+            console.log("pls");
+          }}
+        >
+          <UserPic
+            style={tw`rounded-full w-20 h-20 mr-4`}
+            PlaceholderContent={<Icon name="account-circle" size={60} />}
+          />
         </TouchableOpacity>
         <View style={tw`flex-auto flex w-full`}>
           <View style={tw`absolute w-full h-full`}>
             <TouchableOpacity
               style={tw`h-full w-full`}
-              onPress={() => navigate("Conversation", { userId: user.userId })}
+              onPress={() =>
+                navigate("Conversation", { conversationId: conversation.id })
+              }
             >
               <View style={tw`flex flex-row justify-between items-center`}>
                 <View style={tw`flex flex-row items-center`}>
-                  <Text style={tw`font-bold text-xl`}>{user.displayName}</Text>
+                  {user.displayName && (
+                    <Text style={tw`font-bold text-xl`}>
+                      {user.displayName}
+                    </Text>
+                  )}
                   <Text style={tw`ml-2 text-lg font-semibold opacity-60`}>
                     @{user.username}
                   </Text>
                 </View>
                 <Text style={tw`mr-2`}>
-                  {getMessageTimeString(lastMessage.date)}
+                  {getMessageTimeString(parseInt(lastMessagePreview.createdAt))}
                 </Text>
               </View>
-              <Text>{lastMessage.snippet}</Text>
+              <Text>{lastMessagePreview.display}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -120,13 +161,19 @@ const ConversationPreview = ({
   );
 };
 
-const NewMessageButton = () => (
-  <View
-    style={tw`absolute w-full h-full z-10 pb-4 pr-2 flex justify-end items-end`}
-  >
-    <Button
-      icon={<Icon name="add-comment" color="white" size={40} />}
-      buttonStyle={tw`rounded-full w-20 h-20 bg-purple-600`}
-    />
-  </View>
-);
+const NewMessageButton = () => {
+  const {
+    navigation: { navigate },
+  } = useMessagesStackScreen();
+  return (
+    <View
+      style={tw`absolute w-full h-full z-10 pb-4 pr-2 flex justify-end items-end`}
+    >
+      <Button
+        icon={<Icon name="add-comment" color="white" size={40} />}
+        buttonStyle={tw`rounded-full w-20 h-20 bg-purple-600`}
+        onPress={() => navigate("NewMessage")}
+      />
+    </View>
+  );
+};

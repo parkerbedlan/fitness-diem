@@ -7,6 +7,9 @@ query GetConversationPreviews {
       username
       displayName
     }
-    lastMessagePreview
+    lastMessagePreview {
+      createdAt
+      display
+    }
   }
 }

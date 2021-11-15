@@ -18,10 +18,12 @@ import {
   getConnection,
 } from "typeorm";
 import { COOKIE_NAME, corsOptions, __prod__ } from "./constants";
-import { Message } from "./entities/Message";
+import { Conversation } from "./entities/Conversation";
 import { User } from "./entities/User";
+import { MessageResolver } from "./resolvers/message";
 import { MyContext } from "./types";
 import { getLANipAddress } from "./utils/getLANipAddress";
+import { pushToMany } from "./utils/pushToMany";
 
 type HostingMode = "localhost" | "LAN";
 type Resolvers = NonEmptyArray<Function> | NonEmptyArray<string>;
@@ -54,21 +56,41 @@ export class FitnessAppServer {
 
   public async tester() {
     console.log("----------------------------------------------");
-    const conversationId = 3;
-    const lastMessage = await getConnection()
-      .getRepository(Message)
-      .createQueryBuilder("message")
-      .leftJoinAndSelect("message.conversation", "conversation")
-      .where("conversation.id = :convoId", { convoId: conversationId })
-      .leftJoinAndSelect("message.sender", "sender")
-      .select(["message.body", "sender.username"])
-      .getOne();
-    const body = lastMessage?.body!;
-    const username = lastMessage?.sender.username;
-    const realBody = body.length < 20 ? body : body?.substring(0, 20) + "...";
-    console.log(`${username}: ${realBody}`);
 
-    console.log(await User.find({ select: ["id", "username"] }));
+    console.log(await User.find({ select: ["id", "username", "pushToken"] }));
+    console.log(
+      await Conversation.find({
+        select: ["id"],
+        relations: ["members"],
+        loadRelationIds: true,
+      })
+    );
+
+    const asdf = new MessageResolver();
+    asdf.sendMessage(3, "ooga booga 4", {
+      req: {
+        session: { userId: 1 },
+      },
+      expo: this.expo,
+    } as MyContext);
+
+    // const pushTokens = await getConnection()
+    //   .getRepository(Conversation)
+    //   .createQueryBuilder("convo")
+    //   .leftJoinAndSelect("convo.members", "members")
+    //   .where("convo.id = :convoId", { convoId: 3 })
+    //   .andWhere("members.id != :senderId", { senderId: 1 })
+    //   .select(["convo.id", "members.pushToken"])
+    //   .getOne()
+    //   .then((response) => response?.members.map((member) => member.pushToken));
+    // console.log(pushTokens);
+
+    // pushToMany(this.expo, ["ExponentPushToken[WXVEetGVp9awuCdPL616fy]"], {
+    //   sound: "default",
+    //   title: "Test notification",
+    //   body: "blah blah blah",
+    //   data: { withSome: "data" },
+    // });
 
     console.log("----------------------------------------------");
   }

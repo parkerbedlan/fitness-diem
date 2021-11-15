@@ -2,6 +2,7 @@ import {
   Arg,
   Ctx,
   FieldResolver,
+  Int,
   Mutation,
   Query,
   Resolver,
@@ -9,7 +10,7 @@ import {
   UseMiddleware,
 } from "type-graphql";
 import { getConnection } from "typeorm";
-import { Conversation } from "../entities/Conversation";
+import { Conversation, MessagePreview } from "../entities/Conversation";
 import { Message } from "../entities/Message";
 import { User } from "../entities/User";
 import { isAuth } from "../middleware/isAuth";
@@ -18,20 +19,23 @@ import { MyContext } from "../types";
 @Resolver(Conversation)
 export class ConversationResolver {
   @FieldResolver()
-  async lastMessagePreview(@Root() conversation: Conversation) {
-    // return "username: last message preview here";
+  async lastMessagePreview(
+    @Root() conversation: Conversation
+  ): Promise<MessagePreview> {
     const lastMessage = await getConnection()
       .getRepository(Message)
       .createQueryBuilder("message")
       .leftJoinAndSelect("message.conversation", "conversation")
       .where("conversation.id = :convoId", { convoId: conversation.id })
       .leftJoinAndSelect("message.sender", "sender")
-      .select(["message.body", "sender.username"])
+      .orderBy("message.createdAt", "DESC")
+      .select(["sender.username", "message.body", "message.createdAt"])
       .getOne();
     const body = lastMessage?.body!;
     const username = lastMessage?.sender.username;
     const realBody = body.length < 20 ? body : body?.substring(0, 20) + "...";
-    return `${username}: ${realBody}`;
+    const createdAt = lastMessage?.createdAt!;
+    return { display: `${username}: ${realBody}`, createdAt };
   }
 
   @FieldResolver()
@@ -65,7 +69,7 @@ export class ConversationResolver {
   @Query(() => Conversation)
   @UseMiddleware(isAuth)
   async getConversation(
-    @Arg("conversationId") conversationId: number
+    @Arg("conversationId", () => Int) conversationId: number
     // @Ctx() { req, expo }: MyContext
   ) {
     // TODO: verify the user is in the conversation
@@ -75,10 +79,10 @@ export class ConversationResolver {
     });
   }
 
-  @Mutation(() => Number)
+  @Mutation(() => Int)
   @UseMiddleware(isAuth)
   async startConversation(
-    @Arg("memberIds", () => [Number]) memberIds: number[],
+    @Arg("memberIds", () => [Int]) memberIds: number[],
     @Ctx() { req }: MyContext
   ) {
     const realMemberIds = [...memberIds, req.session.userId];
@@ -88,5 +92,24 @@ export class ConversationResolver {
     return newConversation.id;
 
     // TODO: send notif telling members they got added to a group if 3+ members?
+  }
+
+  // temporary mutation until user search and selection is implemented
+  @Mutation(() => Int)
+  @UseMiddleware(isAuth)
+  async startConversationByUsername(
+    @Arg("username") username: string,
+    @Ctx() { req }: MyContext
+  ) {
+    const user = await User.findOne({ where: { username } });
+    if (!user) {
+      return -1;
+    }
+    const realMemberIds = [user.id, req.session.userId];
+    const newConversation = await Conversation.create({
+      members: realMemberIds.map((id) => ({ id })),
+    }).save();
+
+    return newConversation.id;
   }
 }
