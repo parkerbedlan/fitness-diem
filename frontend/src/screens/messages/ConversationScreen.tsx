@@ -1,16 +1,8 @@
 import { useFocusEffect } from "@react-navigation/core";
 import * as Notifications from "expo-notifications";
-import { AndroidNotificationPriority } from "expo-notifications";
 import { Formik } from "formik";
-import React, { useEffect, useRef, useState } from "react";
-import {
-  ActivityIndicator,
-  Keyboard,
-  ScrollView,
-  View,
-  AppState,
-  AppStateStatus,
-} from "react-native";
+import React, { useRef } from "react";
+import { ActivityIndicator, Keyboard, ScrollView, View } from "react-native";
 import { Button, Icon, Text } from "react-native-elements";
 import tw from "tailwind-react-native-classnames";
 import CenteredContainer from "../../components/CenteredContainer";
@@ -22,6 +14,7 @@ import {
   useMeQuery,
   useSendMessageMutation,
 } from "../../generated/graphql";
+import { useAppFocusEffect } from "../../utils/hooks/useAppFocusEffect";
 import { useMessagesStackScreen } from "../MessagesScreen";
 
 export const ConversationScreenName = "Conversation";
@@ -30,21 +23,6 @@ export type ConversationScreenParams = {
 };
 
 export const ConversationScreen = () => {
-  // useAppFocusEffect (updateMessages)
-  const appState = useRef(AppState.currentState);
-  useFocusEffect(() => {
-    const changeListener = (nextAppState: AppStateStatus) => {
-      appState.current = nextAppState;
-      console.log("AppState", appState.current);
-      if (appState.current === "active") onFocusRefetch();
-    };
-
-    AppState.addEventListener("change", changeListener);
-    return () => {
-      AppState.removeEventListener("change", changeListener);
-    };
-  });
-
   // fetch data
   const { data: meData } = useMeQuery();
   const {
@@ -55,10 +33,12 @@ export const ConversationScreen = () => {
   const { data, fetchMore, loading } = useGetConversationQuery({
     variables: { conversationId },
   });
-  const [sendMessage] = useSendMessageMutation();
+  const [sendMessage, { loading: sending }] = useSendMessageMutation();
 
+  // onFocusRefetch
   const onFocusRefetch = () => {
     fetchMore({});
+
     (async () => {
       const presented = await Notifications.getPresentedNotificationsAsync();
       presented
@@ -72,6 +52,7 @@ export const ConversationScreen = () => {
     })();
   };
   useFocusEffect(onFocusRefetch);
+  useAppFocusEffect(onFocusRefetch);
 
   // notification stuff
   const notifListener: any = useRef();
@@ -206,7 +187,7 @@ export const ConversationScreen = () => {
               icon={<Icon name="send" color="white" />}
               buttonStyle={tw`bg-purple-600`}
               onPress={() => handleSubmit()}
-              loading={loading}
+              loading={loading || sending}
             />
           </View>
         )}
