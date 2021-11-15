@@ -23,8 +23,8 @@ export const ConversationPreviewsScreenName = "ConversationPreviews";
 export type ConversationPreviewsScreenParams = undefined;
 
 export const ConversationPreviewsScreen = () => {
-  const { navigation } = useRootScreen();
-  useIsAuth(navigation, useIsFocused());
+  const { navigation: rootNavigation } = useRootScreen();
+  useIsAuth(rootNavigation, useIsFocused());
   const { data: meData } = useMeQuery();
   const { data, refetch, previousData } = useGetConversationPreviewsQuery();
   const convoPreviews = data?.getConversationPreviews;
@@ -166,14 +166,11 @@ const NewMessageButton = () => {
     navigation: { navigate },
   } = useMessagesStackScreen();
   return (
-    <View
-      style={tw`absolute w-full h-full z-10 pb-4 pr-2 flex justify-end items-end`}
-    >
-      <Button
-        icon={<Icon name="add-comment" color="white" size={40} />}
-        buttonStyle={tw`rounded-full w-20 h-20 bg-purple-600`}
-        onPress={() => navigate("NewMessage")}
-      />
-    </View>
+    <Button
+      icon={<Icon name="add-comment" color="white" size={40} />}
+      buttonStyle={tw`rounded-full w-20 h-20 bg-purple-600`}
+      containerStyle={tw`absolute bottom-4 right-4`}
+      onPress={() => navigate("NewMessage")}
+    />
   );
 };
