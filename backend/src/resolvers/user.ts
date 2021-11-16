@@ -12,6 +12,7 @@ import {
   Resolver,
   Root,
 } from "type-graphql";
+import { getConnection } from "typeorm";
 import argon2 from "argon2";
 import { COOKIE_NAME, FORGOT_PASSWORD_PREFIX } from "../constants";
 import { validateRegister } from "../utils/validateRegister";
@@ -52,9 +53,16 @@ export class UserResolver {
     @Arg('userId') userId: number,
     @Ctx() {req}: MyContext
   ) {
-    const myUserId = req.session.userId
-    const theirUserId = userId
-    
+    const myUser = User.findOne(req.session.userId)
+    const theirUser = User.findOne(userId)
+
+    // https://github.com/typeorm/typeorm/blob/master/docs/relational-query-builder.md
+    await getConnection()
+      .createQueryBuilder()
+      .relation(User, "following")
+      .of(myUser)
+      .add(theirUser);
+
     return true
   }
 
@@ -62,7 +70,11 @@ export class UserResolver {
   async followers(
     @Arg('userId') userId: number
   ) {
-    
+    return await getConnection()
+      .createQueryBuilder()
+      .relation(User, "followers")
+      .of(userId)
+      .loadMany();
   }
 
   @Mutation(() => UserResponse)
