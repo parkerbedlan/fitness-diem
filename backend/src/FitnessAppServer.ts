@@ -15,7 +15,6 @@ import { Connection, createConnection, EntitySchema } from "typeorm";
 import { COOKIE_NAME, corsOptions, __prod__ } from "./constants";
 import { Conversation } from "./entities/Conversation";
 import { User } from "./entities/User";
-import { ConversationResolver } from "./resolvers/conversation";
 import { MessageResolver } from "./resolvers/message";
 import { MyContext } from "./types";
 import { getLANipAddress } from "./utils/getLANipAddress";
@@ -65,7 +64,7 @@ export class FitnessAppServer {
     // const asdf = new MessageResolver();
     // asdf.sendMessage(3, "ooga booga 16", {
     //   req: {
-    //     session: { userId: 1 },
+    //     session: { userId: 2 },
     //   },
     //   expo: this.expo,
     // } as MyContext);
