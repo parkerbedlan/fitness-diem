@@ -1,4 +1,4 @@
-import { MyContext } from "src/types";
+import { MyContext } from "../types";
 import { MiddlewareFn } from "type-graphql";
 
 // middleware runs before the resolver if they use @UseMiddleware(isAuth)

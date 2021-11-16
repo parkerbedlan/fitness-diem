@@ -1,5 +1,5 @@
-import { FieldError } from "src/resolvers/user";
 import { object } from "yup";
+import { FieldError } from "../../resolvers/user";
 import { OptionalAndAny } from "../typeUtils";
 import { fieldCriteria } from "./fieldCriteria";
 
