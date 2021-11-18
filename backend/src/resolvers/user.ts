@@ -53,8 +53,8 @@ export class UserResolver {
     @Arg('userId') userId: number,
     @Ctx() {req}: MyContext
   ) {
-    const myUser = User.findOne(req.session.userId)
-    const theirUser = User.findOne(userId)
+    const myUser = User.findOne(req.session.userId);
+    const theirUser = User.findOne(userId);
 
     // https://github.com/typeorm/typeorm/blob/master/docs/relational-query-builder.md
     await getConnection()
@@ -63,7 +63,7 @@ export class UserResolver {
       .of(myUser)
       .add(theirUser);
 
-    return true
+    return true;
   }
 
   @Query(() => [User])
