@@ -67,6 +67,8 @@ export const RootNavigator: React.FC<RootNavigatorProps> = ({ Drawer }) => {
           component={MessagesScreen}
           options={{
             drawerIcon: nameToNavIcon("forum"),
+            drawerLabel: "Fitness DMs",
+            headerTitle: "Fitness DMs",
           }}
         />
         {/* IMPORTANT NOTE: always keep the drawer omissions last in the drawer order!*/}
