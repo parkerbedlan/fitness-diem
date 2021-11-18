@@ -14,6 +14,7 @@ import { buildSchema, NonEmptyArray } from "type-graphql";
 import { Connection, createConnection, EntitySchema } from "typeorm";
 import { COOKIE_NAME, corsOptions, __prod__ } from "./constants";
 import { Conversation } from "./entities/Conversation";
+import { Message } from "./entities/Message";
 import { User } from "./entities/User";
 import { MessageResolver } from "./resolvers/message";
 import { MyContext } from "./types";
@@ -51,18 +52,24 @@ export class FitnessAppServer {
   public async tester() {
     console.log("----------------------------------------------");
 
-    console.log(await User.find({ select: ["id", "username", "pushToken"] }));
+    // await Message.delete({});
+    // await Conversation.delete({});
+
+    console.log(
+      await User.find({
+        select: ["id", "username", "pushToken"],
+      })
+    );
     // await Conversation.delete(6);
     console.log(
       await Conversation.find({
         select: ["id"],
-        relations: ["members"],
         loadRelationIds: true,
       })
     );
 
     // const asdf = new MessageResolver();
-    // asdf.sendMessage(3, "ooga booga 16", {
+    // asdf.sendMessage(13, "hey what's up", {
     //   req: {
     //     session: { userId: 2 },
     //   },
