@@ -35,7 +35,7 @@ export class ConversationResolver {
       return { display: "No messages yet!", createdAt: conversation.createdAt };
     const body = lastMessage?.body!;
     const username = lastMessage?.sender.username;
-    const realBody = body.length < 20 ? body : body?.substring(0, 20) + "...";
+    const realBody = body.length < 25 ? body : body?.substring(0, 20) + "...";
     const createdAt = lastMessage?.createdAt!;
     return { display: `${username}: ${realBody}`, createdAt };
   }

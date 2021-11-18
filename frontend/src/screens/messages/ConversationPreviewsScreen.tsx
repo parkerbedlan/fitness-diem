@@ -1,7 +1,7 @@
 import { useFocusEffect, useIsFocused } from "@react-navigation/core";
 import { format } from "date-fns";
 import * as Notifications from "expo-notifications";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { Button, Icon, Text } from "react-native-elements";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
@@ -29,9 +29,14 @@ export const ConversationPreviewsScreen = () => {
   const { data, refetch, previousData } = useGetConversationPreviewsQuery();
   const convoPreviews = data?.getConversationPreviews;
 
+  const [lastRefetchTime, setLastRefetchTime] = useState(1637086349324);
+
   const notifListener: any = useRef();
   useFocusEffect(() => {
     if (data !== previousData) {
+      refetch();
+    } else if (new Date().getTime() - lastRefetchTime > 5000) {
+      setLastRefetchTime(new Date().getTime());
       refetch();
     }
     Notifications.setNotificationHandler({

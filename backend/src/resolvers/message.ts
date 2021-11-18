@@ -88,7 +88,7 @@ export class MessageResolver {
     });
 
     let messageBodyPreview =
-      body.length < 20 ? body : body.substring(0, 20) + "...";
+      body.length < 25 ? body : body.substring(0, 20) + "...";
 
     const notif = {
       body: `${sender?.username}: ${messageBodyPreview}`,
