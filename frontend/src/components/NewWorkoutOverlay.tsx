@@ -4,7 +4,7 @@ import { Alert, Button, Picker, StyleSheet, TextInput, View } from "react-native
 import DropDownPicker from "react-native-dropdown-picker";
 import ExerciseElement from "./ExerciseElement";
 
-export default function NewWorkoutOverlay(props: { updateVisibility: (arg0: string) => void; }){
+export default function NewWorkoutOverlay(props: any){
 
     // const [workout, setWorkout] = useState({
     //     "WorkoutName" : "",
@@ -80,7 +80,7 @@ export default function NewWorkoutOverlay(props: { updateVisibility: (arg0: stri
                     title="Create Workout"
                     onPress={() => {console.log(exerciseList);
                                     props.updateVisibility('none')
-                                    
+                                    props.addToWorkoutList({"name" : workoutName, "exercises" : exerciseList});
                                     }}
                     color="#ca7af0"
                     />

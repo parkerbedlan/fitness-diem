@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { Text } from "react-native-elements";
 import { FlatList, ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import {List} from 'react-native-paper';
 
 import NewWorkoutOverlay from "../components/NewWorkoutOverlay";
+import tw from "tailwind-react-native-classnames";
 
 export const WorkoutsScreenName = "Workouts";
 
@@ -21,9 +23,7 @@ export default function WorkoutsScreen(this: any) {
             setVisible('none')
     }
 
-    const workoutList = 
-    {
-        workouts : [    
+    const [workoutList, setWorkoutList] = useState([    
         {
             name: "Chest and Triceps",
             exercises : [
@@ -68,173 +68,64 @@ export default function WorkoutsScreen(this: any) {
                     repsPerSet: 10
                 }
             ]
-        },
-        {
-            name: "Chest and Triceps",
-            exercises : [
-                {
-                    name: "Bench Press",
-                    sets: 3,
-                    repsPerSet: 10
-                },
-                {
-                    name: "Tricep Pulldowns",
-                    sets: 3,
-                    repsPerSet: 10
-                }
-            ]
-        },
-        {
-            name: "Back and Biceps",
-            exercises : [
-                {
-                    name: "Lat Pulldowns",
-                    sets: 3,
-                    repsPerSet: 10
-                },
-                {
-                    name: "Bicep Curls",
-                    sets: 3,
-                    repsPerSet: 10
-                }
-            ]
-        },
-        {
-            name: "Leg Day",
-            exercises : [
-                {
-                    name: "Squat",
-                    sets: 3,
-                    repsPerSet: 10
-                },
-                {
-                    name: "Leg Press",
-                    sets: 3,
-                    repsPerSet: 10
-                }
-            ]
-        },
-        {
-            name: "Chest and Triceps",
-            exercises : [
-                {
-                    name: "Bench Press",
-                    sets: 3,
-                    repsPerSet: 10
-                },
-                {
-                    name: "Tricep Pulldowns",
-                    sets: 3,
-                    repsPerSet: 10
-                }
-            ]
-        },
-        {
-            name: "Back and Biceps",
-            exercises : [
-                {
-                    name: "Lat Pulldowns",
-                    sets: 3,
-                    repsPerSet: 10
-                },
-                {
-                    name: "Bicep Curls",
-                    sets: 3,
-                    repsPerSet: 10
-                }
-            ]
-        },
-        {
-            name: "Leg Day",
-            exercises : [
-                {
-                    name: "Squat",
-                    sets: 3,
-                    repsPerSet: 10
-                },
-                {
-                    name: "Leg Press",
-                    sets: 3,
-                    repsPerSet: 10
-                }
-            ]
-        },
-        {
-            name: "Chest and Triceps",
-            exercises : [
-                {
-                    name: "Bench Press",
-                    sets: 3,
-                    repsPerSet: 10
-                },
-                {
-                    name: "Tricep Pulldowns",
-                    sets: 3,
-                    repsPerSet: 10
-                }
-            ]
-        },
-        {
-            name: "Back and Biceps",
-            exercises : [
-                {
-                    name: "Lat Pulldowns",
-                    sets: 3,
-                    repsPerSet: 10
-                },
-                {
-                    name: "Bicep Curls",
-                    sets: 3,
-                    repsPerSet: 10
-                }
-            ]
-        },
-        {
-            name: "Leg Day",
-            exercises : [
-                {
-                    name: "Squat",
-                    sets: 3,
-                    repsPerSet: 10
-                },
-                {
-                    name: "Leg Press",
-                    sets: 3,
-                    repsPerSet: 10
-                }
-            ]
-        }
-        ]
-    };
+        }]);
        
+    function addToWorkoutList(newWorkout:any){
+        var newWorkoutList = workoutList;
+        newWorkoutList.push(newWorkout);
+        setWorkoutList(newWorkoutList);
+        console.log(workoutList);
+    }
+
     function renderItem(item: { name: any; exercises: any; }){
         return(
-            <TouchableWithoutFeedback onPress={() => console.log("Pressed Workout")}>
-                <View style={styles.workoutListItem}>
-                    <Text style={styles.listItemTitle}>{item.name}</Text>
-                    <Text style={styles.listItemNumExercises}>{item.exercises.length} Exercises</Text>
-                    {/* <Text style={styles.listItemNumSets}>{item.name}</Text> */}
-                    <View
+            <View style={styles.workoutListItem}>
+                <List.Accordion title={item.name} style={{backgroundColor : "#f0defc"}} titleStyle={{fontFamily : 'Tahoma', fontSize : 25}}>
+
+                        {[...Array(item.exercises.length)].map(
+                            (value: undefined, index: number) => (
+                                <View>
+                                    <View >
+                                        <List.Item titleStyle={styles.listItemDescription} title={item.exercises[index].name + ": " + item.exercises[index].sets + " sets of " + item.exercises[index].repsPerSet + " reps"}>
+                                        </List.Item>
+                                    </View>
+                                    <View
+                                    style={{
+                                        borderBottomColor: '#cb81fc',
+                                        borderBottomWidth: 1,
+                                    }}
+                                    />
+                                </View>
+                            )
+                        )}
+                </List.Accordion>
+                <View
                     style={{
-                        borderBottomColor: '#c9c9c9',
-                        borderBottomWidth: 1,
-                        marginBottom: -11
+                        borderBottomColor: '#cb81fc',
+                        borderBottomWidth: 3
                     }}
-                    />
-                </View>
-            </TouchableWithoutFeedback>
+                />
+            </View>
         )
     }
 
     return (
         <View style={styles.container}>
-                <ScrollView>
+                {/* <ScrollView>
                 
                 <FlatList
-                    data={workoutList.workouts}
+                    extraData={visible}
+                    data={workoutList}
                     renderItem={({item}) => renderItem(item)}
                 />
-                </ScrollView>
+                </ScrollView> */}
+
+                    {[...Array(workoutList.length)].map(
+                        (value: undefined, index: number) => (
+                            renderItem(workoutList[index])
+                        )
+                    )}
+
             <View>
                 <TouchableOpacity
                 onPress={toggleOverlay}
@@ -244,7 +135,7 @@ export default function WorkoutsScreen(this: any) {
                 </TouchableOpacity>
             </View>
             <View style={[styles.overlay, {display: visible}]}>
-                <NewWorkoutOverlay updateVisibility={setVisible}/>
+                <NewWorkoutOverlay updateVisibility={setVisible} addToWorkoutList={addToWorkoutList}/>
             </View>
         </View>
   );
@@ -253,26 +144,30 @@ export default function WorkoutsScreen(this: any) {
 const styles = StyleSheet.create({
     container : {
         flex: 1,
-        backgroundColor: "#f7f0f6"
+        backgroundColor: "#f0defc",
+        height: "100%"
     },
     workoutListItem : {
-        padding: "13px"
+        padding: "13px",
+        backgroundColor: "#f0defc",
+        fontFamily: "Tahoma",
     },
     listItemTitle : {
         fontFamily: "Tahoma",
         fontSize: 25,
         color: "#7100a6"
     },
-    listItemNumExercises : {
-        fontSize: 15,
-        color: "#ca7af0",
+    listItemDescription : {
+        fontSize: 16,
+        color: "#6d239e",
+        
         paddingBottom: 5
     },
     createNewButton : {
         position: "absolute",
         width: 60,
         height: 60,
-        bottom: 35,
+        bottom: -60,
         right: 35,
         backgroundColor: "#7100a6",
         justifyContent: "center",
