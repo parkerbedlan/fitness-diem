@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
   ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -54,4 +55,12 @@ export class User extends BaseEntity {
   @Field(() => String)
   @UpdateDateColumn()
   updatedAt: Date;
+
+  // https://github.com/typeorm/typeorm/issues/1511
+  @ManyToMany(() => User, (user) => user.following)
+  @JoinTable()
+  followers: User[];
+
+  @ManyToMany(() => User, (user) => user.followers)
+  following: User[];
 }

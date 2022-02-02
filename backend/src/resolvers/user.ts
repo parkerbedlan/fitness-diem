@@ -13,13 +13,13 @@ import {
   Root,
   UseMiddleware,
 } from "type-graphql";
+import { getConnection } from "typeorm";
 import argon2 from "argon2";
 import { COOKIE_NAME, FORGOT_PASSWORD_PREFIX } from "../constants";
 import { sendEmail } from "../utils/sendEmail";
 import { v4 as uuid } from "uuid";
 import { RegisterInput } from "./types/RegisterInput";
 import { isAuth } from "../middleware/isAuth";
-import { getConnection } from "typeorm";
 import { EditProfileInput } from "./types/EditProfileInput";
 import { deleteNullUndefinedValues } from "../utils/deleteNullUndefinedValues";
 import { validateFields } from "../utils/validation/validateFields";
@@ -131,6 +131,29 @@ export class UserResolver {
         errors: [{ field: "username", message: error.message as string }],
       };
     }
+  }
+
+  async follow(@Arg("userId") userId: number, @Ctx() { req }: MyContext) {
+    const myUser = User.findOne(req.session.userId);
+    const theirUser = User.findOne(userId);
+
+    // https://github.com/typeorm/typeorm/blob/master/docs/relational-query-builder.md
+    await getConnection()
+      .createQueryBuilder()
+      .relation(User, "following")
+      .of(myUser)
+      .add(theirUser);
+
+    return true;
+  }
+
+  @Query(() => [User])
+  async followers(@Arg("userId") userId: number) {
+    return await getConnection()
+      .createQueryBuilder()
+      .relation(User, "followers")
+      .of(userId)
+      .loadMany();
   }
 
   @Mutation(() => UserResponse)
