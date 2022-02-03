@@ -133,6 +133,7 @@ export class UserResolver {
     }
   }
 
+  @Mutation(() => Boolean)
   async follow(@Arg("userId") userId: number, @Ctx() { req }: MyContext) {
     const myUser = User.findOne(req.session.userId);
     const theirUser = User.findOne(userId);
@@ -147,6 +148,7 @@ export class UserResolver {
     return true;
   }
 
+  @Mutation(() => Boolean)
   async unfollow(@Arg("userId") userId: number, @Ctx() { req }: MyContext) {
     const myUser = User.findOne(req.session.userId);
     const theirUser = User.findOne(userId);
