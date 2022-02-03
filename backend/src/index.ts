@@ -6,12 +6,14 @@ import { Conversation } from "./entities/Conversation";
 import { Message } from "./entities/Message";
 import { Post } from "./entities/Post";
 import { User } from "./entities/User";
+import { Workout } from "./entities/Workout";
 import { FitnessAppServer } from "./FitnessAppServer";
 import { ConversationResolver } from "./resolvers/conversation";
 import { HelloResolver } from "./resolvers/hello";
 import { MessageResolver } from "./resolvers/message";
 import { PostResolver } from "./resolvers/post";
 import { UserResolver } from "./resolvers/user";
+import { WorkoutResolver } from "./resolvers/workout";
 
 const main = async () => {
   const fileDirectories = ["./images", "./images/profilepic"];
@@ -29,8 +31,9 @@ const main = async () => {
       PostResolver,
       MessageResolver,
       ConversationResolver,
+      WorkoutResolver,
     ],
-    [User, Post, Message, Conversation]
+    [User, Post, Message, Conversation, Workout]
   );
   await myServer.setup();
   myServer.start();
