@@ -147,6 +147,20 @@ export class UserResolver {
     return true;
   }
 
+  async unfollow(@Arg("userId") userId: number, @Ctx() { req }: MyContext) {
+    const myUser = User.findOne(req.session.userId);
+    const theirUser = User.findOne(userId);
+
+    // https://github.com/typeorm/typeorm/blob/master/docs/relational-query-builder.md
+    await getConnection()
+      .createQueryBuilder()
+      .relation(User, "following")
+      .of(myUser)
+      .remove(theirUser);
+
+    return true;
+  }
+
   @Query(() => [User])
   async followers(@Arg("userId") userId: number) {
     return await getConnection()
