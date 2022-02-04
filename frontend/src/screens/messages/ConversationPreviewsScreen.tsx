@@ -126,7 +126,7 @@ const ConversationPreview = ({
         <TouchableOpacity
           style={tw`rounded-full w-20 h-20 mr-4`}
           onPress={() => {
-            console.log("pls");
+            // console.log("pls");
           }}
         >
           <UserPic

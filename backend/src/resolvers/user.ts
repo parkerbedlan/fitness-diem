@@ -133,6 +133,7 @@ export class UserResolver {
     }
   }
 
+  @Mutation(() => Boolean)
   async follow(@Arg("userId") userId: number, @Ctx() { req }: MyContext) {
     const myUser = User.findOne(req.session.userId);
     const theirUser = User.findOne(userId);
@@ -143,6 +144,21 @@ export class UserResolver {
       .relation(User, "following")
       .of(myUser)
       .add(theirUser);
+
+    return true;
+  }
+
+  @Mutation(() => Boolean)
+  async unfollow(@Arg("userId") userId: number, @Ctx() { req }: MyContext) {
+    const myUser = User.findOne(req.session.userId);
+    const theirUser = User.findOne(userId);
+
+    // https://github.com/typeorm/typeorm/blob/master/docs/relational-query-builder.md
+    await getConnection()
+      .createQueryBuilder()
+      .relation(User, "following")
+      .of(myUser)
+      .remove(theirUser);
 
     return true;
   }

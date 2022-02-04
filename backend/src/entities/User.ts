@@ -12,6 +12,8 @@ import {
 } from "typeorm";
 import { Conversation } from "./Conversation";
 import { Post } from "./Post";
+import { Workout } from "./Workout";
+import { Exercise } from "./Exercise";
 
 @ObjectType()
 @Entity()
@@ -47,6 +49,12 @@ export class User extends BaseEntity {
 
   @ManyToMany(() => Conversation, (conversation) => conversation.members)
   conversations: Conversation[];
+
+  @OneToMany(() => Workout, (workout) => workout.creator)
+  workouts: Workout[];
+
+  @OneToMany(() => Exercise, (exercise) => exercise.creator)
+  exercises: Exercise[];
 
   @Field(() => String)
   @CreateDateColumn()
