@@ -13,27 +13,20 @@ import {
   } from "type-graphql";
   import { getConnection } from "typeorm";
   import { User } from "../entities/User";
-  import { Workout } from "../entities/Workout";
+  import { WorkoutExercise } from "../entities/WorkoutExercise";
   import { isAuth } from "../middleware/isAuth";
   import { MyContext } from "../types";
   
   @InputType()
-  class WorkoutOptions {
+  class WorkoutExerciseOptions {
     @Field()
-    name: string;
+    index: number;
     @Field()
-    pub: boolean;
+    supersetWithPrevious: boolean;
   }
   
-  @Resolver(Workout)
-  export class WorkoutResolver {
-    @FieldResolver(() => User)
-    async creator(
-      @Root() workout: Workout
-    ) {
-      return User.findOne(workout.creatorId);
-    }
-  
+  @Resolver(WorkoutExercise)
+  export class WorkoutExerciseResolver {
     @Query(() => [Workout])
     async workouts(): Promise<Workout[]> {
       return Workout.find({});
@@ -41,6 +34,8 @@ import {
   
     @Query(() => Workout, { nullable: true })
     workout(@Arg("id", () => Int) id: number): Promise<Workout | undefined> {
+      // unnecessary due to our creator FieldResolver
+      // return Post.findOne(id, { relations: ["creator"] });
       return Workout.findOne(id);
     }
   
@@ -53,6 +48,7 @@ import {
       return Workout.create({ ...options, creatorId: req.session.userId }).save();
     }
   
+    // TODO: let them edit text and only let them edit workouts they've made
     @Mutation(() => Workout)
     @UseMiddleware(isAuth)
     async updateWorkout(

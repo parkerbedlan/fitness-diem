@@ -14,7 +14,7 @@ import { WorkoutExercise } from "./WorkoutExercise";
 
 @ObjectType()
 @Entity()
-export class Workout extends BaseEntity {
+export class Exercise extends BaseEntity {
   @Field()
   @PrimaryGeneratedColumn()
   id!: number;
@@ -24,18 +24,14 @@ export class Workout extends BaseEntity {
   name!: string;
 
   @Field()
-  @Column('boolean', {default : false})
-  pub: boolean = false;
-
-  @Field()
   @Column()
   creatorId: number;
 
   @Field(() => User)
-  @ManyToOne(() => User, (user) => user.workouts)
+  @ManyToOne(() => User, (user) => user.exercises)
   creator: User;
 
-  @OneToMany(() => WorkoutExercise, (workoutExercise) => workoutExercise.workouts)
+  @OneToMany(() => WorkoutExercise, (workoutExercise) => workoutExercise.exercises)
   workoutExercises: WorkoutExercise[];
 
   @Field(() => String)

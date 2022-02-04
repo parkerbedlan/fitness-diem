@@ -13,71 +13,68 @@ import {
   } from "type-graphql";
   import { getConnection } from "typeorm";
   import { User } from "../entities/User";
-  import { Workout } from "../entities/Workout";
+  import { Exercise } from "../entities/Exercise";
   import { isAuth } from "../middleware/isAuth";
   import { MyContext } from "../types";
   
   @InputType()
-  class WorkoutOptions {
+  class ExerciseOptions {
     @Field()
     name: string;
-    @Field()
-    pub: boolean;
   }
   
-  @Resolver(Workout)
-  export class WorkoutResolver {
+  @Resolver(Exercise)
+  export class ExerciseResolver {
     @FieldResolver(() => User)
     async creator(
-      @Root() workout: Workout
+      @Root() exercise: Exercise
     ) {
-      return User.findOne(workout.creatorId);
+      return User.findOne(exercise.creatorId);
     }
   
-    @Query(() => [Workout])
-    async workouts(): Promise<Workout[]> {
-      return Workout.find({});
+    @Query(() => [Exercise])
+    async exercises(): Promise<Exercise[]> {
+      return Exercise.find({});
     }
   
-    @Query(() => Workout, { nullable: true })
-    workout(@Arg("id", () => Int) id: number): Promise<Workout | undefined> {
-      return Workout.findOne(id);
+    @Query(() => Exercise, { nullable: true })
+    workout(@Arg("id", () => Int) id: number): Promise<Exercise | undefined> {
+      return Exercise.findOne(id);
     }
   
-    @Mutation(() => Workout)
+    @Mutation(() => Exercise)
     @UseMiddleware(isAuth)
-    async createWorkout(
-      @Arg("options") options: WorkoutOptions,
+    async createExercise(
+      @Arg("options") options: ExerciseOptions,
       @Ctx() { req }: MyContext
-    ): Promise<Workout> {
-      return Workout.create({ ...options, creatorId: req.session.userId }).save();
+    ): Promise<Exercise> {
+      return Exercise.create({ ...options, creatorId: req.session.userId }).save();
     }
   
-    @Mutation(() => Workout)
+    @Mutation(() => Exercise)
     @UseMiddleware(isAuth)
-    async updateWorkout(
+    async updateExercise(
       @Arg("id", () => Int) id: number,
       @Arg("name") name: string,
-      @Arg("pub") pub: boolean,
       @Ctx() { req }: MyContext
-    ): Promise<Workout | null> {
+    ): Promise<Exercise | null> {
       const result = await getConnection()
         .createQueryBuilder()
-        .update(Workout)
-        .set({ name, pub })
+        .update(Exercise)
+        .set({ name })
         .where({ id, creatorId: req.session.userId })
         .returning("*")
         .execute();
-      return result.raw[0] as Workout;
+      return result.raw[0] as Exercise;
     }
   
     @Mutation(() => Boolean)
     @UseMiddleware(isAuth)
-    async deleteWorkout(
+    async deleteExercise(
       @Arg("id", () => Int) id: number,
       @Ctx() { req }: MyContext
     ): Promise<boolean> {
-      await Workout.delete({ id, creatorId: req.session.userId });
+      await Exercise.delete({ id, creatorId: req.session.userId });
       return true;
     }
   }
