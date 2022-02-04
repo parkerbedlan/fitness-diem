@@ -2,11 +2,8 @@ import { Field, ObjectType } from "type-graphql";
 import {
   BaseEntity,
   Column,
-  CreateDateColumn,
   Entity,
   ManyToOne,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from "typeorm";
 import { Workout } from "./Workout";
 import { Exercise } from "./Exercise";
