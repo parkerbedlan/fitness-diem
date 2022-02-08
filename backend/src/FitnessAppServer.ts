@@ -14,9 +14,8 @@ import { buildSchema, NonEmptyArray } from "type-graphql";
 import { Connection, createConnection, EntitySchema } from "typeorm";
 import { COOKIE_NAME, corsOptions, __prod__ } from "./constants";
 import { Conversation } from "./entities/Conversation";
-import { Message } from "./entities/Message";
+import { Post } from "./entities/Post";
 import { User } from "./entities/User";
-import { MessageResolver } from "./resolvers/message";
 import { MyContext } from "./types";
 import { getLANipAddress } from "./utils/getLANipAddress";
 
@@ -67,6 +66,8 @@ export class FitnessAppServer {
         loadRelationIds: true,
       })
     );
+
+    console.log(await Post.find({ relations: ["creator"] }));
 
     // const asdf = new MessageResolver();
     // asdf.sendMessage(13, "hey what's up", {
@@ -226,6 +227,7 @@ export class FitnessAppServer {
     this.app.get("/testimage.png", (_req, res) => {
       res.send(fs.readFileSync(path.join(__dirname, "images/testfile.png")));
     });
+    // TODO: change profilepic naming from username to userId, because it's the only unchanging User column
     this.app.get("/profilepic/:username.png", (req, res) => {
       const filePath = path.join(
         __dirname,

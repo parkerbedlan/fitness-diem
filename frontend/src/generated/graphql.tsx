@@ -18,6 +18,7 @@ export type Scalars = {
 
 export type Conversation = {
   __typename?: 'Conversation';
+  createdAt: Scalars['String'];
   id: Scalars['Float'];
   lastMessagePreview: MessagePreview;
   members: Array<User>;
@@ -30,6 +31,21 @@ export type EditProfileInput = {
   displayName?: Maybe<Scalars['String']>;
   email?: Maybe<Scalars['String']>;
   username?: Maybe<Scalars['String']>;
+};
+
+export type Exercise = {
+  __typename?: 'Exercise';
+  createdAt: Scalars['String'];
+  creator: User;
+  creatorId: Scalars['Float'];
+  id: Scalars['Float'];
+  name: Scalars['String'];
+  updatedAt: Scalars['String'];
+  workoutExercise: WorkoutExercise;
+};
+
+export type ExerciseOptions = {
+  name: Scalars['String'];
 };
 
 export type FieldError = {
@@ -57,10 +73,15 @@ export type Mutation = {
   __typename?: 'Mutation';
   approveNotifications: Scalars['Boolean'];
   changePassword: UserResponse;
+  createExercise: Exercise;
   createPost: Post;
+  createWorkout: Workout;
+  deleteExercise: Scalars['Boolean'];
   deletePost: Scalars['Boolean'];
+  deleteWorkout: Scalars['Boolean'];
   editProfile: UserResponse;
   editProfilePic: Scalars['Boolean'];
+  follow: Scalars['Boolean'];
   forgotPassword: Scalars['Boolean'];
   login: UserResponse;
   logout: Scalars['Boolean'];
@@ -69,7 +90,10 @@ export type Mutation = {
   sendMyselfANotification: Scalars['Boolean'];
   startConversation: Scalars['Int'];
   startConversationByUsername: Scalars['Int'];
+  unfollow: Scalars['Boolean'];
+  updateExercise: Exercise;
   updatePost: Post;
+  updateWorkout: Workout;
   uploadTestImage: Scalars['Boolean'];
 };
 
@@ -85,12 +109,32 @@ export type MutationChangePasswordArgs = {
 };
 
 
+export type MutationCreateExerciseArgs = {
+  options: ExerciseOptions;
+};
+
+
 export type MutationCreatePostArgs = {
   options: PostOptions;
 };
 
 
+export type MutationCreateWorkoutArgs = {
+  options: WorkoutOptions;
+};
+
+
+export type MutationDeleteExerciseArgs = {
+  id: Scalars['Int'];
+};
+
+
 export type MutationDeletePostArgs = {
+  id: Scalars['Int'];
+};
+
+
+export type MutationDeleteWorkoutArgs = {
   id: Scalars['Int'];
 };
 
@@ -102,6 +146,11 @@ export type MutationEditProfileArgs = {
 
 export type MutationEditProfilePicArgs = {
   fileUpload: Scalars['Upload'];
+};
+
+
+export type MutationFollowArgs = {
+  userId: Scalars['Float'];
 };
 
 
@@ -142,10 +191,28 @@ export type MutationStartConversationByUsernameArgs = {
 };
 
 
+export type MutationUnfollowArgs = {
+  userId: Scalars['Float'];
+};
+
+
+export type MutationUpdateExerciseArgs = {
+  id: Scalars['Int'];
+  name: Scalars['String'];
+};
+
+
 export type MutationUpdatePostArgs = {
   id: Scalars['Int'];
   text: Scalars['String'];
   title: Scalars['String'];
+};
+
+
+export type MutationUpdateWorkoutArgs = {
+  id: Scalars['Int'];
+  name: Scalars['String'];
+  pub: Scalars['Boolean'];
 };
 
 
@@ -172,12 +239,21 @@ export type PostOptions = {
 
 export type Query = {
   __typename?: 'Query';
+  exercises: Array<Exercise>;
+  followers: Array<User>;
   getConversation: Conversation;
   getConversationPreviews: Array<Conversation>;
   hello: Scalars['String'];
   me?: Maybe<User>;
   post?: Maybe<Post>;
   posts: Array<Post>;
+  workout?: Maybe<Exercise>;
+  workouts: Array<Workout>;
+};
+
+
+export type QueryFollowersArgs = {
+  userId: Scalars['Float'];
 };
 
 
@@ -187,6 +263,11 @@ export type QueryGetConversationArgs = {
 
 
 export type QueryPostArgs = {
+  id: Scalars['Int'];
+};
+
+
+export type QueryWorkoutArgs = {
   id: Scalars['Int'];
 };
 
@@ -203,9 +284,11 @@ export type User = {
   createdAt: Scalars['String'];
   displayName?: Maybe<Scalars['String']>;
   email: Scalars['String'];
+  exercise: Exercise;
   id: Scalars['Float'];
   updatedAt: Scalars['String'];
   username: Scalars['String'];
+  workout: Workout;
 };
 
 export type UserResponse = {
@@ -214,11 +297,39 @@ export type UserResponse = {
   user?: Maybe<User>;
 };
 
+export type Workout = {
+  __typename?: 'Workout';
+  createdAt: Scalars['String'];
+  creator: User;
+  creatorId: Scalars['Float'];
+  id: Scalars['Float'];
+  name: Scalars['String'];
+  pub: Scalars['Boolean'];
+  updatedAt: Scalars['String'];
+  workoutExercise: WorkoutExercise;
+};
+
+export type WorkoutExercise = {
+  __typename?: 'WorkoutExercise';
+  exercise: Exercise;
+  id: Scalars['Float'];
+  index: Scalars['Float'];
+  supersetWithPrevious: Scalars['Boolean'];
+  workout: Workout;
+};
+
+export type WorkoutOptions = {
+  name: Scalars['String'];
+  pub: Scalars['Boolean'];
+};
+
 export type PostSnippetFragment = { __typename?: 'Post', id: number, createdAt: string, updatedAt: string, title: string, textSnippet: string, creator: { __typename?: 'User', id: number, username: string } };
 
 export type ProfileUserFragment = { __typename?: 'User', id: number, username: string, email: string, bio?: string | null | undefined, displayName?: string | null | undefined };
 
 export type RegularErrorFragment = { __typename?: 'FieldError', field: string, message: string };
+
+export type RegularPostFragment = { __typename?: 'Post', id: number, createdAt: string, updatedAt: string, title: string, text: string, creator: { __typename?: 'User', id: number, username: string, displayName?: string | null | undefined } };
 
 export type RegularUserFragment = { __typename?: 'User', id: number, username: string };
 
@@ -333,12 +444,12 @@ export type PostQueryVariables = Exact<{
 }>;
 
 
-export type PostQuery = { __typename?: 'Query', post?: { __typename?: 'Post', id: number, createdAt: string, updatedAt: string, title: string, text: string, creator: { __typename?: 'User', id: number, username: string } } | null | undefined };
+export type PostQuery = { __typename?: 'Query', post?: { __typename?: 'Post', id: number, createdAt: string, updatedAt: string, title: string, text: string, creator: { __typename?: 'User', id: number, username: string, displayName?: string | null | undefined } } | null | undefined };
 
 export type PostsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type PostsQuery = { __typename?: 'Query', posts: Array<{ __typename?: 'Post', id: number, createdAt: string, updatedAt: string, title: string, textSnippet: string, creator: { __typename?: 'User', id: number, username: string } }> };
+export type PostsQuery = { __typename?: 'Query', posts: Array<{ __typename?: 'Post', id: number, createdAt: string, updatedAt: string, title: string, text: string, creator: { __typename?: 'User', id: number, username: string, displayName?: string | null | undefined } }> };
 
 export const PostSnippetFragmentDoc = gql`
     fragment PostSnippet on Post {
@@ -360,6 +471,20 @@ export const ProfileUserFragmentDoc = gql`
   email
   bio
   displayName
+}
+    `;
+export const RegularPostFragmentDoc = gql`
+    fragment RegularPost on Post {
+  id
+  createdAt
+  updatedAt
+  title
+  text
+  creator {
+    id
+    username
+    displayName
+  }
 }
     `;
 export const RegularErrorFragmentDoc = gql`
@@ -937,18 +1062,10 @@ export type MeProfileQueryResult = Apollo.QueryResult<MeProfileQuery, MeProfileQ
 export const PostDocument = gql`
     query Post($id: Int!) {
   post(id: $id) {
-    id
-    createdAt
-    updatedAt
-    title
-    text
-    creator {
-      id
-      username
-    }
+    ...RegularPost
   }
 }
-    `;
+    ${RegularPostFragmentDoc}`;
 
 /**
  * __usePostQuery__
@@ -980,10 +1097,10 @@ export type PostQueryResult = Apollo.QueryResult<PostQuery, PostQueryVariables>;
 export const PostsDocument = gql`
     query Posts {
   posts {
-    ...PostSnippet
+    ...RegularPost
   }
 }
-    ${PostSnippetFragmentDoc}`;
+    ${RegularPostFragmentDoc}`;
 
 /**
  * __usePostsQuery__

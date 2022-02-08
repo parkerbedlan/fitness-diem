@@ -43,7 +43,7 @@ export class PostResolver {
 
   @Query(() => [Post])
   async posts(): Promise<Post[]> {
-    return Post.find({});
+    return Post.find({ relations: ["creator"] });
   }
 
   @Query(() => Post, { nullable: true })

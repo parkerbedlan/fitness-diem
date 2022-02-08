@@ -1,5 +1,5 @@
 query Posts {
   posts {
-    ...PostSnippet
+    ...RegularPost
   }
 }
