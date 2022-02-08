@@ -3,19 +3,28 @@ import {
   BaseEntity,
   Column,
   Entity,
+  Index,
   ManyToOne,
+  PrimaryGeneratedColumn,
 } from "typeorm";
 import { Workout } from "./Workout";
 import { Exercise } from "./Exercise";
 
 @ObjectType()
 @Entity()
+@Index((workoutExercise: WorkoutExercise) => [workoutExercise.workout, workoutExercise.exercise], { unique: true })
 export class WorkoutExercise extends BaseEntity {
-  @ManyToOne(() => Workout, (workout) => workout.workoutExercises)
-  workouts: Workout;
+  @Field()
+  @PrimaryGeneratedColumn()
+  id!: number;
+
+  @Field(() => Workout)
+  @ManyToOne(() => Workout, (workout) => workout.workoutExercise)
+  workout: Workout;
   
-  @ManyToOne(() => Exercise, (exercise) => exercise.workoutExercises)
-  exercises: Exercise;
+  @Field(() => Exercise)
+  @ManyToOne(() => Exercise, (exercise) => exercise.workoutExercise)
+  exercise: Exercise;
 
   @Field()
   @Column()

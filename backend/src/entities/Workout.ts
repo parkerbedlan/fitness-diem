@@ -32,11 +32,12 @@ export class Workout extends BaseEntity {
   creatorId: number;
 
   @Field(() => User)
-  @ManyToOne(() => User, (user) => user.workouts)
+  @ManyToOne(() => User, (user) => user.workout)
   creator: User;
 
-  @OneToMany(() => WorkoutExercise, (workoutExercise) => workoutExercise.workouts)
-  workoutExercises: WorkoutExercise[];
+  @Field(() => WorkoutExercise)
+  @OneToMany(() => WorkoutExercise, (workoutExercise) => workoutExercise.workout)
+  workoutExercise: WorkoutExercise[];
 
   @Field(() => String)
   @CreateDateColumn()
