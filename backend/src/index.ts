@@ -27,7 +27,7 @@ const main = async () => {
   });
 
   const myServer = new FitnessAppServer(
-    "LAN",
+    "localhost",
     corsOptions,
     [
       HelloResolver,
