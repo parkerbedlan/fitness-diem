@@ -36,8 +36,8 @@ export class Workout extends BaseEntity {
   creator: User;
 
   @Field(() => WorkoutExercise)
-  @OneToMany(() => WorkoutExercise, (workoutExercise) => workoutExercise.workouts)
-  workoutExercises: WorkoutExercise[];
+  @OneToMany(() => WorkoutExercise, (workoutExercise) => workoutExercise.workout)
+  workoutExercise: WorkoutExercise[];
 
   @Field(() => String)
   @CreateDateColumn()
