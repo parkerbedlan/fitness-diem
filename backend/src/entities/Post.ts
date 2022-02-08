@@ -26,6 +26,10 @@ export class Post extends BaseEntity {
   text!: string;
 
   @Field()
+  @Column("boolean", { default: false })
+  hasImage: boolean = false;
+
+  @Field()
   @Column()
   creatorId: number;
 

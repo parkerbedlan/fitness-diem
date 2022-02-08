@@ -68,6 +68,9 @@ export class FitnessAppServer {
     );
 
     console.log(await Post.find({ relations: ["creator"] }));
+    // await Post.update(2, { hasImage: true });
+    // const post1 = await Post.find({ where: { id: 1 } });
+    // console.log(post1);
 
     // const asdf = new MessageResolver();
     // asdf.sendMessage(13, "hey what's up", {
@@ -232,6 +235,18 @@ export class FitnessAppServer {
       const filePath = path.join(
         __dirname,
         `images/profilepic/${req.params.username}.png`
+      );
+      const fileExists = fs.existsSync(filePath);
+      if (fileExists) {
+        res.send(fs.readFileSync(filePath));
+      } else {
+        res.send("ERROR: no profile pic for that user");
+      }
+    });
+    this.app.get("/postpic/:postId.png", (req, res) => {
+      const filePath = path.join(
+        __dirname,
+        `images/postpic/${req.params.postId}.png`
       );
       const fileExists = fs.existsSync(filePath);
       if (fileExists) {

@@ -225,6 +225,7 @@ export type Post = {
   createdAt: Scalars['String'];
   creator: User;
   creatorId: Scalars['Float'];
+  hasImage: Scalars['Boolean'];
   id: Scalars['Float'];
   text: Scalars['String'];
   textSnippet: Scalars['String'];
@@ -329,7 +330,7 @@ export type ProfileUserFragment = { __typename?: 'User', id: number, username: s
 
 export type RegularErrorFragment = { __typename?: 'FieldError', field: string, message: string };
 
-export type RegularPostFragment = { __typename?: 'Post', id: number, createdAt: string, updatedAt: string, title: string, text: string, creator: { __typename?: 'User', id: number, username: string, displayName?: string | null | undefined } };
+export type RegularPostFragment = { __typename?: 'Post', id: number, createdAt: string, updatedAt: string, title: string, text: string, hasImage: boolean, creator: { __typename?: 'User', id: number, username: string, displayName?: string | null | undefined } };
 
 export type RegularUserFragment = { __typename?: 'User', id: number, username: string };
 
@@ -444,12 +445,12 @@ export type PostQueryVariables = Exact<{
 }>;
 
 
-export type PostQuery = { __typename?: 'Query', post?: { __typename?: 'Post', id: number, createdAt: string, updatedAt: string, title: string, text: string, creator: { __typename?: 'User', id: number, username: string, displayName?: string | null | undefined } } | null | undefined };
+export type PostQuery = { __typename?: 'Query', post?: { __typename?: 'Post', id: number, createdAt: string, updatedAt: string, title: string, text: string, hasImage: boolean, creator: { __typename?: 'User', id: number, username: string, displayName?: string | null | undefined } } | null | undefined };
 
 export type PostsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type PostsQuery = { __typename?: 'Query', posts: Array<{ __typename?: 'Post', id: number, createdAt: string, updatedAt: string, title: string, text: string, creator: { __typename?: 'User', id: number, username: string, displayName?: string | null | undefined } }> };
+export type PostsQuery = { __typename?: 'Query', posts: Array<{ __typename?: 'Post', id: number, createdAt: string, updatedAt: string, title: string, text: string, hasImage: boolean, creator: { __typename?: 'User', id: number, username: string, displayName?: string | null | undefined } }> };
 
 export const PostSnippetFragmentDoc = gql`
     fragment PostSnippet on Post {
@@ -480,6 +481,7 @@ export const RegularPostFragmentDoc = gql`
   updatedAt
   title
   text
+  hasImage
   creator {
     id
     username

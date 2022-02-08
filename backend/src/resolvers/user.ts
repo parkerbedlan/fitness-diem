@@ -134,6 +134,7 @@ export class UserResolver {
   }
 
   @Mutation(() => Boolean)
+  @UseMiddleware(isAuth)
   async follow(@Arg("userId") userId: number, @Ctx() { req }: MyContext) {
     const myUser = User.findOne(req.session.userId);
     const theirUser = User.findOne(userId);

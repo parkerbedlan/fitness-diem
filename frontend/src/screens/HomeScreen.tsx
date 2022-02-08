@@ -16,6 +16,8 @@ import {
   useApproveNotificationsMutation,
   usePostsQuery,
 } from "../generated/graphql";
+import { getPostPicUri } from "../utils/getPostPicUri";
+import { useCacheyImage } from "../utils/hooks/cacheyImage/useCacheyImage";
 import { useIsAuth } from "../utils/hooks/useIsAuth";
 import { useRootScreen } from "../utils/hooks/useRootScreen";
 import { registerForPushNotificationsAsync } from "../utils/registerForPushNotificationsAsync";
@@ -86,30 +88,46 @@ function HomeScreen() {
 }
 
 const PostPreview = ({ post }: { post: PostsQuery["posts"][number] }) => {
+  const profilePicUri = getPostPicUri(post.id);
+  const [PostPic] = useCacheyImage(profilePicUri);
+
   return (
     <View style={tw`flex flex-row justify-start w-full bg-gray-200 mb-1`}>
       <TouchableOpacity style={tw`rounded-full w-10 mt-2`}>
         <Icon style={tw`rounded-full w-10`} name="account-circle" />
       </TouchableOpacity>
+
       <View style={tw`flex-auto flex w-full`}>
         <View style={tw`absolute w-full `}>
           <TouchableOpacity style={tw` w-full`}>
-            <View style={tw`flex flex-row  top-1 w-full `}>
-              <Text style={tw`font-bold text-xl `}>
-                {post.creator.username}
-              </Text>
+            <View style={tw`flex flex-row top-1 w-full `}>
+              <View style={tw`flex flex-row items-center`}>
+                {post.creator.displayName && (
+                  <Text style={tw`font-bold text-xl`}>
+                    {post.creator.displayName}
+                  </Text>
+                )}
+                <Text style={tw`ml-2 text-lg font-semibold opacity-60`}>
+                  @{post.creator.username}
+                </Text>
+              </View>
             </View>
           </TouchableOpacity>
         </View>
         <View style={tw`flex flex-row top-10 w-11/12 mr-3 mb-11`}>
           <Text>{post.text}</Text>
         </View>
-
         <View style={tw` flex flex-row mb-1`}>
           <Icon name="favorite" onPress={() => console.log("liked")} />
           <Text>1</Text>
         </View>
       </View>
+      {post.hasImage && (
+        <PostPic
+          style={tw`rounded-md w-20 h-20 mr-4`}
+          PlaceholderContent={<Icon name="image" size={60} />}
+        />
+      )}
     </View>
   );
 };
