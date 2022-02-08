@@ -35,6 +35,7 @@ export class Workout extends BaseEntity {
   @ManyToOne(() => User, (user) => user.workouts)
   creator: User;
 
+  @Field(() => WorkoutExercise)
   @OneToMany(() => WorkoutExercise, (workoutExercise) => workoutExercise.workouts)
   workoutExercises: WorkoutExercise[];
 

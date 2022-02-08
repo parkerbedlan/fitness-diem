@@ -11,9 +11,11 @@ import { Exercise } from "./Exercise";
 @ObjectType()
 @Entity()
 export class WorkoutExercise extends BaseEntity {
+  @Field(() => Workout)
   @ManyToOne(() => Workout, (workout) => workout.workoutExercises)
   workouts: Workout;
   
+  @Field(() => Exercise)
   @ManyToOne(() => Exercise, (exercise) => exercise.workoutExercises)
   exercises: Exercise;
 
