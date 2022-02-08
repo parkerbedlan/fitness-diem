@@ -32,7 +32,7 @@ export class Workout extends BaseEntity {
   creatorId: number;
 
   @Field(() => User)
-  @ManyToOne(() => User, (user) => user.workouts)
+  @ManyToOne(() => User, (user) => user.workout)
   creator: User;
 
   @Field(() => WorkoutExercise)

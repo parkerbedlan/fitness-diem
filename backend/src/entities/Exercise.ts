@@ -28,7 +28,7 @@ export class Exercise extends BaseEntity {
   creatorId: number;
 
   @Field(() => User)
-  @ManyToOne(() => User, (user) => user.exercises)
+  @ManyToOne(() => User, (user) => user.exercise)
   creator: User;
 
   @Field(() => WorkoutExercise)
