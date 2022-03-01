@@ -6,10 +6,12 @@ import {
   Entity,
   OneToMany,
   ManyToOne,
+  ManyToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import { User } from "./User";
+import { MuscleGroup } from "./MuscleGroup";
 import { WorkoutExercise } from "./WorkoutExercise";
 
 @ObjectType()
@@ -34,6 +36,9 @@ export class Exercise extends BaseEntity {
   @Field(() => WorkoutExercise)
   @OneToMany(() => WorkoutExercise, (workoutExercise) => workoutExercise.exercise)
   workoutExercise: WorkoutExercise[];
+
+  @ManyToMany(() => MuscleGroup, (muscleGroup) => muscleGroup.exercises)
+  muscleGroups: MuscleGroup[];
 
   @Field(() => String)
   @CreateDateColumn()

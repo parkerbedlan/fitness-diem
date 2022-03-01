@@ -38,7 +38,7 @@ import {
     }
   
     @Query(() => Exercise, { nullable: true })
-    workout(@Arg("id", () => Int) id: number): Promise<Exercise | undefined> {
+    exercise(@Arg("id", () => Int) id: number): Promise<Exercise | undefined> {
       return Exercise.findOne(id);
     }
   
