@@ -67,7 +67,7 @@ export const RootNavigator: React.FC<RootNavigatorProps> = ({ Drawer }) => {
           name={WorkoutsScreenName}
           component={WorkoutsScreen}
           options={{
-            drawerIcon: nameToNavIcon("account-circle"),
+            drawerIcon: nameToNavIcon("fitness-center"),
           }}
         />
         <Drawer.Screen

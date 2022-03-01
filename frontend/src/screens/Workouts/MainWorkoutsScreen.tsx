@@ -1,15 +1,7 @@
 import React, { useState } from "react";
-import { Button, Icon, Text } from "react-native-elements";
-import {
-  FlatList,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-} from "react-native";
+import { View } from "react-native";
+import { Button, Icon } from "react-native-elements";
 import { List } from "react-native-paper";
-
 //import NewWorkoutOverlay from "../components/NewWorkoutOverlay";
 import tw from "tailwind-react-native-classnames";
 import { useWorkoutsStackScreen } from "../WorkoutsScreen";
