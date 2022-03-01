@@ -16,6 +16,7 @@ import LoginScreen, { LoginScreenName } from "../screens/LoginScreen";
 import { MessagesScreenName, MessagesScreen } from "../screens/MessagesScreen";
 import { ProfileScreen, ProfileScreenName } from "../screens/ProfileScreen";
 import SignupScreen, { SignupScreenName } from "../screens/SignupScreen";
+import { WorkoutsScreenName, WorkoutsScreen } from "../screens/WorkoutsScreen";
 import { updateLogout } from "../utils/GraphQLUtils";
 import { nameToNavIcon } from "../utils/nameToNavIcon";
 import {
@@ -60,6 +61,13 @@ export const RootNavigator: React.FC<RootNavigatorProps> = ({ Drawer }) => {
           component={ProfileScreen}
           options={{
             drawerIcon: nameToNavIcon("account-circle"),
+          }}
+        />
+        <Drawer.Screen
+          name={WorkoutsScreenName}
+          component={WorkoutsScreen}
+          options={{
+            drawerIcon: nameToNavIcon("fitness-center"),
           }}
         />
         <Drawer.Screen
