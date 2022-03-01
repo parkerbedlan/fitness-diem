@@ -136,30 +136,24 @@ export class UserResolver {
   @Mutation(() => Boolean)
   @UseMiddleware(isAuth)
   async follow(@Arg("userId") userId: number, @Ctx() { req }: MyContext) {
-    const myUser = User.findOne(req.session.userId);
-    const theirUser = User.findOne(userId);
-
     // https://github.com/typeorm/typeorm/blob/master/docs/relational-query-builder.md
     await getConnection()
       .createQueryBuilder()
       .relation(User, "following")
-      .of(myUser)
-      .add(theirUser);
+      .of(req.session.userId)
+      .add(userId);
 
     return true;
   }
 
   @Mutation(() => Boolean)
   async unfollow(@Arg("userId") userId: number, @Ctx() { req }: MyContext) {
-    const myUser = User.findOne(req.session.userId);
-    const theirUser = User.findOne(userId);
-
     // https://github.com/typeorm/typeorm/blob/master/docs/relational-query-builder.md
     await getConnection()
       .createQueryBuilder()
       .relation(User, "following")
-      .of(myUser)
-      .remove(theirUser);
+      .of(req.session.userId)
+      .remove(userId);
 
     return true;
   }
