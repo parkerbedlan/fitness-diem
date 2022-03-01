@@ -26,6 +26,9 @@ import {
   SignupScreenName,
   SignupScreenParams,
 } from "../../screens/SignupScreen";
+import {
+  WorkoutsScreenName, WorkoutsScreenParams
+} from "../../screens/WorkoutsScreen";
 
 export type RootScreenList = {
   [HomeScreenName]: HomeScreenParams;
@@ -33,6 +36,7 @@ export type RootScreenList = {
   [LoginScreenName]: LoginScreenParams;
   [ProfileScreenName]: ProfileScreenParams;
   [MessagesScreenName]: MessagesScreenParams;
+  [WorkoutsScreenName]: WorkoutsScreenParams;
 };
 
 export type RootNavigation = NativeStackNavigationProp<
