@@ -19,11 +19,11 @@ export class WorkoutExercise extends BaseEntity {
   id!: number;
 
   @Field(() => Workout)
-  @ManyToOne(() => Workout, (workout) => workout.workoutExercise)
+  @ManyToOne(() => Workout, (workout) => workout.workoutExercises)
   workout: Workout;
   
   @Field(() => Exercise)
-  @ManyToOne(() => Exercise, (exercise) => exercise.workoutExercise)
+  @ManyToOne(() => Exercise, (exercise) => exercise.workoutExercises)
   exercise: Exercise;
 
   @Field()

@@ -51,12 +51,12 @@ export class User extends BaseEntity {
   conversations: Conversation[];
 
   @Field(() => Workout)
-  @OneToMany(() => Workout, (workout) => workout.creator)
-  workout: Workout[];
+  @OneToMany(() => Workout, (workouts) => workouts.creator)
+  workouts: Workout[];
 
   @Field(() => Exercise)
-  @OneToMany(() => Exercise, (exercise) => exercise.creator)
-  exercise: Exercise[];
+  @OneToMany(() => Exercise, (exercises) => exercises.creator)
+  exercises: Exercise[];
 
   @Field(() => String)
   @CreateDateColumn()

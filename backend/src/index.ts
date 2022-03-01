@@ -10,6 +10,9 @@ import { Workout } from "./entities/Workout";
 import { Exercise } from "./entities/Exercise";
 import { WorkoutExercise } from "./entities/WorkoutExercise";
 import { MuscleGroup } from "./entities/MuscleGroup";
+import { Gym } from "./entities/Gym";
+import { Machine } from "./entities/Machine";
+import { WeightChart } from "./entities/WeightChart";
 import { FitnessAppServer } from "./FitnessAppServer";
 import { ConversationResolver } from "./resolvers/conversation";
 import { HelloResolver } from "./resolvers/hello";
@@ -20,6 +23,9 @@ import { WorkoutResolver } from "./resolvers/workout";
 import { ExerciseResolver } from "./resolvers/exercise";
 import { WorkoutExerciseResolver } from "./resolvers/workoutExercise";
 import { MuscleGroupResolver } from "./resolvers/muscleGroup";
+import { GymResolver } from "./resolvers/gym";
+import { MachineResolver } from "./resolvers/machine";
+import { WeightChartResolver } from "./resolvers/weightChart";
 
 const main = async () => {
   const fileDirectories = ["./images", "./images/profilepic"];
@@ -41,6 +47,9 @@ const main = async () => {
       ExerciseResolver,
       WorkoutExerciseResolver,
       MuscleGroupResolver,
+      GymResolver,
+      MachineResolver,
+      WeightChartResolver,
     ],
     [
       User,
@@ -51,6 +60,9 @@ const main = async () => {
       Exercise,
       WorkoutExercise,
       MuscleGroup,
+      Gym,
+      Machine,
+      WeightChart,
     ]
   );
   await myServer.setup();
