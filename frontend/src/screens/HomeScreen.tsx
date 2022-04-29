@@ -10,7 +10,6 @@ import {
 import { Button, Icon, Text } from "react-native-elements";
 import tw from "tailwind-react-native-classnames";
 import CenteredContainer from "../components/CenteredContainer";
-import LineBreak from "../components/LineBreak";
 import UncenteredContainer from "../components/UncenteredContainer";
 import {
   PostsQuery,

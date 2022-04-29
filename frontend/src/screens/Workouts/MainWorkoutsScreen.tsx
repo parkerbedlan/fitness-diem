@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { View } from "react-native";
-import { Button, Icon } from "react-native-elements";
+import { ScrollView, View } from "react-native";
+import { Button, Icon, Input, Text } from "react-native-elements";
 import { List } from "react-native-paper";
 //import NewWorkoutOverlay from "../components/NewWorkoutOverlay";
 import tw from "tailwind-react-native-classnames";
+import { useRootScreen } from "../../utils/hooks/useRootScreen";
+import { HomeScreenName } from "../HomeScreen";
 import { useWorkoutsStackScreen } from "../WorkoutsScreen";
 
 export const MainWorkoutsScreenName = "MainWorkouts";
@@ -11,141 +13,71 @@ export const MainWorkoutsScreenName = "MainWorkouts";
 export type MainWorkoutsScreenParams = undefined;
 
 export const MainWorkoutsScreen = () => {
-  //const { navigation, route } = useRootScreen(WorkoutsScreenName);
+  const { navigation } = useRootScreen();
 
-  const [workoutList, setWorkoutList] = useState([
-    {
-      id: 1,
-      name: "Chest and Triceps",
-      exercises: [
-        {
-          id: 1,
-          name: "Bench Press",
-          sets: 3,
-          repsPerSet: 10,
-        },
-        {
-          id: 2,
-          name: "Tricep Pulldowns",
-          sets: 3,
-          repsPerSet: 10,
-        },
-      ],
-    },
-    {
-      id: 2,
-      name: "Back and Biceps",
-      exercises: [
-        {
-          id: 1,
-          name: "Lat Pulldowns",
-          sets: 3,
-          repsPerSet: 10,
-        },
-        {
-          id: 2,
-          name: "Bicep Curls",
-          sets: 3,
-          repsPerSet: 10,
-        },
-      ],
-    },
-    {
-      id: 3,
-      name: "Leg Day",
-      exercises: [
-        {
-          id: 1,
-          name: "Squat",
-          sets: 3,
-          repsPerSet: 10,
-        },
-        {
-          id: 2,
-          name: "Leg Press",
-          sets: 3,
-          repsPerSet: 10,
-        },
-      ],
-    },
-  ]);
+  const handleSubmit = () => {
+    navigation.navigate(HomeScreenName);
+  };
 
-  function addToWorkoutList(newWorkout: any) {
-    var newWorkoutList = workoutList;
-    newWorkoutList.push(newWorkout);
-    setWorkoutList(newWorkoutList);
-    console.log(workoutList);
-  }
-
-  function renderItem(item: { name: any; exercises: any; id: any }) {
-    return (
-      <View key={item.id}>
-        <List.Accordion
-          title={item.name}
-          style={{ backgroundColor: "#f0defc" }}
-          titleStyle={{ fontSize: 25 }}
-        >
-          {item.exercises.map((exercise: any) => (
-            <View key={exercise.id}>
-              <View>
-                <List.Item
-                  title={
-                    exercise.name +
-                    ": " +
-                    exercise.sets +
-                    " sets of " +
-                    exercise.repsPerSet +
-                    " reps"
-                  }
-                ></List.Item>
-              </View>
-              <View
-                style={{
-                  borderBottomColor: "#cb81fc",
-                  borderBottomWidth: 1,
-                }}
-              />
-            </View>
-          ))}
-        </List.Accordion>
-        <View
-          style={{
-            borderBottomColor: "#cb81fc",
-            borderBottomWidth: 3,
-          }}
-        />
-      </View>
-    );
-  }
+  const [amount, setAmount] = useState(1);
 
   return (
     <View style={tw`h-full`}>
-      {/* <ScrollView>
-                
-                <FlatList
-                    extraData={visible}
-                    data={workoutList}
-                    renderItem={({item}) => renderItem(item)}
-                />
-                </ScrollView> */}
-
-      {workoutList.map((workout) => renderItem(workout))}
-
-      <NewPostButton />
+      <ScrollView>
+        {[...Array(amount)].map((_, i) => (
+          <ExerciseBlock key={i} onDelete={() => setAmount(amount - 1)} />
+        ))}
+        <View style={tw`flex flex-row justify-end m-2 mb-28`}>
+          <Button
+            icon={<Icon name="add" color="white" size={20} />}
+            buttonStyle={tw`rounded-lg w-12 h-12 bg-purple-600`}
+            // containerStyle={tw`flex flex-end`}
+            onPress={() => setAmount(amount + 1)}
+          />
+        </View>
+      </ScrollView>
+      <NewPostButton onClick={handleSubmit} />
     </View>
   );
 };
 
-const NewPostButton = () => {
+const ExerciseBlock = ({ onDelete }: { onDelete: any }) => {
+  return (
+    <>
+      {/* <Text style={tw`text-lg`}>Reps</Text> */}
+      <View style={tw`m-2 p-2 border`}>
+        <View style={tw`flex flex-row justify-between pr-2`}>
+          <View style={tw`w-11/12`}>
+            <Input
+              label={"Exercise"}
+              placeholder={"Exercise name"}
+              // style={tw`w-10`}
+            />
+          </View>
+          <Button
+            icon={<Icon name="remove" color="white" size={20} />}
+            buttonStyle={tw`rounded-lg w-10 h-10 bg-purple-300`}
+            // containerStyle={tw`flex flex-end`}
+            onPress={onDelete}
+          />
+        </View>
+        <Input label="Reps" placeholder={"Number of reps"} />
+        <Input label="Weight (optional)" placeholder={"Weight (lbs)"} />
+      </View>
+    </>
+  );
+};
+
+const NewPostButton = ({ onClick }: { onClick: any }) => {
   const {
     navigation: { navigate },
   } = useWorkoutsStackScreen();
   return (
     <Button
-      icon={<Icon name="add-comment" color="white" size={40} />}
+      icon={<Icon name="check" color="white" size={40} />}
       buttonStyle={tw`rounded-full w-20 h-20 bg-purple-600`}
       containerStyle={tw`absolute bottom-4 right-4`}
-      onPress={() => navigate("NewWorkout")}
+      onPress={onClick}
     />
   );
 };
