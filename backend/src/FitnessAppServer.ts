@@ -64,7 +64,7 @@ export class FitnessAppServer {
         select: ["id", "username", "pushToken"],
       })
     );
-
+    //
     // await Conversation.delete(6);
     // console.log(
     //   await Conversation.find({
@@ -74,9 +74,9 @@ export class FitnessAppServer {
     // );
 
     // await Post.create({
-    //   creatorId: 17,
-    //   title: "Just benched 220 today 🔥🔥🔥",
-    //   text: "Shoutout to @Jane1919 for spotting me!!!",
+    //   creatorId: 14,
+    //   title: "Leg day",
+    //   text: "Hard leg day with @Joe, but I feel like I seized my fitness today.",
     // }).save();
 
     // await getConnection()
@@ -88,7 +88,8 @@ export class FitnessAppServer {
     //   .execute();
 
     console.log(await Post.find({ relations: ["creator"] }));
-    // await Post.update(2, { hasImage: true });
+
+    // await Post.update(7, { hasImage: true });
     // const post1 = await Post.find({ where: { id: 1 } });
     // console.log(post1);
 

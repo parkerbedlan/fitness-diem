@@ -23,6 +23,7 @@ import { useIsAuth } from "../utils/hooks/useIsAuth";
 import { useRootScreen } from "../utils/hooks/useRootScreen";
 import { registerForPushNotificationsAsync } from "../utils/registerForPushNotificationsAsync";
 import { useMessagesStackScreen } from "./MessagesScreen";
+import { WorkoutsScreenName } from "./WorkoutsScreen";
 
 export const HomeScreenName = "Home";
 
@@ -98,49 +99,53 @@ const PostPreview = ({ post }: { post: PostsQuery["posts"][number] }) => {
   const postPicUri = getPostPicUri(post.id);
   const [PostPic] = useCacheyImage(postPicUri);
 
-  return (
-    <View style={tw`flex flex-row justify-start w-full bg-gray-200 mb-1`}>
-      <TouchableOpacity
-        style={tw`rounded-full w-20 h-20 mr-4`}
-        onPress={() => {
-          // console.log("pls");
-        }}
-      >
-        <UserPic
-          style={tw`rounded-full w-20 h-20 mr-4`}
-          PlaceholderContent={<Icon name="account-circle" size={60} />}
-        />
-      </TouchableOpacity>
+  const { navigation } = useRootScreen();
 
-      <View style={tw`w-full`}>
-        <View style={tw`flex flex-row items-center`}>
-          {post.creator.displayName && (
-            <Text style={tw`font-bold text-xl`}>
-              {post.creator.displayName}
-            </Text>
-          )}
-          <Text style={tw`ml-2 text-lg font-semibold opacity-60`}>
-            @{post.creator.username}
-          </Text>
-        </View>
-        <View style={tw`flex flex-row w-11/12 mr-3`}>
-          <View style={tw`flex flex-col w-60`}>
-            <Text style={tw`font-semibold text-xl`}>{post.title}</Text>
-            <Text>{post.text}</Text>
-          </View>
-        </View>
-        <View style={tw` flex flex-row mb-1`}>
-          <Icon name="favorite" onPress={() => console.log("liked")} />
-          <Text>1</Text>
-        </View>
-        {post.hasImage && (
-          <PostPic
-            style={tw`rounded-md w-40 h-40 mr-4`}
-            PlaceholderContent={<Icon name="image" size={60} />}
+  return (
+    <TouchableOpacity onPress={() => navigation.navigate(WorkoutsScreenName)}>
+      <View style={tw`flex flex-row justify-start w-full bg-gray-200 mb-1`}>
+        <TouchableOpacity
+          style={tw`rounded-full w-20 h-20 mr-4`}
+          onPress={() => {
+            // console.log("pls");
+          }}
+        >
+          <UserPic
+            style={tw`rounded-full w-20 h-20 mr-4`}
+            PlaceholderContent={<Icon name="account-circle" size={60} />}
           />
-        )}
+        </TouchableOpacity>
+
+        <View style={tw`w-full`}>
+          <View style={tw`flex flex-row items-center`}>
+            {post.creator.displayName && (
+              <Text style={tw`font-bold text-xl`}>
+                {post.creator.displayName}
+              </Text>
+            )}
+            <Text style={tw`ml-2 text-lg font-semibold opacity-60`}>
+              @{post.creator.username}
+            </Text>
+          </View>
+          <View style={tw`flex flex-row w-11/12 mr-3`}>
+            <View style={tw`flex flex-col w-60`}>
+              <Text style={tw`font-semibold text-xl`}>{post.title}</Text>
+              <Text>{post.text}</Text>
+            </View>
+          </View>
+          <View style={tw` flex flex-row mb-1`}>
+            <Icon name="favorite" onPress={() => console.log("liked")} />
+            <Text>1</Text>
+          </View>
+          {post.hasImage && (
+            <PostPic
+              style={tw`rounded-md w-40 h-40 mr-4`}
+              PlaceholderContent={<Icon name="image" size={60} />}
+            />
+          )}
+        </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

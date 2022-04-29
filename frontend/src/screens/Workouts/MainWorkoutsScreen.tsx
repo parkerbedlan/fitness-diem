@@ -44,7 +44,6 @@ export const MainWorkoutsScreen = () => {
 const ExerciseBlock = ({ onDelete }: { onDelete: any }) => {
   return (
     <>
-      {/* <Text style={tw`text-lg`}>Reps</Text> */}
       <View style={tw`m-2 p-2 border`}>
         <View style={tw`flex flex-row justify-between pr-2`}>
           <View style={tw`w-11/12`}>
@@ -61,7 +60,14 @@ const ExerciseBlock = ({ onDelete }: { onDelete: any }) => {
             onPress={onDelete}
           />
         </View>
-        <Input label="Reps" placeholder={"Number of reps"} />
+        <View style={tw`flex flex-row`}>
+          <View style={tw`w-1/2`}>
+            <Input label="Sets" placeholder={"Number of sets"} />
+          </View>
+          <View style={tw`w-1/2`}>
+            <Input label="Reps / Duration" placeholder={"Number of reps"} />
+          </View>
+        </View>
         <Input label="Weight (optional)" placeholder={"Weight (lbs)"} />
       </View>
     </>
