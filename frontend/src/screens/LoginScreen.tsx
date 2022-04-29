@@ -11,7 +11,7 @@ import LineBreak from "../components/LineBreak";
 import {
   MeDocument,
   MeQuery,
-  useHelloQuery,
+  // useHelloQuery,
   useLoginMutation,
   useMeQuery,
 } from "../generated/graphql";
@@ -28,7 +28,7 @@ export type LoginScreenParams = undefined;
 const LoginScreen = () => {
   const { navigation } = useRootScreen();
   useAuthSkip(navigation, useIsFocused());
-  const { data, loading } = useHelloQuery();
+  // const { data, loading } = useHelloQuery();
   const [login] = useLoginMutation();
   const { data: meData } = useMeQuery();
 

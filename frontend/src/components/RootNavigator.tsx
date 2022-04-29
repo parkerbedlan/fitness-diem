@@ -52,7 +52,7 @@ export const RootNavigator: React.FC<RootNavigatorProps> = ({ Drawer }) => {
           name={HomeScreenName}
           component={HomeScreen}
           options={{
-            title: "Welcome",
+            title: "Feed",
             drawerIcon: nameToNavIcon("home"),
           }}
         />

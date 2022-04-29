@@ -11,7 +11,12 @@ import Redis from "ioredis";
 import path from "path";
 import "reflect-metadata";
 import { buildSchema, NonEmptyArray } from "type-graphql";
-import { Connection, createConnection, EntitySchema } from "typeorm";
+import {
+  Connection,
+  createConnection,
+  EntitySchema,
+  getConnection,
+} from "typeorm";
 import { COOKIE_NAME, corsOptions, __prod__ } from "./constants";
 import { Conversation } from "./entities/Conversation";
 import { Post } from "./entities/Post";
@@ -59,13 +64,28 @@ export class FitnessAppServer {
         select: ["id", "username", "pushToken"],
       })
     );
+
     // await Conversation.delete(6);
-    console.log(
-      await Conversation.find({
-        select: ["id"],
-        loadRelationIds: true,
-      })
-    );
+    // console.log(
+    //   await Conversation.find({
+    //     select: ["id"],
+    //     loadRelationIds: true,
+    //   })
+    // );
+
+    // await Post.create({
+    //   creatorId: 17,
+    //   title: "Just benched 220 today 🔥🔥🔥",
+    //   text: "Shoutout to @Jane1919 for spotting me!!!",
+    // }).save();
+
+    // await getConnection()
+    //   .createQueryBuilder()
+    //   .update(Post)
+    //   .set({ hasImage: true })
+    //   .where({ id: 6 })
+    //   .returning("*")
+    //   .execute();
 
     console.log(await Post.find({ relations: ["creator"] }));
     // await Post.update(2, { hasImage: true });

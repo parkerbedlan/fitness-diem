@@ -10,6 +10,7 @@ import {
 import { Button, Icon, Text } from "react-native-elements";
 import tw from "tailwind-react-native-classnames";
 import CenteredContainer from "../components/CenteredContainer";
+import LineBreak from "../components/LineBreak";
 import UncenteredContainer from "../components/UncenteredContainer";
 import {
   PostsQuery,
@@ -17,6 +18,7 @@ import {
   usePostsQuery,
 } from "../generated/graphql";
 import { getPostPicUri } from "../utils/getPostPicUri";
+import { getProfilePicUri } from "../utils/getProfilePicUri";
 import { useCacheyImage } from "../utils/hooks/cacheyImage/useCacheyImage";
 import { useIsAuth } from "../utils/hooks/useIsAuth";
 import { useRootScreen } from "../utils/hooks/useRootScreen";
@@ -75,9 +77,12 @@ function HomeScreen() {
             <Text>No posts to see yet!</Text>
           ) : (
             <ScrollView>
-              {postsData.posts?.map((post) => (
-                <PostPreview key={post.id} post={post} />
-              ))}
+              {postsData.posts
+                ?.slice(0)
+                .reverse()
+                .map((post) => (
+                  <PostPreview key={post.id} post={post} />
+                ))}
             </ScrollView>
           )}
           <NewMessageButton />
@@ -88,46 +93,54 @@ function HomeScreen() {
 }
 
 const PostPreview = ({ post }: { post: PostsQuery["posts"][number] }) => {
-  const profilePicUri = getPostPicUri(post.id);
-  const [PostPic] = useCacheyImage(profilePicUri);
+  const profilePicUri = getProfilePicUri(post.creator.id);
+  const [UserPic] = useCacheyImage(profilePicUri);
+
+  const postPicUri = getPostPicUri(post.id);
+  const [PostPic] = useCacheyImage(postPicUri);
 
   return (
     <View style={tw`flex flex-row justify-start w-full bg-gray-200 mb-1`}>
-      <TouchableOpacity style={tw`rounded-full w-10 mt-2`}>
-        <Icon style={tw`rounded-full w-10`} name="account-circle" />
+      <TouchableOpacity
+        style={tw`rounded-full w-20 h-20 mr-4`}
+        onPress={() => {
+          // console.log("pls");
+        }}
+      >
+        <UserPic
+          style={tw`rounded-full w-20 h-20 mr-4`}
+          PlaceholderContent={<Icon name="account-circle" size={60} />}
+        />
       </TouchableOpacity>
 
-      <View style={tw`flex-auto flex w-full`}>
-        <View style={tw`absolute w-full `}>
-          <TouchableOpacity style={tw` w-full`}>
-            <View style={tw`flex flex-row top-1 w-full `}>
-              <View style={tw`flex flex-row items-center`}>
-                {post.creator.displayName && (
-                  <Text style={tw`font-bold text-xl`}>
-                    {post.creator.displayName}
-                  </Text>
-                )}
-                <Text style={tw`ml-2 text-lg font-semibold opacity-60`}>
-                  @{post.creator.username}
-                </Text>
-              </View>
-            </View>
-          </TouchableOpacity>
+      <View style={tw`w-full`}>
+        <View style={tw`flex flex-row items-center`}>
+          {post.creator.displayName && (
+            <Text style={tw`font-bold text-xl`}>
+              {post.creator.displayName}
+            </Text>
+          )}
+          <Text style={tw`ml-2 text-lg font-semibold opacity-60`}>
+            @{post.creator.username}
+          </Text>
         </View>
-        <View style={tw`flex flex-row top-10 w-11/12 mr-3 mb-11`}>
-          <Text>{post.text}</Text>
+        <View style={tw`flex flex-row w-11/12 mr-3`}>
+          <View style={tw`flex flex-col w-60`}>
+            <Text style={tw`font-semibold text-xl`}>{post.title}</Text>
+            <Text>{post.text}</Text>
+          </View>
         </View>
         <View style={tw` flex flex-row mb-1`}>
           <Icon name="favorite" onPress={() => console.log("liked")} />
           <Text>1</Text>
         </View>
+        {post.hasImage && (
+          <PostPic
+            style={tw`rounded-md w-40 h-40 mr-4`}
+            PlaceholderContent={<Icon name="image" size={60} />}
+          />
+        )}
       </View>
-      {post.hasImage && (
-        <PostPic
-          style={tw`rounded-md w-20 h-20 mr-4`}
-          PlaceholderContent={<Icon name="image" size={60} />}
-        />
-      )}
     </View>
   );
 };
