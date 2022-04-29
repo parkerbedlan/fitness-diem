@@ -39,13 +39,13 @@ const LoginScreen = () => {
   return (
     <CenteredContainer>
       <Text style={tw`text-3xl`}>Welcome to Fitness Dium!</Text>
-      <Text style={tw`text-3xl text-red-500`}>
+      {/* <Text style={tw`text-3xl text-red-500`}>
         {loading
           ? "Loading..."
           : data
           ? data.hello
           : "couldn't connect to server"}
-      </Text>
+      </Text> */}
       <Text>{meData?.me?.username}</Text>
       <LineBreak />
       <Formik
